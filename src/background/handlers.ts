@@ -23,7 +23,7 @@ import {
   importAllData,
 } from '../shared/storage/storage'
 import { rebuildRules } from './dnr-manager'
-import { recordBlock, getStats, clearStats } from '../shared/domain/stats'
+import { recordVisitAttempt, recordBlock, getStats, clearStats } from '../shared/domain/stats'
 import {
   startFocusSession,
   stopFocusSession,
@@ -104,6 +104,9 @@ export async function handleMessage(message: Message): Promise<unknown> {
       // ========================================
       // Statistics
       // ========================================
+      case MessageType.RECORD_VISIT_ATTEMPT:
+        return await handleRecordVisitAttempt(message.host)
+
       case MessageType.RECORD_BLOCK:
         return await handleRecordBlock(message.host)
 
@@ -280,6 +283,11 @@ async function handleGetTempWhitelist(): Promise<
 > {
   const whitelist = await getTempWhitelist()
   return { whitelist }
+}
+
+async function handleRecordVisitAttempt(host: string): Promise<MessageResponse<MessageType.RECORD_VISIT_ATTEMPT>> {
+  await recordVisitAttempt(host)
+  return createSuccessResponse()
 }
 
 async function handleRecordBlock(host: string): Promise<MessageResponse<MessageType.RECORD_BLOCK>> {

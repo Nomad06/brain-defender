@@ -5,8 +5,10 @@
 
 import browser from 'webextension-polyfill'
 import { getCurrentSession, stopFocusSession, SessionState } from '../shared/domain/focus-sessions'
-import { cleanupExpiredWhitelist } from '../shared/storage/storage'
+import { cleanupExpiredWhitelist, getSites } from '../shared/storage/storage'
 import { rebuildRules } from './dnr-manager'
+import { normalizeHost } from '../shared/utils/domain'
+import { addTimeSpent } from '../shared/domain/stats'
 
 /**
  * Alarm names
@@ -15,6 +17,7 @@ export const ALARM_NAMES = {
   FOCUS_SESSION_END: 'focusSessionEnd',
   SCHEDULE_CHECK: 'scheduleCheck',
   WHITELIST_CLEANUP: 'whitelistCleanup',
+  TIME_TRACKING: 'timeTracking',
 } as const
 
 /**
@@ -37,6 +40,10 @@ async function handleAlarm(alarm: browser.Alarms.Alarm): Promise<void> {
 
       case ALARM_NAMES.WHITELIST_CLEANUP:
         await handleWhitelistCleanup()
+        break
+
+      case ALARM_NAMES.TIME_TRACKING:
+        await handleTimeTracking()
         break
 
       default:
@@ -101,6 +108,53 @@ async function handleWhitelistCleanup(): Promise<void> {
 }
 
 /**
+ * Handle time tracking
+ * Tracks time spent on blocked sites for TIME_LIMIT conditional rules
+ */
+async function handleTimeTracking(): Promise<void> {
+  try {
+    // Get active tab
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+    if (!tabs || tabs.length === 0) return
+
+    const tab = tabs[0]
+    if (!tab.url) return
+
+    // Skip chrome:// and extension pages
+    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
+      return
+    }
+
+    const hostname = normalizeHost(tab.url)
+    if (!hostname) return
+
+    // Check if this is a blocked site with TIME_LIMIT rule
+    const sites = await getSites()
+    const site = sites.find(s => s.host === hostname)
+
+    if (!site || !site.conditionalRules || site.conditionalRules.length === 0) {
+      return // Not a site with conditional rules
+    }
+
+    // Check if site has TIME_LIMIT rule
+    const hasTimeLimit = site.conditionalRules.some(
+      rule => rule.type === 'timeLimit' && rule.enabled
+    )
+
+    if (!hasTimeLimit) return
+
+    // Add 1 minute to time spent
+    await addTimeSpent(hostname, 1)
+    console.log('[Alarms] Added 1 minute to', hostname)
+
+    // Rebuild rules to check if time limit exceeded
+    await rebuildRules()
+  } catch (err) {
+    console.error('[Alarms] Error tracking time:', err)
+  }
+}
+
+/**
  * Schedule focus session end alarm
  *
  * @param endTime - Timestamp when session should end
@@ -145,6 +199,11 @@ export async function setupPeriodicAlarms(): Promise<void> {
     // Cleanup whitelist every 15 minutes
     await browser.alarms.create(ALARM_NAMES.WHITELIST_CLEANUP, {
       periodInMinutes: 15,
+    })
+
+    // Track time spent every 1 minute (for TIME_LIMIT conditional rules)
+    await browser.alarms.create(ALARM_NAMES.TIME_TRACKING, {
+      periodInMinutes: 1,
     })
 
     console.log('[Alarms] Periodic alarms set up')

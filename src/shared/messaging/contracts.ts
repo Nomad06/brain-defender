@@ -33,6 +33,7 @@ export enum MessageType {
   GET_TEMP_WHITELIST = 'GET_TEMP_WHITELIST',
 
   // Statistics
+  RECORD_VISIT_ATTEMPT = 'RECORD_VISIT_ATTEMPT',
   RECORD_BLOCK = 'RECORD_BLOCK',
   GET_STATS = 'GET_STATS',
   CLEAR_STATS = 'CLEAR_STATS',
@@ -134,6 +135,14 @@ export interface RemoveTempWhitelistMessage extends BaseMessage {
 }
 
 /**
+ * Record visit attempt message
+ */
+export interface RecordVisitAttemptMessage extends BaseMessage {
+  type: MessageType.RECORD_VISIT_ATTEMPT
+  host: string
+}
+
+/**
  * Record block message
  */
 export interface RecordBlockMessage extends BaseMessage {
@@ -168,6 +177,7 @@ export type Message =
   | StartFocusSessionMessage
   | AddTempWhitelistMessage
   | RemoveTempWhitelistMessage
+  | RecordVisitAttemptMessage
   | RecordBlockMessage
   | CheckAchievementsMessage
   | ImportDataMessage
@@ -189,6 +199,7 @@ export interface MessageResponses {
   [MessageType.ADD_TEMP_WHITELIST]: { success: boolean }
   [MessageType.REMOVE_TEMP_WHITELIST]: { success: boolean }
   [MessageType.GET_TEMP_WHITELIST]: { whitelist: Array<{ host: string; until: number }> }
+  [MessageType.RECORD_VISIT_ATTEMPT]: { success: boolean }
   [MessageType.RECORD_BLOCK]: { success: boolean }
   [MessageType.GET_STATS]: { stats: Stats | null }
   [MessageType.CLEAR_STATS]: { success: boolean }

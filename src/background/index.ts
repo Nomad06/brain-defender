@@ -12,6 +12,8 @@ import { initFocusSessions, getCurrentSession, SessionState } from '../shared/do
 import { getSites, getTempWhitelist } from '../shared/storage/storage'
 import { normalizeHost } from '../shared/utils/domain'
 import { isScheduleActive } from '../shared/domain/schedule'
+import { shouldBlockByConditionalRules } from '../shared/domain/conditional-rules'
+import { getSiteStats, recordVisitAttempt } from '../shared/domain/stats'
 
 /**
  * Extension installation/update handler
@@ -140,14 +142,14 @@ async function handleTabUpdate(
       return
     }
 
+    // Normalize URL to hostname
+    const hostname = normalizeHost(tab.url)
+    if (!hostname) return
+
     // Get blocked sites
     const sites = await getSites()
     const tempWhitelist = await getTempWhitelist()
     const tempWhitelistedHosts = new Set(tempWhitelist.map(e => e.host))
-
-    // Normalize URL to hostname
-    const hostname = normalizeHost(tab.url)
-    if (!hostname) return
 
     // Check if this site should be blocked
     for (const site of sites) {
@@ -163,9 +165,21 @@ async function handleTabUpdate(
         continue
       }
 
+      // For sites with conditional rules, check if we should block
+      if (site.conditionalRules && site.conditionalRules.length > 0) {
+        // Record visit attempt
+        await recordVisitAttempt(hostname)
+
+        // Check if should block
+        const siteStats = await getSiteStats(hostname)
+        if (!shouldBlockByConditionalRules(site, siteStats)) {
+          console.log('[Background] Conditional rule: allow visit (limit not reached)', hostname)
+          return // Don't block - allow the visit
+        }
+        console.log('[Background] Conditional rule: block (limit reached)', hostname)
+      }
+
       // Site should be blocked - redirect the tab
-      // For sites with conditional rules, we always show the block page
-      // but the page will check if user can continue
       const blockedUrl = browser.runtime.getURL(
         `src/pages/blocked/index.html?url=${encodeURIComponent(tab.url)}`
       )
@@ -262,9 +276,21 @@ async function handleHistoryStateUpdate(
         continue
       }
 
+      // For sites with conditional rules, check if we should block
+      if (site.conditionalRules && site.conditionalRules.length > 0) {
+        // Record visit attempt
+        await recordVisitAttempt(hostname)
+
+        // Check if should block
+        const siteStats = await getSiteStats(hostname)
+        if (!shouldBlockByConditionalRules(site, siteStats)) {
+          console.log('[Background] Conditional rule: allow visit (limit not reached)', hostname)
+          return // Don't block - allow the visit
+        }
+        console.log('[Background] Conditional rule: block (limit reached)', hostname)
+      }
+
       // Site should be blocked - redirect the tab
-      // For sites with conditional rules, we always show the block page
-      // but the page will check if user can continue
       const blockedUrl = browser.runtime.getURL(
         `src/pages/blocked/index.html?url=${encodeURIComponent(details.url)}`
       )

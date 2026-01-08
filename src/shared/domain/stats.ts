@@ -9,6 +9,7 @@ import { STORAGE_KEYS } from '../constants'
 
 // Zod schemas for runtime validation
 export const SiteStatsSchema = z.object({
+  visited: z.number().min(0),
   blocks: z.number().min(0),
   firstBlocked: z.number(),
   lastBlocked: z.number(),
@@ -104,6 +105,7 @@ export async function recordBlock(host: string): Promise<Stats | null> {
     if (!stats.bySite[host]) {
       stats.bySite[host] = {
         blocks: 0,
+        visited: 0,
         firstBlocked: now,
         lastBlocked: now,
         visitsToday: 0,
@@ -191,6 +193,91 @@ export async function recordBlock(host: string): Promise<Stats | null> {
     return stats
   } catch (err) {
     console.error('[Stats] Error recording block:', err)
+    return null
+  }
+}
+
+/**
+ * Record a visit attempt (not necessarily blocked)
+ * Used for conditional rules to count attempts before blocking
+ *
+ * @param host - Normalized hostname
+ * @returns Updated stats or null on error
+ */
+export async function recordVisitAttempt(host: string): Promise<Stats | null> {
+  try {
+    const now = Date.now()
+    const today = new Date().toISOString().split('T')[0]
+
+    const data = await browser.storage.local.get(STORAGE_KEYS.BLOCK_STATS)
+    let stats: Stats = data[STORAGE_KEYS.BLOCK_STATS] as Stats
+    if (!stats) {
+      await initStats()
+      const freshData = await browser.storage.local.get(STORAGE_KEYS.BLOCK_STATS)
+      stats = freshData[STORAGE_KEYS.BLOCK_STATS] as Stats
+    }
+
+    // Initialize site stats if needed
+    if (!stats.bySite[host]) {
+      stats.bySite[host] = {
+        visited: 0,
+        blocks: 0,
+        firstBlocked: now,
+        lastBlocked: now,
+        visitsToday: 0,
+        timeSpentToday: 0,
+        lastVisitTime: null,
+        visitsByDate: {},
+      }
+      stats.totalSites = Object.keys(stats.bySite).length
+    }
+
+    // Increment visit counter (not blocks)
+    stats.bySite[host].visited += 1
+
+    // Update visitsByDate for daily tracking
+    const siteStats = stats.bySite[host]
+    if (!siteStats.visitsByDate || typeof siteStats.visitsByDate !== 'object') {
+      siteStats.visitsByDate = {}
+    }
+    if (!siteStats.visitsByDate[today]) {
+      siteStats.visitsByDate[today] = 0
+    }
+    siteStats.visitsByDate[today] += 1
+    siteStats.visitsToday = siteStats.visitsByDate[today]
+    siteStats.lastVisitTime = now
+
+    await browser.storage.local.set({ [STORAGE_KEYS.BLOCK_STATS]: stats })
+    return stats
+  } catch (err) {
+    console.error('[Stats] Error recording visit attempt:', err)
+    return null
+  }
+}
+
+/**
+ * Add time spent on a site today
+ *
+ * @param host - Normalized hostname
+ * @param minutes - Minutes to add
+ * @returns Updated stats or null on error
+ */
+export async function addTimeSpent(host: string, minutes: number): Promise<Stats | null> {
+  try {
+    const data = await browser.storage.local.get(STORAGE_KEYS.BLOCK_STATS)
+    let stats: Stats = data[STORAGE_KEYS.BLOCK_STATS] as Stats
+
+    if (!stats || !stats.bySite[host]) {
+      return null // Site not tracked
+    }
+
+    // Add time to today's total
+    stats.bySite[host].timeSpentToday += minutes
+
+    await browser.storage.local.set({ [STORAGE_KEYS.BLOCK_STATS]: stats })
+    return stats
+  } catch (err) {
+    console.error('[Stats] Error adding time spent:', err)
     return null
   }
 }

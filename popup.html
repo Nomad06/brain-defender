@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <title data-i18n="popup.title">Brain Defender</title>
+  <style>
+    body { width: 330px; }
+    .mini { font-size: 12px; color: var(--muted); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" style="padding:14px;">
+      <div class="h1" data-i18n="popup.title">Brain Defender</div>
+      <div class="mini"><span data-i18n="popup.blockList">Блок-лист:</span> <span class="kbd" id="count">0</span></div>
+      
+      <div class="space"></div>
+
+      <div class="col">
+        <button class="btn primary" id="addCurrent" data-i18n="popup.addCurrent">➕ Добавить текущий сайт</button>
+        <button class="btn" id="openOptions" data-i18n="popup.openOptions">⚙️ Открыть список / настройки</button>
+      </div>
+
+      <div class="space"></div>
+      <div class="muted" data-i18n="popup.hint" data-i18n-params='{"example": "news.example.com"}'>Подсказка: блокируется домен и все поддомены (например, <span class="kbd">news.example.com</span> тоже).</div>
+      
+      <!-- Фокус-сессия -->
+      <div id="focusSessionCard" class="card" style="padding: 12px; background: var(--card2); margin-top: 12px; display: none;">
+        <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="h2" style="font-size: 14px;">🍅 Фокус-сессия</div>
+          <div id="focusSessionTime" class="kbd" style="font-size: 16px;">00:00</div>
+        </div>
+        <div class="row" style="gap: 4px;">
+          <button class="btn" id="pauseFocusSession" style="flex: 1; font-size: 11px; padding: 6px;">Пауза</button>
+          <button class="btn" id="stopFocusSession" style="flex: 1; font-size: 11px; padding: 6px;">Стоп</button>
+        </div>
+      </div>
+      
+      <div id="focusSessionStartCard" class="card" style="padding: 12px; background: var(--card2); margin-top: 12px;">
+        <div class="h2" style="font-size: 14px; margin-bottom: 8px;">🍅 Начать фокус-сессию</div>
+        <button class="btn primary" id="startFocusSession" style="width: 100%; font-size: 12px;">25 минут</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для выбора сайтов Pomodoro -->
+  <div id="pomodoroSitesModalBack" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease-in-out;">
+    <div id="pomodoroSitesModal" class="card" style="max-width: 500px; max-height: 80vh; overflow-y: auto; margin: 20px; padding: 20px; background: var(--bg); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3); transform: scale(0.95); transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out; opacity: 0;">
+      <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div class="h2">Выберите сайты для блокировки</div>
+        <button id="closePomodoroSitesModal" class="btn" style="padding: 4px 8px; font-size: 18px; min-width: auto;">✕</button>
+      </div>
+      
+      <div class="muted" style="margin-bottom: 16px; font-size: 12px;">
+        Выберите дополнительные сайты для блокировки во время Pomodoro-сессии. 
+        Сайты из основного списка блокируются автоматически.
+      </div>
+
+      <!-- Индикатор загрузки -->
+      <div id="pomodoroSitesLoading" style="text-align: center; padding: 20px; display: none;">
+        <div class="muted">Загрузка...</div>
+      </div>
+
+      <div id="pomodoroSitesContent" style="display: none;">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px;">Сайты из основного списка:</label>
+          <div id="pomodoroSitesList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: var(--card2);">
+            <!-- Список сайтов с чекбоксами будет добавлен динамически -->
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px;">Добавить дополнительные сайты:</label>
+          <div class="row" style="gap: 8px;">
+            <input type="text" id="pomodoroAdditionalSite" class="input" placeholder="example.com" style="flex: 1; font-size: 12px;">
+            <button class="btn" id="addPomodoroSite" style="font-size: 12px; padding: 6px 12px;">Добавить</button>
+          </div>
+          <div id="pomodoroAdditionalSitesList" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px;">
+            <!-- Дополнительные сайты будут добавлены динамически -->
+          </div>
+        </div>
+
+        <div class="row" style="gap: 8px; margin-top: 16px;">
+          <button class="btn" id="cancelPomodoroSites" style="flex: 1; font-size: 12px;">Отмена</button>
+          <button class="btn primary" id="confirmPomodoroSites" style="flex: 1; font-size: 12px;">Начать сессию</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="consts.js"></script>
+  <script src="utils.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <script src="focus_sessions.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

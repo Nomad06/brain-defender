@@ -1,0 +1,9 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import DiagnosticsPage from './DiagnosticsPage'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <DiagnosticsPage />
+  </React.StrictMode>
+)

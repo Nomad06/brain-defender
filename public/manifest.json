@@ -1,0 +1,33 @@
+{
+    "name": "Brain Defender",
+    "description": "Защищает ваш фокус и внимание, блокируя отвлекающие сайты с мотивационными напоминаниями.",
+    "version": "2.0.0",
+    "manifest_version": 3,
+    "action": {
+      "default_title": "Brain Defender",
+      "default_popup": "src/popup/index.html"
+    },
+    "options_page": "src/options/index.html",
+    "background": {
+      "service_worker": "src/background/index.ts",
+      "type": "module"
+    },
+    "permissions": [
+      "storage",
+      "tabs",
+      "declarativeNetRequest",
+      "notifications",
+      "webNavigation",
+      "alarms"
+    ],
+    "host_permissions": [
+      "http://*/*",
+      "https://*/*"
+    ],
+    "icons": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }

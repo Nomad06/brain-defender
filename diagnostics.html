@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Диагностика блокировки</title>
+  <style>
+    .status { padding: 8px 12px; border-radius: 8px; margin: 8px 0; }
+    .status.success { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.5); }
+    .status.error { background: rgba(244, 67, 54, 0.2); border: 1px solid rgba(244, 67, 54, 0.5); }
+    .status.warning { background: rgba(255, 152, 0, 0.2); border: 1px solid rgba(255, 152, 0, 0.5); }
+    .rule-item { padding: 12px; margin: 8px 0; background: var(--card2); border-radius: 8px; border: 1px solid var(--border); }
+    .test-url { margin: 4px 0; padding: 4px 8px; background: var(--card); border-radius: 4px; font-family: var(--mono); font-size: 12px; }
+    .match { color: #4caf50; }
+    .no-match { color: #f44336; }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width: 920px; margin: 0 auto; padding: 16px;">
+    <div class="card" style="padding: 16px;">
+      <div class="h1">Диагностика блокировки</div>
+      <div class="space"></div>
+      
+      <div id="status"></div>
+      
+      <div class="space"></div>
+      
+      <div class="card" style="padding: 16px; background: var(--card2);">
+        <div class="h2">Тестирование URL</div>
+        <div class="row" style="gap: 8px; margin-top: 12px;">
+          <input class="input" id="testUrl" placeholder="https://youtube.com" style="flex: 1;" />
+          <button class="btn primary" id="testBtn">Проверить</button>
+        </div>
+        <div id="testResult" style="margin-top: 12px;"></div>
+      </div>
+      
+      <div class="space"></div>
+      
+      <div class="h2">Активные правила</div>
+      <div id="rulesList"></div>
+      
+      <div class="space"></div>
+      
+      <div class="h2">Заблокированные сайты</div>
+      <div id="sitesList"></div>
+      
+      <div class="space"></div>
+      
+      <div class="h2">Последняя ошибка</div>
+      <div id="lastError"></div>
+      
+      <div class="space"></div>
+      
+      <button class="btn" id="refreshBtn">Обновить</button>
+      <button class="btn" id="rebuildBtn" style="margin-left: 8px;">Перестроить правила</button>
+    </div>
+  </div>
+
+  <script src="consts.js"></script>
+  <script src="utils.js"></script>
+  <script src="diagnostics.js"></script>
+</body>
+</html>
+

@@ -6,7 +6,13 @@
 import browser from 'webextension-polyfill'
 import { STORAGE_KEYS, CURRENT_MIGRATION_VERSION } from '../constants'
 import { normalizeSites } from './schemas'
-import type { Site } from './schemas'
+import type { SiteObject } from './schemas'
+
+/**
+ * Legacy site format (string or object)
+ * Used only for migrations from old data
+ */
+type LegacySite = string | SiteObject
 
 // Migration lock settings
 const MIGRATION_LOCK_KEY = 'migrationLock'
@@ -152,7 +158,7 @@ async function migrateV1toV2(): Promise<void> {
   console.log('[Migration] Running v1 → v2 migration')
 
   const data = await browser.storage.sync.get(STORAGE_KEYS.BLOCKED_SITES)
-  const sites = data[STORAGE_KEYS.BLOCKED_SITES] as Site[]
+  const sites = data[STORAGE_KEYS.BLOCKED_SITES] as LegacySite[]
 
   if (!Array.isArray(sites) || sites.length === 0) {
     return
@@ -186,14 +192,21 @@ async function migrateV2toV3(): Promise<void> {
   console.log('[Migration] Running v2 → v3 migration')
 
   const data = await browser.storage.sync.get(STORAGE_KEYS.BLOCKED_SITES)
-  const sites = data[STORAGE_KEYS.BLOCKED_SITES] as Site[]
+  const sites = data[STORAGE_KEYS.BLOCKED_SITES] as LegacySite[]
 
   if (!Array.isArray(sites) || sites.length === 0) {
     return
   }
 
+  // Convert any legacy strings to objects first
+  const sitesAsObjects: SiteObject[] = sites.map(site =>
+    typeof site === 'string'
+      ? { host: site, addedAt: Date.now(), category: null, schedule: null, conditionalRules: [] }
+      : site
+  )
+
   // Normalize with Zod schemas
-  const normalizedSites = normalizeSites(sites)
+  const normalizedSites = normalizeSites(sitesAsObjects)
 
   await browser.storage.sync.set({
     [STORAGE_KEYS.BLOCKED_SITES]: normalizedSites,
@@ -250,7 +263,7 @@ export async function runMigrations(): Promise<MigrationResult> {
 
     // Get final site count
     const data = await browser.storage.sync.get(STORAGE_KEYS.BLOCKED_SITES)
-    const sites = data[STORAGE_KEYS.BLOCKED_SITES] as Site[]
+    const sites = data[STORAGE_KEYS.BLOCKED_SITES] as SiteObject[]
     const sitesCount = Array.isArray(sites) ? sites.length : 0
 
     console.log('[Migration] Successfully migrated to version', CURRENT_MIGRATION_VERSION)

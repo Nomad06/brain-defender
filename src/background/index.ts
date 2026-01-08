@@ -151,7 +151,25 @@ async function handleTabUpdate(
     const tempWhitelist = await getTempWhitelist()
     const tempWhitelistedHosts = new Set(tempWhitelist.map(e => e.host))
 
+    // Get focus session sites
+    const focusSession = await getCurrentSession()
+    const focusSessionSites =
+      focusSession && focusSession.state === SessionState.WORKING
+        ? new Set(focusSession.sitesToBlock)
+        : new Set<string>()
+
     // Check if this site should be blocked
+    // First check focus session sites (they have priority)
+    if (focusSessionSites.has(hostname) && !tempWhitelistedHosts.has(hostname)) {
+      const blockedUrl = browser.runtime.getURL(
+        `src/pages/blocked/index.html?url=${encodeURIComponent(tab.url)}`
+      )
+      await browser.tabs.update(tabId, { url: blockedUrl })
+      console.log('[Background] Redirected tab (focus session):', hostname)
+      return
+    }
+
+    // Then check regular blocked sites
     for (const site of sites) {
       if (site.host !== hostname) continue
 
@@ -258,7 +276,25 @@ async function handleHistoryStateUpdate(
 
     if (!hostname) return
 
+    // Get focus session sites
+    const focusSession = await getCurrentSession()
+    const focusSessionSites =
+      focusSession && focusSession.state === SessionState.WORKING
+        ? new Set(focusSession.sitesToBlock)
+        : new Set<string>()
+
     // Check if this site should be blocked
+    // First check focus session sites (they have priority)
+    if (focusSessionSites.has(hostname) && !tempWhitelistedHosts.has(hostname)) {
+      const blockedUrl = browser.runtime.getURL(
+        `src/pages/blocked/index.html?url=${encodeURIComponent(details.url)}`
+      )
+      console.log('[Background] ⛔ Blocking SPA navigation (focus session):', hostname, 'redirecting to:', blockedUrl)
+      await browser.tabs.update(details.tabId, { url: blockedUrl })
+      return
+    }
+
+    // Then check regular blocked sites
     for (const site of sites) {
       if (site.host !== hostname) continue
 

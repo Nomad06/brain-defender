@@ -6,6 +6,7 @@
 import { z } from 'zod'
 import browser from 'webextension-polyfill'
 import { STORAGE_KEYS, FOCUS_SESSION_DEFAULTS } from '../constants'
+import { t } from '../i18n'
 
 // Session states enum
 export enum SessionState {
@@ -175,8 +176,8 @@ export async function startFocusSession(
       await browser.notifications.create(`focusSession_${startTime}`, {
         type: 'basic',
         iconUrl: browser.runtime.getURL('icons/icon128.png'),
-        title: '🍅 Фокус-сессия началась!',
-        message: `Работайте ${duration} минут без отвлечений`,
+        title: `🍅 ${t('focusSession.title')}`,
+        message: t('notifications.focusSessionStarted', { duration: String(duration) }),
       })
     } catch (notifErr) {
       console.debug('[FocusSessions] Failed to show notification:', notifErr)

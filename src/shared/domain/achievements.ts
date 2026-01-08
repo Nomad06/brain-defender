@@ -7,6 +7,7 @@ import { z } from 'zod'
 import browser from 'webextension-polyfill'
 import { STORAGE_KEYS } from '../constants'
 import type { Stats } from './stats'
+import { t } from '../i18n'
 
 // Achievement types enum
 export enum AchievementType {
@@ -31,88 +32,151 @@ export interface AchievementDefinition {
   check: (stats: Stats, sites?: unknown[], siteHost?: string) => boolean
 }
 
-// Achievement definitions with check functions
-export const ACHIEVEMENT_DEFINITIONS: Record<AchievementType, AchievementDefinition> = {
-  [AchievementType.STREAK_7]: {
-    id: AchievementType.STREAK_7,
-    name: 'Неделя силы',
-    description: '7 дней подряд без блокировок',
-    icon: '🔥',
-    check: (stats: Stats) => (stats.streakDays || 0) >= 7,
-  },
-  [AchievementType.STREAK_30]: {
-    id: AchievementType.STREAK_30,
-    name: 'Месяц дисциплины',
-    description: '30 дней подряд без блокировок',
-    icon: '💪',
-    check: (stats: Stats) => (stats.streakDays || 0) >= 30,
-  },
-  [AchievementType.STREAK_100]: {
-    id: AchievementType.STREAK_100,
-    name: 'Мастер фокуса',
-    description: '100 дней подряд без блокировок',
-    icon: '👑',
-    check: (stats: Stats) => (stats.streakDays || 0) >= 100,
-  },
-  [AchievementType.TOTAL_BLOCKS_100]: {
-    id: AchievementType.TOTAL_BLOCKS_100,
-    name: 'Первые 100',
-    description: '100 блокировок всего',
-    icon: '🎯',
-    check: (stats: Stats) => (stats.totalBlocks || 0) >= 100,
-  },
-  [AchievementType.TOTAL_BLOCKS_500]: {
-    id: AchievementType.TOTAL_BLOCKS_500,
-    name: 'Половина тысячи',
-    description: '500 блокировок всего',
-    icon: '🏆',
-    check: (stats: Stats) => (stats.totalBlocks || 0) >= 500,
-  },
-  [AchievementType.TOTAL_BLOCKS_1000]: {
-    id: AchievementType.TOTAL_BLOCKS_1000,
-    name: 'Тысяча побед',
-    description: '1000 блокировок всего',
-    icon: '🌟',
-    check: (stats: Stats) => (stats.totalBlocks || 0) >= 1000,
-  },
-  [AchievementType.SITES_BLOCKED_10]: {
-    id: AchievementType.SITES_BLOCKED_10,
-    name: 'Десяточка',
-    description: '10 заблокированных сайтов',
-    icon: '📋',
-    check: (_stats: Stats, sites?: unknown[]) => (sites?.length || 0) >= 10,
-  },
-  [AchievementType.SITES_BLOCKED_50]: {
-    id: AchievementType.SITES_BLOCKED_50,
-    name: 'Полсотни',
-    description: '50 заблокированных сайтов',
-    icon: '📚',
-    check: (_stats: Stats, sites?: unknown[]) => (sites?.length || 0) >= 50,
-  },
-  [AchievementType.SITES_BLOCKED_100]: {
-    id: AchievementType.SITES_BLOCKED_100,
-    name: 'Сотня защит',
-    description: '100 заблокированных сайтов',
-    icon: '🛡️',
-    check: (_stats: Stats, sites?: unknown[]) => (sites?.length || 0) >= 100,
-  },
-  [AchievementType.WEEK_NO_BLOCK]: {
-    id: AchievementType.WEEK_NO_BLOCK,
-    name: 'Неделя без отвлечений',
-    description: 'Неделя без блокировок определенного сайта',
-    icon: '✨',
-    check: (stats: Stats, _sites?: unknown[], siteHost?: string) => {
-      if (!siteHost || !stats.bySite || !stats.bySite[siteHost]) {
-        return false
-      }
-      const siteStats = stats.bySite[siteHost]
-      const lastBlocked = new Date(siteStats.lastBlocked)
-      const now = new Date()
-      const daysDiff = Math.floor((now.getTime() - lastBlocked.getTime()) / (1000 * 60 * 60 * 24))
-      return daysDiff >= 7
+/**
+ * Get localized achievement definition
+ * @param type - Achievement type
+ * @returns Localized achievement definition
+ */
+export function getLocalizedAchievement(type: AchievementType): AchievementDefinition {
+  const definitions: Record<AchievementType, Omit<AchievementDefinition, 'check'>> = {
+    [AchievementType.STREAK_7]: {
+      id: AchievementType.STREAK_7,
+      name: t('achievements.streak7Name'),
+      description: t('achievements.streak7Desc'),
+      icon: '🔥',
     },
+    [AchievementType.STREAK_30]: {
+      id: AchievementType.STREAK_30,
+      name: t('achievements.streak30Name'),
+      description: t('achievements.streak30Desc'),
+      icon: '💪',
+    },
+    [AchievementType.STREAK_100]: {
+      id: AchievementType.STREAK_100,
+      name: t('achievements.streak100Name'),
+      description: t('achievements.streak100Desc'),
+      icon: '👑',
+    },
+    [AchievementType.TOTAL_BLOCKS_100]: {
+      id: AchievementType.TOTAL_BLOCKS_100,
+      name: t('achievements.totalBlocks100Name'),
+      description: t('achievements.totalBlocks100Desc'),
+      icon: '🎯',
+    },
+    [AchievementType.TOTAL_BLOCKS_500]: {
+      id: AchievementType.TOTAL_BLOCKS_500,
+      name: t('achievements.totalBlocks500Name'),
+      description: t('achievements.totalBlocks500Desc'),
+      icon: '🏆',
+    },
+    [AchievementType.TOTAL_BLOCKS_1000]: {
+      id: AchievementType.TOTAL_BLOCKS_1000,
+      name: t('achievements.totalBlocks1000Name'),
+      description: t('achievements.totalBlocks1000Desc'),
+      icon: '🌟',
+    },
+    [AchievementType.SITES_BLOCKED_10]: {
+      id: AchievementType.SITES_BLOCKED_10,
+      name: t('achievements.sitesBlocked10Name'),
+      description: t('achievements.sitesBlocked10Desc'),
+      icon: '📋',
+    },
+    [AchievementType.SITES_BLOCKED_50]: {
+      id: AchievementType.SITES_BLOCKED_50,
+      name: t('achievements.sitesBlocked50Name'),
+      description: t('achievements.sitesBlocked50Desc'),
+      icon: '📚',
+    },
+    [AchievementType.SITES_BLOCKED_100]: {
+      id: AchievementType.SITES_BLOCKED_100,
+      name: t('achievements.sitesBlocked100Name'),
+      description: t('achievements.sitesBlocked100Desc'),
+      icon: '🛡️',
+    },
+    [AchievementType.WEEK_NO_BLOCK]: {
+      id: AchievementType.WEEK_NO_BLOCK,
+      name: t('achievements.weekNoBlockName'),
+      description: t('achievements.weekNoBlockDesc'),
+      icon: '✨',
+    },
+  }
+
+  return {
+    ...definitions[type],
+    check: ACHIEVEMENT_CHECKS[type],
+  }
+}
+
+// Achievement check functions (separate from definitions for reusability)
+const ACHIEVEMENT_CHECKS: Record<
+  AchievementType,
+  (stats: Stats, sites?: unknown[], siteHost?: string) => boolean
+> = {
+  [AchievementType.STREAK_7]: (stats: Stats) => (stats.streakDays || 0) >= 7,
+  [AchievementType.STREAK_30]: (stats: Stats) => (stats.streakDays || 0) >= 30,
+  [AchievementType.STREAK_100]: (stats: Stats) => (stats.streakDays || 0) >= 100,
+  [AchievementType.TOTAL_BLOCKS_100]: (stats: Stats) => (stats.totalBlocks || 0) >= 100,
+  [AchievementType.TOTAL_BLOCKS_500]: (stats: Stats) => (stats.totalBlocks || 0) >= 500,
+  [AchievementType.TOTAL_BLOCKS_1000]: (stats: Stats) => (stats.totalBlocks || 0) >= 1000,
+  [AchievementType.SITES_BLOCKED_10]: (_stats: Stats, sites?: unknown[]) =>
+    (sites?.length || 0) >= 10,
+  [AchievementType.SITES_BLOCKED_50]: (_stats: Stats, sites?: unknown[]) =>
+    (sites?.length || 0) >= 50,
+  [AchievementType.SITES_BLOCKED_100]: (_stats: Stats, sites?: unknown[]) =>
+    (sites?.length || 0) >= 100,
+  [AchievementType.WEEK_NO_BLOCK]: (stats: Stats, _sites?: unknown[], siteHost?: string) => {
+    if (!siteHost || !stats.bySite || !stats.bySite[siteHost]) {
+      return false
+    }
+    const siteStats = stats.bySite[siteHost]
+    const lastBlocked = new Date(siteStats.lastBlocked)
+    const now = new Date()
+    const daysDiff = Math.floor((now.getTime() - lastBlocked.getTime()) / (1000 * 60 * 60 * 24))
+    return daysDiff >= 7
   },
 }
+
+// Cached definitions to avoid recreating on every access
+let cachedDefinitions: Record<AchievementType, AchievementDefinition> | null = null
+
+/**
+ * Get all achievement definitions (lazy-loaded)
+ * This is called only when ACHIEVEMENT_DEFINITIONS is accessed
+ */
+function getAchievementDefinitionsInternal(): Record<AchievementType, AchievementDefinition> {
+  if (!cachedDefinitions) {
+    cachedDefinitions = Object.keys(ACHIEVEMENT_CHECKS).reduce((acc, key) => {
+      const type = key as AchievementType
+      acc[type] = getLocalizedAchievement(type)
+      return acc
+    }, {} as Record<AchievementType, AchievementDefinition>)
+  }
+  return cachedDefinitions
+}
+
+// Legacy: Keep for backward compatibility
+// Using Proxy to lazy-load definitions only when accessed (after i18n is ready)
+export const ACHIEVEMENT_DEFINITIONS = new Proxy(
+  {} as Record<AchievementType, AchievementDefinition>,
+  {
+    get(_target, prop: string | symbol) {
+      const defs = getAchievementDefinitionsInternal()
+      return defs[prop as AchievementType]
+    },
+    ownKeys(_target) {
+      const defs = getAchievementDefinitionsInternal()
+      return Reflect.ownKeys(defs)
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+      const defs = getAchievementDefinitionsInternal()
+      return Reflect.getOwnPropertyDescriptor(defs, prop)
+    },
+    has(_target, prop) {
+      const defs = getAchievementDefinitionsInternal()
+      return prop in defs
+    },
+  }
+)
 
 // Zod schemas for runtime validation
 export const AchievementsDataSchema = z.object({
@@ -198,21 +262,20 @@ export async function checkAchievements(
     const newAchievements: UnlockedAchievement[] = []
 
     // Check each achievement
-    for (const [type, definition] of Object.entries(ACHIEVEMENT_DEFINITIONS)) {
-      const achievementType = type as AchievementType
-
+    for (const type of Object.keys(ACHIEVEMENT_CHECKS) as AchievementType[]) {
       // Skip already unlocked
-      if (unlocked.includes(achievementType)) {
+      if (unlocked.includes(type)) {
         continue
       }
 
       // Check achievement condition
       let passed = false
       try {
-        if (achievementType === AchievementType.WEEK_NO_BLOCK && siteHost) {
-          passed = definition.check(stats, sites, siteHost)
+        const checkFn = ACHIEVEMENT_CHECKS[type]
+        if (type === AchievementType.WEEK_NO_BLOCK && siteHost) {
+          passed = checkFn(stats, sites, siteHost)
         } else {
-          passed = definition.check(stats, sites)
+          passed = checkFn(stats, sites)
         }
       } catch (err) {
         console.error(`[Achievements] Error checking ${type}:`, err)
@@ -220,7 +283,8 @@ export async function checkAchievements(
       }
 
       if (passed) {
-        unlocked.push(achievementType)
+        unlocked.push(type)
+        const definition = getLocalizedAchievement(type)
         newAchievements.push({
           ...definition,
           unlockedAt: Date.now(),
@@ -332,22 +396,24 @@ export async function getAchievementProgress(
 }
 
 /**
- * Get all achievement definitions
+ * Get all achievement definitions (localized)
  * @returns Array of all achievement definitions
  */
 export function getAllAchievementDefinitions(): AchievementDefinition[] {
-  return Object.values(ACHIEVEMENT_DEFINITIONS)
+  return (Object.keys(ACHIEVEMENT_CHECKS) as AchievementType[]).map(type =>
+    getLocalizedAchievement(type)
+  )
 }
 
 /**
- * Get a specific achievement definition
+ * Get a specific achievement definition (localized)
  * @param type - Achievement type
  * @returns Achievement definition or undefined
  */
 export function getAchievementDefinition(
   type: AchievementType
 ): AchievementDefinition | undefined {
-  return ACHIEVEMENT_DEFINITIONS[type]
+  return getLocalizedAchievement(type)
 }
 
 /**
@@ -375,7 +441,7 @@ export async function getUnlockedAchievements(): Promise<UnlockedAchievement[]> 
     const unlocked: UnlockedAchievement[] = []
 
     for (const type of data.unlocked) {
-      const definition = ACHIEVEMENT_DEFINITIONS[type]
+      const definition = getLocalizedAchievement(type)
       if (definition) {
         unlocked.push({
           ...definition,

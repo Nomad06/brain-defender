@@ -123,8 +123,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
         </div>
 
         <div className="muted" style={{ marginBottom: '16px', fontSize: '12px' }}>
-          Настройте условия, при которых сайт будет блокироваться. Если ни одно условие не выполнено,
-          сайт будет доступен.
+          {t('conditionalRules.description')}
         </div>
 
         {/* Existing Rules */}
@@ -266,7 +265,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                     {rule.type === ConditionType.TIME_LIMIT && (
                       <div>
                         <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                          Максимум минут в день:
+                          {t('conditionalRules.maxTimeMinutesLabel')}
                         </label>
                         <input
                           type="number"

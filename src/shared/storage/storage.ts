@@ -17,9 +17,8 @@ import {
 
 /**
  * Get all blocked sites from storage
- * Automatically normalizes legacy format to modern format
  *
- * @returns Array of normalized site objects
+ * @returns Array of site objects
  */
 export async function getSites(): Promise<SiteObject[]> {
   try {
@@ -34,7 +33,7 @@ export async function getSites(): Promise<SiteObject[]> {
     // Parse and validate with schema
     const sites = safeParseStorageData(rawSites, SitesArraySchema, [])
 
-    // Normalize to modern format
+    // Normalize sites
     return normalizeSites(sites)
   } catch (err) {
     console.error('[Storage] Error getting sites:', err)

@@ -99,19 +99,17 @@ export function removeCategory(category: string): Category[] {
 }
 
 /**
- * Type for sites (supports both legacy string format and modern object format)
+ * Type for sites with category support
  */
-type SiteWithCategory =
-  | string
-  | {
-      host: string
-      category?: string | null
-      [key: string]: unknown
-    }
+type SiteWithCategory = {
+  host: string
+  category?: string | null
+  [key: string]: unknown
+}
 
 /**
  * Group sites by their category
- * @param sites - Array of sites (string or object format)
+ * @param sites - Array of site objects
  * @returns Object with categories as keys and arrays of sites as values
  */
 export function groupSitesByCategory(
@@ -121,7 +119,7 @@ export function groupSitesByCategory(
   const uncategorized: SiteWithCategory[] = []
 
   sites.forEach(site => {
-    const category = typeof site === 'object' && site.category ? site.category : null
+    const category = site.category || null
 
     if (!category) {
       uncategorized.push(site)
@@ -156,16 +154,10 @@ export function filterSitesByCategory(
   }
 
   if (category === UNCATEGORIZED_CATEGORY) {
-    return sites.filter(site => {
-      const siteCategory = typeof site === 'object' && site.category ? site.category : null
-      return !siteCategory
-    })
+    return sites.filter(site => !site.category)
   }
 
-  return sites.filter(site => {
-    const siteCategory = typeof site === 'object' && site.category ? site.category : null
-    return siteCategory === category
-  })
+  return sites.filter(site => site.category === category)
 }
 
 /**
@@ -177,9 +169,7 @@ export function getCategoryStats(sites: SiteWithCategory[]): Record<string, numb
   const stats: Record<string, number> = {}
 
   sites.forEach(site => {
-    const category =
-      typeof site === 'object' && site.category ? site.category : UNCATEGORIZED_CATEGORY
-
+    const category = site.category || UNCATEGORIZED_CATEGORY
     stats[category] = (stats[category] || 0) + 1
   })
 
@@ -206,7 +196,7 @@ export function renameCategory(
   }
 
   return sites.map(site => {
-    if (typeof site === 'object' && site.category === oldName) {
+    if (site.category === oldName) {
       return { ...site, category: newName }
     }
     return site

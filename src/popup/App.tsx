@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react'
 import { messagingClient } from '../shared/messaging/client'
 import { normalizeHost } from '../shared/utils/domain'
-import { t } from '../shared/i18n'
+import { t, initI18n } from '../shared/i18n'
 import { SessionState, type FocusSession } from '../shared/domain/focus-sessions'
 
 const App: React.FC = () => {
@@ -56,6 +56,7 @@ const App: React.FC = () => {
   // Initial load
   useEffect(() => {
     const init = async () => {
+      await initI18n()
       await loadSitesCount()
       await loadFocusSession()
       setLoading(false)

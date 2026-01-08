@@ -8,6 +8,7 @@ import { getSites, getTempWhitelist, cleanupExpiredWhitelist } from '../shared/s
 import { isScheduleActive } from '../shared/domain/schedule'
 import { hostToRegex } from '../shared/utils/domain'
 import { DNR_RULE_IDS } from '../shared/constants'
+import { getCurrentSession, SessionState } from '../shared/domain/focus-sessions'
 
 /**
  * Build DNR rules from blocked sites
@@ -23,6 +24,15 @@ async function buildRules() {
     // Get temporary whitelist
     const tempWhitelist = await getTempWhitelist()
     const tempWhitelistedHosts = new Set(tempWhitelist.map(e => e.host))
+
+    // Get focus session sites (if session is active)
+    const focusSession = await getCurrentSession()
+    const focusSessionSites =
+      focusSession && focusSession.state === SessionState.WORKING
+        ? focusSession.sitesToBlock
+        : []
+
+    console.log('[DNR] Focus session active:', !!focusSession, 'sites:', focusSessionSites.length)
 
     // Filter sites based on schedule and conditional rules
     const activeSites = []
@@ -46,6 +56,23 @@ async function buildRules() {
       }
 
       activeSites.push(site)
+    }
+
+    // Add focus session sites (convert to SiteObject-like format)
+    for (const host of focusSessionSites) {
+      // Skip if already in activeSites or in temp whitelist
+      if (activeSites.some(s => s.host === host) || tempWhitelistedHosts.has(host)) {
+        continue
+      }
+
+      // Add as temporary site for this session
+      activeSites.push({
+        host: host,
+        addedAt: Date.now(),
+        category: null,
+        schedule: null,
+        conditionalRules: [],
+      })
     }
 
     // Build DNR rules

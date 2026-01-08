@@ -16,8 +16,7 @@ import {
 export { ScheduleSchema, ConditionalRuleSchema, StatsSchema }
 
 /**
- * Site object schema (modern format)
- * Supports both legacy string format and modern object format
+ * Site object schema
  */
 export const SiteObjectSchema = z.object({
   host: z.string().min(1),
@@ -30,21 +29,9 @@ export const SiteObjectSchema = z.object({
 export type SiteObject = z.infer<typeof SiteObjectSchema>
 
 /**
- * Legacy site format (string array)
+ * Array of sites
  */
-export const SiteLegacySchema = z.string()
-
-/**
- * Site can be either legacy string or modern object
- */
-export const SiteSchema = z.union([SiteLegacySchema, SiteObjectSchema])
-
-export type Site = z.infer<typeof SiteSchema>
-
-/**
- * Array of sites (mixed legacy and modern format)
- */
-export const SitesArraySchema = z.array(SiteSchema)
+export const SitesArraySchema = z.array(SiteObjectSchema)
 
 /**
  * Temporary whitelist entry
@@ -83,24 +70,12 @@ export type ExtensionStorage = z.infer<typeof ExtensionStorageSchema>
 
 /**
  * Validate and normalize a site object
- * Converts legacy format to modern format
+ * Ensures all required fields exist
  *
- * @param site - Site in any format
+ * @param site - Site object
  * @returns Normalized SiteObject
  */
-export function normalizeSite(site: Site): SiteObject {
-  if (typeof site === 'string') {
-    // Legacy format - convert to modern
-    return {
-      host: site,
-      addedAt: Date.now(),
-      category: null,
-      schedule: null,
-      conditionalRules: [],
-    }
-  }
-
-  // Already modern format - ensure all fields exist
+export function normalizeSite(site: SiteObject): SiteObject {
   return {
     host: site.host,
     addedAt: site.addedAt || Date.now(),
@@ -114,10 +89,10 @@ export function normalizeSite(site: Site): SiteObject {
  * Validate and normalize an array of sites
  * Removes duplicates and invalid entries
  *
- * @param sites - Array of sites in any format
+ * @param sites - Array of site objects
  * @returns Array of normalized SiteObjects
  */
-export function normalizeSites(sites: Site[]): SiteObject[] {
+export function normalizeSites(sites: SiteObject[]): SiteObject[] {
   const seen = new Set<string>()
   const normalized: SiteObject[] = []
 

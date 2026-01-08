@@ -4,93 +4,90 @@
 
 **Brain Defender** is a Chrome browser extension designed to help users maintain focus and attention by blocking distracting websites with motivational reminders. The extension uses Chrome's Manifest V3 architecture and provides flexible scheduling, statistics tracking, and focus session management.
 
-**Tech Stack**: Vanilla JavaScript, Chrome Extension Manifest V3, Chrome Storage API
+**Tech Stack**: TypeScript, React, Chrome Extension Manifest V3, Vite, Zod
 
 ## Project Structure
 
-### Core Files
+### Source Code (`src/`)
 
-#### Configuration & Constants
-- **manifest.json** - Chrome extension manifest (v3) with permissions and metadata
-- **consts.js** - Central constants definition (storage keys, defaults)
+#### Background Service (`src/background/`)
+- **index.ts** - Main background service worker entry point
+  - Coordinates all extension functionality
+  - Handles tab navigation and blocking
+  - Manages alarms and focus sessions
+- **dnr-manager.ts** - Declarative Net Request (DNR) rules manager
+  - Builds blocking rules from sites and focus sessions
+  - Updates Chrome's declarativeNetRequest API
+- **handlers.ts** - Message handlers for communication with UI
+- **alarms.ts** - Alarm system for scheduled tasks
 
-#### Background Service
-- **service_worker.js** - Main background script that orchestrates all extension functionality
-  - Loads all modules via `importScripts()`
-  - Manages declarativeNetRequest rules for blocking
-  - Handles focus sessions (Pomodoro-style)
-  - Coordinates with conditional rules and scheduling systems
+#### Shared Domain Logic (`src/shared/domain/`)
+- **focus-sessions.ts** - Pomodoro-style focus session management
+- **schedule.ts** - Time-based blocking rules
+- **conditional-rules.ts** - Advanced conditional blocking logic
+- **stats.ts** - Statistics tracking for blocked attempts
+- **achievements.ts** - Gamification system
+- **categories.ts** - Site categorization system
 
-#### Storage & Data Layer
-- **storage.js** - Unified module for chrome.storage operations
-  - `getSites()` - Retrieves blocked sites list (supports legacy string array format and new object format)
-  - `setSites(sites)` - Saves sites to chrome.storage.sync
-  - Site format: `{ host, addedAt, category, schedule }`
-  - Handles data normalization and migration between formats
+#### Storage Layer (`src/shared/storage/`)
+- **storage.ts** - Unified storage abstraction with type-safe operations
+- **schemas.ts** - Zod schemas for runtime validation
+- **migrations.ts** - Data migration system for version updates
 
-#### Utilities & Helpers
-- **utils.js** - Domain normalization utilities
-  - `normalizeHost(urlStr)` - Converts URLs/domains to normalized hostname format
-  - Used throughout the codebase for consistent domain handling
+#### Utilities (`src/shared/utils/`)
+- **domain.ts** - Domain normalization utilities
+  - `normalizeHost()` - Converts URLs to normalized hostname format
+  - `hostToRegex()` - Generates regex patterns for DNR rules
 
-- **translations.js** - Translation strings for internationalization
-- **i18n.js** - Internationalization system for UI text
+#### Messaging System (`src/shared/messaging/`)
+- **contracts.ts** - Type-safe message contracts
+- **client.ts** - Client for sending messages to background
 
-#### Feature Modules
-- **schedule.js** - Time-based blocking rules (specific hours/days)
-- **conditional_rules.js** - Advanced conditional blocking logic
-- **focus_sessions.js** - Pomodoro-style focus session management
-- **stats.js** - Statistics tracking for blocked attempts
-- **achievements.js** - Gamification system
-- **categories.js** - Site categorization system
-- **migration.js** - Data migration between extension versions
-
-#### Legacy Files
-- **blocked-legacy.js** - Legacy blocking implementation (being phased out)
+#### Internationalization (`src/shared/i18n/`)
+- **translations.ts** - Translation strings
+- **index.ts** - i18n system for UI text
 
 #### UI Components
-- **popup.html** / **popup.js** - Extension popup interface
+- **src/popup/** - Extension popup (React)
   - Quick site blocking/unblocking
+  - Focus session controls
   - Site counter display
-  - Temporary site allowance (15min, 30min, 1hr)
-  - Links to options page
 
-- **options.html** / **options.js** - Full settings page
+- **src/options/** - Settings page (React)
   - Blocked sites management
   - Schedule configuration
   - Categories and conditional rules
   - Statistics dashboard
 
-- **blocked.html** / **blocked.js** - Block notification page shown when user tries to access blocked site
+- **src/pages/blocked/** - Block notification page (React)
   - Motivational messages
   - Temporary allowance options
 
-- **diagnostics.html** / **diagnostics.js** - Debug/troubleshooting interface
+- **src/pages/diagnostics/** - Debug/troubleshooting interface (React)
 
-- **styles.css** - Shared styles across all UI components
+#### Configuration
+- **public/manifest.json** - Chrome extension manifest (source)
+- **vite.config.ts** - Vite build configuration
+- **tsconfig.json** - TypeScript configuration
+- **styles.css** - Global styles
 
 #### Assets
 - **icons/** - Extension icons (16x16, 32x32, 48x48, 128x128)
-- **icon.py** - Script for generating icon assets
 
 ## Key Architecture Patterns
 
-### Module Loading Strategy
-The service worker uses `importScripts()` to load modules in dependency order:
-1. Constants (consts.js)
-2. Translations (translations.js)
-3. Core systems (stats.js, schedule.js, migration.js)
-4. Utilities (utils.js)
-5. Feature modules (conditional_rules.js, focus_sessions.js)
+### Modern TypeScript Stack
+- **TypeScript** - Full type safety across the codebase
+- **Zod** - Runtime validation for storage data
+- **React** - Modern UI components
+- **Vite** - Fast build system with HMR
+- **ES Modules** - Service worker uses modern module syntax
 
-All modules include fallback error handling for failed loads.
+### Data Format
+Sites are stored as structured objects:
+- **Format**: `[{ host: "example.com", addedAt: 1234567890, category: null, schedule: null }]`
 
-### Data Format Evolution
-The extension supports two data formats for backward compatibility:
-- **Legacy format**: `["example.com", "another-site.com"]` (array of strings)
-- **Current format**: `[{ host: "example.com", addedAt: 1234567890, category: null, schedule: null }]`
-
-The storage.js module automatically migrates legacy data on read.
+The storage.ts module provides type-safe access to all site data.
 
 ### Blocking Mechanism
 Uses Chrome's declarativeNetRequest API (Manifest V3 requirement):
@@ -137,11 +134,11 @@ Sites are normalized before storage:
 
 ### Extending Features
 When adding new modules:
-1. Create standalone .js file with proper error handling
-2. Add to service_worker.js import list in correct order
-3. Ensure compatibility with both legacy and current data formats
-4. Add i18n strings to translations.js
-5. Update UI components as needed
+1. Create standalone TypeScript file with proper error handling
+2. Ensure proper type definitions and validation
+3. Add i18n strings to translations system
+4. Update UI components as needed
+5. Test with the build system
 
 ### Testing Blocking
 Use diagnostics.html for debugging:
@@ -200,20 +197,35 @@ All files are currently untracked (new project initialization). No commits yet.
    - node_modules/ (if added)
    - Build artifacts
 
-2. Consider migrating legacy code:
-   - Remove blocked-legacy.js after full migration
-   - Consolidate storage format to new object-based approach
-
-3. Documentation improvements:
+2. Documentation improvements:
    - Add JSDoc comments to all functions
    - Create user documentation
    - Add developer setup guide
 
 ## Notes for AI Assistants
 
-- Always use `normalizeHost()` from utils.js for domain handling
-- Check both string and object formats when working with site lists
-- Service worker has no DOM access - use chrome.storage for state
+- Always use `normalizeHost()` from utils for domain handling
+- All sites are stored as typed objects with full metadata
+- Service worker has no DOM access - use browser.storage for state
 - UI scripts have DOM but limited to their page context
-- Use chrome.runtime.sendMessage() for UI ↔ service worker communication
-- Test with both sync and async operations (chrome.storage.sync has quotas)
+- Use browser.runtime.sendMessage() for UI ↔ service worker communication
+- Test with both sync and async operations (browser.storage.sync has quotas)
+- Use TypeScript for type safety and better developer experience
+
+
+# Do / Don’t
+## Do
+- Keep rule IDs stable and deterministic
+- Validate user input (domains/patterns) before applying
+- Write small tests for rule generation and settings migrations
+- Prefer minimal changes per PR
+
+## Don’t
+- Don’t modify manifest permissions without a clear reason
+- Don’t call chrome.declarativeNetRequest from UI/content
+- Don’t store large data in storage.sync (use local for stats/logs)
+- Don’t introduce heavy dependencies into background/content
+
+# When unsure
+- Ask 1–2 clarifying questions OR propose a safe default.
+- If choice impacts permissions or blocking behavior, prefer the safer/less intrusive option.

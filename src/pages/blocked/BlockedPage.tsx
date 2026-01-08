@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react'
-import { t, getRandomBlockedPhrase } from '../../shared/i18n'
+import { t, getRandomBlockedPhrase, initI18n } from '../../shared/i18n'
 import { messagingClient } from '../../shared/messaging/client'
 
 // Eye exercise trajectories
@@ -91,6 +91,12 @@ const BlockedPage: React.FC = () => {
   const [breathPhase, setBreathPhase] = useState('')
 
   useEffect(() => {
+    // Initialize i18n first, then set phrase
+    initI18n().then(() => {
+      const phrase = getRandomBlockedPhrase()
+      setMotivationalPhrase(phrase)
+    })
+
     // Get blocked URL from query params
     const params = new URLSearchParams(window.location.search)
     const url = params.get('url') || window.location.href
@@ -109,10 +115,6 @@ const BlockedPage: React.FC = () => {
         console.error('[Blocked] Failed to record block:', err)
       })
     }
-
-    // Pick random motivational phrase
-    const randomPhrase = getRandomBlockedPhrase()
-    setMotivationalPhrase(randomPhrase)
 
     // Cleanup on unmount
     return () => {
@@ -467,10 +469,10 @@ const BlockedPage: React.FC = () => {
           }}
         >
           <div className="h2" style={{ marginBottom: '6px' }}>
-            Если у тебя есть минута — давай сделаем что-то полезное
+            {t('exercises.title')}
           </div>
           <div className="muted" style={{ marginBottom: '16px', fontSize: '12px' }}>
-            Выбери одно — или просто закрой вкладку.
+            {t('blocked.breathe')}
           </div>
 
           {/* Exercise Buttons */}

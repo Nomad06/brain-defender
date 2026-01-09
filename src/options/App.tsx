@@ -577,12 +577,12 @@ const App: React.FC = () => {
                           )}
                           {site.schedule && (
                             <span className="kbd" style={{ fontSize: '10px', padding: '2px 6px' }}>
-                              📅 Расписание
+                              📅 {t('options.scheduleLabel')}
                             </span>
                           )}
                           {site.conditionalRules && site.conditionalRules.length > 0 && (
                             <span className="kbd" style={{ fontSize: '10px', padding: '2px 6px' }}>
-                              🔀 Условия ({site.conditionalRules.length})
+                              🔀 {t('options.conditionsLabel')} ({site.conditionalRules.length})
                             </span>
                           )}
                         </div>
@@ -593,7 +593,7 @@ const App: React.FC = () => {
                         className="btn"
                         onClick={() => handleOpenSchedule(site.host)}
                         style={{ fontSize: '11px', padding: '6px 10px' }}
-                        title="Настроить расписание"
+                        title={t('options.scheduleButtonTitle')}
                       >
                         📅
                       </button>
@@ -601,7 +601,7 @@ const App: React.FC = () => {
                         className="btn"
                         onClick={() => handleOpenConditionalRules(site.host)}
                         style={{ fontSize: '11px', padding: '6px 10px' }}
-                        title="Настроить условия блокировки"
+                        title={t('options.conditionsButtonTitle')}
                       >
                         🔀
                       </button>

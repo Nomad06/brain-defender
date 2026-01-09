@@ -4,14 +4,12 @@
  */
 
 import { z } from 'zod'
-import { parseTime } from './schedule'
+import { t } from '../i18n'
 import type { SiteStats } from './stats'
 
 // Condition types enum
 export enum ConditionType {
   VISITS_PER_DAY = 'visitsPerDay', // Block after N visits per day
-  TIME_AFTER = 'timeAfter', // Block only after specific time
-  DAYS_OF_WEEK = 'daysOfWeek', // Block only on specific days
   TIME_LIMIT = 'timeLimit', // Block when time limit exceeded
 }
 
@@ -65,10 +63,6 @@ export function shouldBlockByConditionalRules(
   }
 
   const now = new Date()
-  const currentDay = now.getDay() // 0 = Sunday, 1 = Monday, ...
-  const currentHour = now.getHours()
-  const currentMinute = now.getMinutes()
-  const currentTime = currentHour * 60 + currentMinute // minutes since start of day
   const today = now.toISOString().split('T')[0]
 
   // Check each rule
@@ -97,31 +91,6 @@ export function shouldBlockByConditionalRules(
         // If visits are below limit, don't block
         // (but this rule takes precedence - return false immediately)
         return false
-      }
-
-      case ConditionType.TIME_AFTER: {
-        // Block only after specific time
-        if (rule.timeAfter) {
-          const timeAfter = parseTime(rule.timeAfter) // minutes since start of day
-          if (currentTime >= timeAfter) {
-            return true // Time has come
-          } else {
-            return false // Too early, don't block
-          }
-        }
-        break
-      }
-
-      case ConditionType.DAYS_OF_WEEK: {
-        // Block only on specific days of the week
-        if (rule.days && Array.isArray(rule.days) && rule.days.length > 0) {
-          if (rule.days.includes(currentDay)) {
-            return true // Today is a blocking day
-          } else {
-            return false // Today is not a blocking day
-          }
-        }
-        break
       }
 
       case ConditionType.TIME_LIMIT: {
@@ -158,12 +127,6 @@ export function createDefaultRule(type: ConditionType): ConditionalRule {
     case ConditionType.VISITS_PER_DAY:
       return { ...baseRule, maxVisits: 5 }
 
-    case ConditionType.TIME_AFTER:
-      return { ...baseRule, timeAfter: '18:00' }
-
-    case ConditionType.DAYS_OF_WEEK:
-      return { ...baseRule, days: [1, 2, 3, 4, 5] } // Weekdays
-
     case ConditionType.TIME_LIMIT:
       return { ...baseRule, maxTimeMinutes: 30 }
 
@@ -198,18 +161,6 @@ export function validateConditionalRule(
       }
       break
 
-    case ConditionType.TIME_AFTER:
-      if (!validRule.timeAfter) {
-        return { valid: false, error: 'timeAfter is required' }
-      }
-      break
-
-    case ConditionType.DAYS_OF_WEEK:
-      if (!validRule.days || validRule.days.length === 0) {
-        return { valid: false, error: 'At least one day must be selected' }
-      }
-      break
-
     case ConditionType.TIME_LIMIT:
       if (!validRule.maxTimeMinutes || validRule.maxTimeMinutes < 1) {
         return { valid: false, error: 'maxTimeMinutes must be at least 1' }
@@ -223,27 +174,18 @@ export function validateConditionalRule(
 /**
  * Get human-readable description of a conditional rule
  * @param rule - Conditional rule
- * @returns Human-readable description in Russian
+ * @returns Human-readable description
  */
 export function getConditionDescription(rule: ConditionalRule): string {
   switch (rule.type) {
     case ConditionType.VISITS_PER_DAY:
-      return `Блокировка после ${rule.maxVisits} посещений в день`
-
-    case ConditionType.TIME_AFTER:
-      return `Блокировка после ${rule.timeAfter}`
-
-    case ConditionType.DAYS_OF_WEEK: {
-      const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
-      const days = rule.days?.map(d => dayNames[d]).join(', ') || ''
-      return `Блокировка в дни: ${days}`
-    }
+      return t('conditionalRules.descVisitsPerDay', { maxVisits: rule.maxVisits || 0 })
 
     case ConditionType.TIME_LIMIT:
-      return `Блокировка при превышении ${rule.maxTimeMinutes} минут`
+      return t('conditionalRules.descTimeLimit', { maxTimeMinutes: rule.maxTimeMinutes || 0 })
 
     default:
-      return 'Неизвестное условие'
+      return t('conditionalRules.descUnknown')
   }
 }
 
@@ -260,26 +202,14 @@ export function getConditionTypes(): Array<{
   return [
     {
       type: ConditionType.VISITS_PER_DAY,
-      name: 'Лимит посещений',
-      description: 'Блокировать после определенного количества посещений в день',
+      name: t("conditionalRules.visitsLimit"),
+      description: t("conditionalRules.visitsLimitDesc"),
       icon: '🔢',
     },
     {
-      type: ConditionType.TIME_AFTER,
-      name: 'Время блокировки',
-      description: 'Блокировать только после определенного времени',
-      icon: '⏰',
-    },
-    {
-      type: ConditionType.DAYS_OF_WEEK,
-      name: 'Дни недели',
-      description: 'Блокировать только в определенные дни недели',
-      icon: '📅',
-    },
-    {
       type: ConditionType.TIME_LIMIT,
-      name: 'Лимит времени',
-      description: 'Блокировать при превышении лимита времени на сайте',
+      name: t("conditionalRules.timeLimit"),
+      description: t("conditionalRules.timeLimitDesc"),
       icon: '⏱️',
     },
   ]

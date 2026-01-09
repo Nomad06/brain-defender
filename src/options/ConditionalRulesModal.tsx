@@ -58,7 +58,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
     for (const rule of rules) {
       const validation = validateConditionalRule(rule)
       if (!validation.valid) {
-        alert(`Ошибка валидации: ${validation.error}`)
+        alert(t('conditionalRules.validationError', { error: validation.error || 'Unknown error' }))
         return
       }
     }
@@ -108,7 +108,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
           }}
         >
           <div>
-            <div className="h2">Условия блокировки</div>
+            <div className="h2">{t('conditionalRules.modalTitle')}</div>
             <div className="muted" style={{ fontSize: '12px', marginTop: '4px' }}>
               {host}
             </div>
@@ -181,7 +181,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                     {rule.type === ConditionType.VISITS_PER_DAY && (
                       <div>
                         <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                          Максимум посещений в день:
+                          {t('conditionalRules.maxVisitsPerDay')}
                         </label>
                         <input
                           type="number"
@@ -193,72 +193,6 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                           }
                           style={{ width: '100px', fontSize: '12px' }}
                         />
-                      </div>
-                    )}
-
-                    {rule.type === ConditionType.TIME_AFTER && (
-                      <div>
-                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                          Блокировать после:
-                        </label>
-                        <input
-                          type="time"
-                          className="input"
-                          value={rule.timeAfter || '18:00'}
-                          onChange={e => handleUpdateRule(index, { timeAfter: e.target.value })}
-                          style={{ width: '120px', fontSize: '12px' }}
-                        />
-                      </div>
-                    )}
-
-                    {rule.type === ConditionType.DAYS_OF_WEEK && (
-                      <div>
-                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>
-                          Дни недели:
-                        </label>
-                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          {[
-                            { value: 1, label: 'Пн' },
-                            { value: 2, label: 'Вт' },
-                            { value: 3, label: 'Ср' },
-                            { value: 4, label: 'Чт' },
-                            { value: 5, label: 'Пт' },
-                            { value: 6, label: 'Сб' },
-                            { value: 0, label: 'Вс' },
-                          ].map(day => (
-                            <label
-                              key={day.value}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                cursor: 'pointer',
-                                padding: '4px 8px',
-                                background: (rule.days || []).includes(day.value)
-                                  ? 'var(--primary)'
-                                  : 'var(--card)',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                userSelect: 'none',
-                                color: (rule.days || []).includes(day.value) ? 'white' : 'inherit',
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={(rule.days || []).includes(day.value)}
-                                onChange={e => {
-                                  const currentDays = rule.days || []
-                                  const newDays = e.target.checked
-                                    ? [...currentDays, day.value]
-                                    : currentDays.filter(d => d !== day.value)
-                                  handleUpdateRule(index, { days: newDays })
-                                }}
-                                style={{ display: 'none' }}
-                              />
-                              {day.label}
-                            </label>
-                          ))}
-                        </div>
                       </div>
                     )}
 
@@ -289,7 +223,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
         {/* Add Rule Buttons */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', fontSize: '12px' }}>
-            Добавить условие:
+            {t('conditionalRules.addCondition')}
           </label>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {conditionTypes.map(type => (

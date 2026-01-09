@@ -65,13 +65,13 @@ type BreathPhase = {
 }
 
 const BREATH_PHASES: BreathPhase[] = [
-  { name: 'Вдох', duration: 4000, scale: 1.0 },
-  { name: 'Пауза', duration: 2000, scale: 1.0 },
-  { name: 'Выдох', duration: 6000, scale: 0.3 },
-  { name: 'Вдох', duration: 4000, scale: 1.0 },
-  { name: 'Пауза', duration: 2000, scale: 1.0 },
-  { name: 'Выдох', duration: 6000, scale: 0.3 },
-  { name: 'Завершение', duration: 6000, scale: 0.6 },
+  { name: 'inhale', duration: 4000, scale: 1.0 },
+  { name: 'pause', duration: 2000, scale: 1.0 },
+  { name: 'exhale', duration: 6000, scale: 0.3 },
+  { name: 'inhale', duration: 4000, scale: 1.0 },
+  { name: 'pause', duration: 2000, scale: 1.0 },
+  { name: 'exhale', duration: 6000, scale: 0.3 },
+  { name: 'completion', duration: 6000, scale: 0.6 },
 ]
 
 const BlockedPage: React.FC = () => {
@@ -282,15 +282,16 @@ const BlockedPage: React.FC = () => {
         }
 
         if (currentPhase) {
-          setBreathPhase(currentPhase.name)
+          // Translate phase name
+          setBreathPhase(t(`exercises.${currentPhase.name}`))
 
           // Calculate scale with smooth interpolation
           let scale = currentPhase.scale
-          if (currentPhase.name === 'Вдох') {
+          if (currentPhase.name === 'inhale') {
             scale = 0.3 + localT * 0.7
-          } else if (currentPhase.name === 'Выдох') {
+          } else if (currentPhase.name === 'exhale') {
             scale = 1.0 - localT * 0.7
-          } else if (currentPhase.name === 'Завершение') {
+          } else if (currentPhase.name === 'completion') {
             scale = 0.3 + localT * 0.3
           }
 
@@ -479,13 +480,13 @@ const BlockedPage: React.FC = () => {
           {activeExercise === 'none' && (
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button className="btn" onClick={startEyeExercise} style={{ flex: 1, minWidth: '160px' }}>
-                👁 Тренировка для глаз
+                👁 {t('exercises.eyeTraining')}
               </button>
               <button className="btn" onClick={startBreathExercise} style={{ flex: 1, minWidth: '160px' }}>
-                🫁 Дыхание
+                🫁 {t('exercises.breathing')}
               </button>
               <button className="btn" onClick={startStretchExercise} style={{ flex: 1, minWidth: '160px' }}>
-                🧍 Мини-разминка
+                🧍 {t('exercises.stretch')}
               </button>
               <button className="btn" onClick={handleCloseTab} style={{ flex: 1, minWidth: '160px' }}>
                 ❌ {t('blocked.closeTab')}
@@ -505,10 +506,10 @@ const BlockedPage: React.FC = () => {
               }}
             >
               <div className="h2" style={{ marginBottom: '12px' }}>
-                Тренировка для глаз
+                {t('exercises.eyeTrainingTitle')}
               </div>
               <div className="muted" style={{ fontSize: '12px', marginBottom: '12px' }}>
-                Следи за точкой глазами, не двигая головой
+                {t('exercises.eyeTrainingInstruction')}
               </div>
               <canvas
                 ref={eyeCanvasRef}
@@ -525,7 +526,7 @@ const BlockedPage: React.FC = () => {
                 <div className="progressBar" style={{ width: `${eyeProgress}%` }} />
               </div>
               <button className="btn" onClick={stopEyeExercise} style={{ fontSize: '11px', padding: '6px 12px' }}>
-                Остановить
+                {t('exercises.stop')}
               </button>
             </div>
           )}
@@ -542,10 +543,10 @@ const BlockedPage: React.FC = () => {
               }}
             >
               <div className="h2" style={{ marginBottom: '12px' }}>
-                Дыхание
+                {t('exercises.breathingTitle')}
               </div>
               <div className="muted" style={{ fontSize: '12px', marginBottom: '12px' }}>
-                Следуй ритму круга
+                {t('exercises.breathingInstruction')}
               </div>
               <canvas
                 ref={breathCanvasRef}
@@ -578,7 +579,7 @@ const BlockedPage: React.FC = () => {
                 onClick={stopBreathExercise}
                 style={{ fontSize: '11px', padding: '6px 12px', display: 'block', margin: '0 auto' }}
               >
-                Остановить
+                {t('exercises.stop')}
               </button>
             </div>
           )}
@@ -595,7 +596,7 @@ const BlockedPage: React.FC = () => {
               }}
             >
               <div className="h2" style={{ marginBottom: '12px' }}>
-                Мини-разминка
+                {t('exercises.stretchTitle')}
               </div>
               <div
                 className="muted"
@@ -609,20 +610,20 @@ const BlockedPage: React.FC = () => {
                   borderLeft: '3px solid var(--danger)',
                 }}
               >
-                ⚠️ Без резких движений
+                {t('exercises.stretchWarning')}
               </div>
               <div style={{ fontSize: '14px', lineHeight: 2, paddingLeft: '8px' }}>
                 <div style={{ marginBottom: '8px', padding: '8px', background: 'var(--card2)', borderRadius: '6px' }}>
-                  1. Встань
+                  {t('exercises.stretchStep1')}
                 </div>
                 <div style={{ marginBottom: '8px', padding: '8px', background: 'var(--card2)', borderRadius: '6px' }}>
-                  2. Круг плечами 5 раз
+                  {t('exercises.stretchStep2')}
                 </div>
                 <div style={{ marginBottom: '8px', padding: '8px', background: 'var(--card2)', borderRadius: '6px' }}>
-                  3. Потяни шею: вправо/влево по 5 секунд (без резких движений)
+                  {t('exercises.stretchStep3')}
                 </div>
                 <div style={{ marginBottom: '8px', padding: '8px', background: 'var(--card2)', borderRadius: '6px' }}>
-                  4. Сделай глубокий вдох
+                  {t('exercises.stretchStep4')}
                 </div>
               </div>
               <button
@@ -630,7 +631,7 @@ const BlockedPage: React.FC = () => {
                 onClick={stopStretchExercise}
                 style={{ marginTop: '16px', fontSize: '11px', padding: '6px 12px' }}
               >
-                Закрыть
+                {t('common.close')}
               </button>
             </div>
           )}

@@ -267,7 +267,7 @@ const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({ hosts, onCo
         <div className="muted" style={{ fontSize: '14px', marginBottom: '20px' }}>
           {hosts.length === 1
             ? t('options.deleteChallengeDescription', { host: hosts[0] })
-            : `Пройдите 3 шага, чтобы удалить ${hosts.length} сайтов`}
+            : t('deleteChallenge.multipleDescription', { count: hosts.length })}
         </div>
         {hosts.length > 1 && (
           <div className="muted" style={{ fontSize: '12px', marginBottom: '16px', maxHeight: '100px', overflowY: 'auto' }}>

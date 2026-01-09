@@ -1,6 +1,7 @@
 {
-    "name": "Brain Defender",
-    "description": "Защищает ваш фокус и внимание, блокируя отвлекающие сайты с мотивационными напоминаниями.",
+    "name": "__MSG_extensionName__",
+    "description": "__MSG_extensionDescription__",
+    "default_locale": "en",
     "version": "2.0.0",
     "manifest_version": 3,
     "action": {

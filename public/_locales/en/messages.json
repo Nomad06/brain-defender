@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Brain Defender",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Protects your focus and attention by blocking distracting websites with motivational reminders.",
+    "description": "Description of the extension"
+  }
+}

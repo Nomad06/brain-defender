@@ -32,3 +32,11 @@ yarn-error.log*
 
 # Extension files (keep source)
 # We'll keep manifest.json in public/
+
+# Store listing assets (optional - keep if you want to version control them)
+# store-assets/
+
+# Temporary files
+*.zip
+*.crx
+*.pem

@@ -1,6 +1,7 @@
 /**
- * Achievements and badges system for Brain Defender
- * Gamification system to encourage focus and productivity
+ * Achievements and badges system for Focusan
+ * Japanese rank-based gamification system inspired by martial arts progression
+ * Ranks: 初心者 (Beginner) → 見習い (Apprentice) → 修行者 (Practitioner) → 達人 (Master) → 仙人 (Grand Master)
  */
 
 import { z } from 'zod'
@@ -9,18 +10,25 @@ import { STORAGE_KEYS } from '../constants'
 import type { Stats } from './stats'
 import { t } from '../i18n'
 
-// Achievement types enum
+// Achievement types enum - Japanese-inspired badges
 export enum AchievementType {
-  STREAK_7 = 'streak_7',
-  STREAK_30 = 'streak_30',
-  STREAK_100 = 'streak_100',
-  TOTAL_BLOCKS_100 = 'total_blocks_100',
-  TOTAL_BLOCKS_500 = 'total_blocks_500',
-  TOTAL_BLOCKS_1000 = 'total_blocks_1000',
-  SITES_BLOCKED_10 = 'sites_blocked_10',
-  SITES_BLOCKED_50 = 'sites_blocked_50',
-  SITES_BLOCKED_100 = 'sites_blocked_100',
-  WEEK_NO_BLOCK = 'week_no_block',
+  // Streak achievements (継続 - Keizoku)
+  STREAK_7 = 'streak_7',           // Mt. Fuji Badge
+  STREAK_30 = 'streak_30',          // Sakura Badge
+  STREAK_100 = 'streak_100',        // Rising Sun Badge
+
+  // Block count achievements (実績 - Jisseki)
+  TOTAL_BLOCKS_100 = 'total_blocks_100',   // Bamboo Badge
+  TOTAL_BLOCKS_500 = 'total_blocks_500',   // Katana Badge
+  TOTAL_BLOCKS_1000 = 'total_blocks_1000', // Dragon Badge
+
+  // Site management achievements (管理 - Kanri)
+  SITES_BLOCKED_10 = 'sites_blocked_10',   // Koi Badge
+  SITES_BLOCKED_50 = 'sites_blocked_50',   // Crane Badge
+  SITES_BLOCKED_100 = 'sites_blocked_100', // Phoenix Badge
+
+  // Perfect week achievement (完璧 - Kanpeki)
+  WEEK_NO_BLOCK = 'week_no_block',         // Zen Master Badge
 }
 
 // Achievement definition interface
@@ -43,61 +51,61 @@ export function getLocalizedAchievement(type: AchievementType): AchievementDefin
       id: AchievementType.STREAK_7,
       name: t('achievements.streak7Name'),
       description: t('achievements.streak7Desc'),
-      icon: '🔥',
+      icon: '🗻', // Mt. Fuji - 7 day streak
     },
     [AchievementType.STREAK_30]: {
       id: AchievementType.STREAK_30,
       name: t('achievements.streak30Name'),
       description: t('achievements.streak30Desc'),
-      icon: '💪',
+      icon: '🌸', // Sakura - 30 day streak (perfect month)
     },
     [AchievementType.STREAK_100]: {
       id: AchievementType.STREAK_100,
       name: t('achievements.streak100Name'),
       description: t('achievements.streak100Desc'),
-      icon: '👑',
+      icon: '🎌', // Rising Sun - 100 day streak
     },
     [AchievementType.TOTAL_BLOCKS_100]: {
       id: AchievementType.TOTAL_BLOCKS_100,
       name: t('achievements.totalBlocks100Name'),
       description: t('achievements.totalBlocks100Desc'),
-      icon: '🎯',
+      icon: '🎋', // Bamboo - 100 blocks
     },
     [AchievementType.TOTAL_BLOCKS_500]: {
       id: AchievementType.TOTAL_BLOCKS_500,
       name: t('achievements.totalBlocks500Name'),
       description: t('achievements.totalBlocks500Desc'),
-      icon: '🏆',
+      icon: '⚔️', // Katana - 500 blocks
     },
     [AchievementType.TOTAL_BLOCKS_1000]: {
       id: AchievementType.TOTAL_BLOCKS_1000,
       name: t('achievements.totalBlocks1000Name'),
       description: t('achievements.totalBlocks1000Desc'),
-      icon: '🌟',
+      icon: '🐉', // Dragon - 1000 blocks
     },
     [AchievementType.SITES_BLOCKED_10]: {
       id: AchievementType.SITES_BLOCKED_10,
       name: t('achievements.sitesBlocked10Name'),
       description: t('achievements.sitesBlocked10Desc'),
-      icon: '📋',
+      icon: '🐟', // Koi fish - 10 sites
     },
     [AchievementType.SITES_BLOCKED_50]: {
       id: AchievementType.SITES_BLOCKED_50,
       name: t('achievements.sitesBlocked50Name'),
       description: t('achievements.sitesBlocked50Desc'),
-      icon: '📚',
+      icon: '🦢', // Crane - 50 sites
     },
     [AchievementType.SITES_BLOCKED_100]: {
       id: AchievementType.SITES_BLOCKED_100,
       name: t('achievements.sitesBlocked100Name'),
       description: t('achievements.sitesBlocked100Desc'),
-      icon: '🛡️',
+      icon: '🦅', // Phoenix (鳳凰) - 100 sites
     },
     [AchievementType.WEEK_NO_BLOCK]: {
       id: AchievementType.WEEK_NO_BLOCK,
       name: t('achievements.weekNoBlockName'),
       description: t('achievements.weekNoBlockDesc'),
-      icon: '✨',
+      icon: '🧘', // Zen Master - perfect week
     },
   }
 

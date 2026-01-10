@@ -165,8 +165,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="container">
-      <div className="card" style={{ padding: '14px' }}>
+    <div className="container washi-texture">
+      <div className="card" style={{ padding: '16px', minWidth: '320px' }}>
         {/* Show Pomodoro modal or main content */}
         {showPomodoroModal ? (
           <PomodoroModal
@@ -178,36 +178,59 @@ const App: React.FC = () => {
           />
         ) : (
           <>
-            <div className="h1">{t('popup.title')}</div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+            {/* Japanese-style header */}
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '32px', marginBottom: '4px' }}>⛩️</div>
+              <div className="japanese-title" style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>
+                Focusan
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em' }}>
+                集中 · FOCUS
+              </div>
+            </div>
+
+          <div style={{
+            fontSize: '12px',
+            color: 'var(--muted)',
+            textAlign: 'center',
+            marginBottom: '12px',
+            padding: '8px',
+            background: 'var(--card2)',
+            borderRadius: 'var(--radius)',
+            border: '1px solid var(--border)'
+          }}>
             <span>{t('popup.blockList')}</span>{' '}
-            <span className="kbd">{sitesCount}</span>
+            <span className="kbd" style={{ background: 'var(--accent)', color: 'white', fontWeight: 600 }}>{sitesCount}</span>
           </div>
 
-          <div className="space"></div>
-
-          <div className="col">
-            <button className="btn primary" onClick={handleAddCurrentSite}>
-              ➕ {t('popup.addCurrent')}
+          <div className="col" style={{ gap: '8px' }}>
+            <button className="btn primary samurai-transition" onClick={handleAddCurrentSite}>
+              ⛔ {t('popup.addCurrent')}
             </button>
-            <button className="btn" onClick={handleOpenOptions}>
+            <button className="btn samurai-transition" onClick={handleOpenOptions}>
               ⚙️ {t('popup.openOptions')}
             </button>
           </div>
 
-          <div className="space"></div>
-          <div className="muted" style={{ fontSize: '12px' }}>
+          <div style={{
+            fontSize: '11px',
+            color: 'var(--muted)',
+            textAlign: 'center',
+            marginTop: '12px',
+            fontStyle: 'italic'
+          }}>
             {t('popup.hint', { example: 'news.example.com' })}
           </div>
 
           {/* Focus Session - Active */}
           {isSessionActive && (
             <div
-              className="card"
+              className="card bamboo-grid"
               style={{
-                padding: '12px',
-                background: 'var(--card2)',
-                marginTop: '12px',
+                padding: '14px',
+                background: 'var(--kinari-cream)',
+                marginTop: '16px',
+                border: '2px solid var(--accent)',
               }}
             >
               <div
@@ -215,32 +238,38 @@ const App: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: '8px',
+                  marginBottom: '10px',
                 }}
               >
-                <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  🍅 {t('focusSession.title')}
+                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--accent)' }}>
+                  🧘 {t('focusSession.title')}
                 </div>
-                <div className="kbd" style={{ fontSize: '16px' }}>
+                <div className="kbd lantern-glow" style={{
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  background: 'var(--accent)',
+                  color: 'white',
+                  padding: '4px 10px'
+                }}>
                   {formatTime(remainingTime)}
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '4px' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
                 <button
-                  className="btn"
+                  className="btn samurai-transition"
                   onClick={handlePauseFocusSession}
-                  style={{ flex: 1, fontSize: '11px', padding: '6px' }}
+                  style={{ flex: 1, fontSize: '11px', padding: '8px' }}
                 >
                   {currentSession?.state === SessionState.PAUSED
-                    ? t('focusSession.resume')
-                    : t('focusSession.pause')}
+                    ? '▶ ' + t('focusSession.resume')
+                    : '⏸ ' + t('focusSession.pause')}
                 </button>
                 <button
-                  className="btn"
+                  className="btn danger samurai-transition"
                   onClick={handleStopFocusSession}
-                  style={{ flex: 1, fontSize: '11px', padding: '6px' }}
+                  style={{ flex: 1, fontSize: '11px', padding: '8px' }}
                 >
-                  {t('focusSession.stop')}
+                  ⏹ {t('focusSession.stop')}
                 </button>
               </div>
             </div>
@@ -251,20 +280,27 @@ const App: React.FC = () => {
             <div
               className="card"
               style={{
-                padding: '12px',
+                padding: '14px',
                 background: 'var(--card2)',
-                marginTop: '12px',
+                marginTop: '16px',
+                border: '1px solid var(--border)',
               }}
             >
-              <div style={{ fontSize: '14px', marginBottom: '8px', fontWeight: '500' }}>
-                🍅 {t('focusSession.startTitle')}
+              <div style={{
+                fontSize: '13px',
+                marginBottom: '10px',
+                fontWeight: '600',
+                textAlign: 'center',
+                color: 'var(--text)'
+              }}>
+                🧘 {t('focusSession.startTitle')}
               </div>
               <button
-                className="btn primary"
+                className="btn primary samurai-transition"
                 onClick={handleStartFocusSession}
-                style={{ width: '100%', fontSize: '12px' }}
+                style={{ width: '100%', fontSize: '12px', padding: '10px' }}
               >
-                {t('focusSession.start25min')}
+                ⏱ {t('focusSession.start25min')}
               </button>
             </div>
           )}

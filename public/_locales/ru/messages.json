@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Brain Defender",
+    "message": "Focusan - 集中",
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Защищает ваш фокус и внимание, блокируя отвлекающие сайты с мотивационными напоминаниями.",
+    "message": "Овладейте фокусом с японской дисциплиной. Блокируйте отвлечения с дзен-осознанностью и самурайской решимостью.",
     "description": "Description of the extension"
   }
 }

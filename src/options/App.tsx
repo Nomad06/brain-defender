@@ -1,6 +1,6 @@
 /**
- * Options Page React App for Brain Defender
- * Full settings and management interface
+ * Options Page React App for Focusan
+ * Full settings and management interface with Japanese aesthetics
  */
 
 import React, { useState, useEffect } from 'react'
@@ -16,8 +16,9 @@ import DeleteChallengeModal from './DeleteChallengeModal'
 import ScheduleModal from './ScheduleModal'
 import ConditionalRulesModal from './ConditionalRulesModal'
 import type { ConditionalRule } from '../shared/domain/conditional-rules'
+import { getAllThemes, getCurrentThemeId, switchTheme, type Theme } from '../shared/themes'
 
-type Tab = 'sites' | 'stats' | 'achievements'
+type Tab = 'sites' | 'stats' | 'achievements' | 'appearance'
 
 const App: React.FC = () => {
   const [sites, setSites] = useState<SiteObject[]>([])
@@ -34,6 +35,8 @@ const App: React.FC = () => {
   const [deletingHosts, setDeletingHosts] = useState<string[]>([])  // Changed to array
   const [schedulingHost, setSchedulingHost] = useState<{ host: string; schedule: Schedule | null } | null>(null)
   const [conditionalRulesHost, setConditionalRulesHost] = useState<{ host: string; rules: ConditionalRule[] } | null>(null)
+  const [currentThemeId, setCurrentThemeId] = useState<string>('default')
+  const [availableThemes, setAvailableThemes] = useState<Theme[]>([])
 
   // Load data and language
   useEffect(() => {
@@ -42,6 +45,11 @@ const App: React.FC = () => {
       await initI18n()
       const currentLang = getCurrentLanguage()
       setLanguageState(currentLang)
+      // Load themes
+      const themes = getAllThemes()
+      setAvailableThemes(themes)
+      const themeId = await getCurrentThemeId()
+      setCurrentThemeId(themeId)
       // Then load data
       loadAllData()
     }
@@ -90,6 +98,13 @@ const App: React.FC = () => {
     }
   }
 
+  // Handle theme change
+  const handleThemeChange = async (themeId: string) => {
+    const success = await switchTheme(themeId)
+    if (success) {
+      setCurrentThemeId(themeId)
+    }
+  }
 
   // Add single site
   const handleAddSite = async () => {
@@ -375,36 +390,54 @@ const App: React.FC = () => {
   }
 
   return (
+    <div className="washi-texture" style={{ minHeight: '100vh', padding: '20px 0' }}>
     <div className="container" style={{ maxWidth: '920px', margin: '0 auto' }}>
-      <div className="card" style={{ padding: '16px' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div className="h1">{t('options.title')}</div>
-            <div className="h2" style={{ fontSize: '14px', color: 'var(--muted)' }}>
-              {t('options.subtitle')}
-            </div>
+      <div className="card" style={{ padding: '24px' }}>
+        {/* Japanese-style Header */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '8px' }}>⛩️</div>
+          <div className="japanese-title" style={{ fontSize: '28px', marginBottom: '8px' }}>
+            Focusan Settings
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div className="kbd">{sites.length}</div>
-            <select
-              className="btn"
-              value={language}
-              onChange={e => handleLanguageChange(e.target.value)}
-              style={{ padding: '6px 10px', fontSize: '12px' }}
-            >
-              <option value="ru">{t('options.languageRu')}</option>
-              <option value="en">{t('options.languageEn')}</option>
-            </select>
+          <div style={{ fontSize: '14px', color: 'var(--muted)', letterSpacing: '0.1em' }}>
+            集中 · FOCUS MANAGEMENT
           </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{
+            padding: '8px 16px',
+            background: 'var(--kinari-cream)',
+            borderRadius: 'var(--radius)',
+            border: '2px solid var(--border)'
+          }}>
+            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Blocked Sites:</span>{' '}
+            <span className="kbd" style={{
+              background: 'var(--accent)',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '14px'
+            }}>{sites.length}</span>
+          </div>
+          <select
+            className="btn samurai-transition"
+            value={language}
+            onChange={e => handleLanguageChange(e.target.value)}
+            style={{ padding: '8px 12px', fontSize: '12px' }}
+          >
+            <option value="ru">🇷🇺 {t('options.languageRu')}</option>
+            <option value="en">🇬🇧 {t('options.languageEn')}</option>
+          </select>
         </div>
 
         <div className="space"></div>
 
         {/* Add Site Section */}
-        <div className="card" style={{ padding: '16px', background: 'var(--card2)' }}>
-          <div className="h2">{t('options.manualAdd')}</div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="card bamboo-grid" style={{ padding: '18px', background: 'var(--kinari-cream)', border: '2px solid var(--border)' }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
+            ⛔ {t('options.manualAdd')}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <input
               className="input"
               value={newSiteInput}
@@ -413,16 +446,14 @@ const App: React.FC = () => {
               placeholder={t('options.inputPlaceholder')}
               style={{ flex: 1 }}
             />
-            <button className="btn primary" onClick={handleAddSite}>
-              {t('options.addButton')}
+            <button className="btn primary samurai-transition" onClick={handleAddSite}>
+              ➕ {t('options.addButton')}
             </button>
           </div>
-          <div className="space"></div>
-          <button className="btn" onClick={handleAddCurrentSite}>
-            ➕ {t('options.addCurrent')}
+          <button className="btn samurai-transition" onClick={handleAddCurrentSite} style={{ width: '100%' }}>
+            🌐 {t('options.addCurrent')}
           </button>
-          <div className="space"></div>
-          <div className="muted" style={{ fontSize: '12px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '12px', fontStyle: 'italic' }}>
             {t('options.normalizationHint')}
           </div>
         </div>
@@ -430,36 +461,54 @@ const App: React.FC = () => {
         <div className="space"></div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '2px solid var(--border)', marginBottom: '20px' }}>
           <button
-            className="btn"
+            className="btn samurai-transition"
             onClick={() => setActiveTab('sites')}
             style={{
-              borderRadius: 0,
-              borderBottom: `2px solid ${activeTab === 'sites' ? 'var(--accent)' : 'transparent'}`,
+              borderRadius: 'var(--radius) var(--radius) 0 0',
+              borderBottom: activeTab === 'sites' ? '3px solid var(--accent)' : '3px solid transparent',
+              background: activeTab === 'sites' ? 'var(--kinari-cream)' : 'transparent',
+              fontWeight: activeTab === 'sites' ? 600 : 400,
             }}
           >
-            {t('options.tabSites')}
+            📋 {t('options.tabSites')}
           </button>
           <button
-            className="btn"
+            className="btn samurai-transition"
             onClick={() => setActiveTab('stats')}
             style={{
-              borderRadius: 0,
-              borderBottom: `2px solid ${activeTab === 'stats' ? 'var(--accent)' : 'transparent'}`,
+              borderRadius: 'var(--radius) var(--radius) 0 0',
+              borderBottom: activeTab === 'stats' ? '3px solid var(--accent)' : '3px solid transparent',
+              background: activeTab === 'stats' ? 'var(--kinari-cream)' : 'transparent',
+              fontWeight: activeTab === 'stats' ? 600 : 400,
             }}
           >
-            {t('options.tabStats')}
+            📊 {t('options.tabStats')}
           </button>
           <button
-            className="btn"
+            className="btn samurai-transition"
             onClick={() => setActiveTab('achievements')}
             style={{
-              borderRadius: 0,
-              borderBottom: `2px solid ${activeTab === 'achievements' ? 'var(--accent)' : 'transparent'}`,
+              borderRadius: 'var(--radius) var(--radius) 0 0',
+              borderBottom: activeTab === 'achievements' ? '3px solid var(--accent)' : '3px solid transparent',
+              background: activeTab === 'achievements' ? 'var(--kinari-cream)' : 'transparent',
+              fontWeight: activeTab === 'achievements' ? 600 : 400,
             }}
           >
-            {t('options.tabAchievements')}
+            🏆 {t('options.tabAchievements')}
+          </button>
+          <button
+            className="btn samurai-transition"
+            onClick={() => setActiveTab('appearance')}
+            style={{
+              borderRadius: 'var(--radius) var(--radius) 0 0',
+              borderBottom: activeTab === 'appearance' ? '3px solid var(--accent)' : '3px solid transparent',
+              background: activeTab === 'appearance' ? 'var(--kinari-cream)' : 'transparent',
+              fontWeight: activeTab === 'appearance' ? 600 : 400,
+            }}
+          >
+            🎨 Appearance
           </button>
         </div>
 
@@ -759,6 +808,126 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Appearance Tab */}
+        {activeTab === 'appearance' && (
+          <div>
+            <div className="h2" style={{ marginBottom: '16px' }}>🎨 Theme Settings</div>
+            <p className="muted" style={{ marginBottom: '24px' }}>
+              Choose a theme to customize the appearance of the extension
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+              {availableThemes.map((theme) => {
+                const isActive = theme.metadata.id === currentThemeId
+                return (
+                  <div
+                    key={theme.metadata.id}
+                    onClick={() => handleThemeChange(theme.metadata.id)}
+                    className="zen-card"
+                    style={{
+                      padding: '20px',
+                      cursor: 'pointer',
+                      border: isActive ? '3px solid var(--accent)' : '2px solid var(--border)',
+                      background: isActive ? 'var(--card2)' : 'var(--card)',
+                      transition: 'all 0.2s ease',
+                      position: 'relative',
+                    }}
+                  >
+                    {isActive && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          background: 'var(--accent)',
+                          color: 'white',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        ACTIVE
+                      </div>
+                    )}
+
+                    <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '12px' }}>
+                      {theme.metadata.emoji}
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)' }}>
+                        {theme.metadata.name}
+                      </div>
+                      {theme.metadata.version && (
+                        <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>
+                          v{theme.metadata.version}
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="muted" style={{ fontSize: '12px', textAlign: 'center', marginBottom: '12px' }}>
+                      {theme.metadata.description}
+                    </p>
+
+                    {theme.metadata.author && (
+                      <div style={{ fontSize: '10px', color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center' }}>
+                        {theme.metadata.author}
+                      </div>
+                    )}
+
+                    {/* Color preview */}
+                    <div style={{ marginTop: '16px', display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: theme.colors.accent,
+                          border: '2px solid var(--border)',
+                        }}
+                        title="Accent"
+                      />
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: theme.colors.bg1,
+                          border: '2px solid var(--border)',
+                        }}
+                        title="Background"
+                      />
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: theme.colors.text,
+                          border: '2px solid var(--border)',
+                        }}
+                        title="Text"
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="space"></div>
+
+            <div style={{ background: 'var(--card2)', padding: '16px', borderRadius: 'var(--radius)', marginTop: '24px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>ℹ️ Theme Information</div>
+              <ul className="muted" style={{ fontSize: '12px', margin: 0, paddingLeft: '20px' }}>
+                <li>Themes change the visual appearance of all extension pages</li>
+                <li>Your theme preference is saved and synced across devices</li>
+                <li>The active theme is applied immediately when selected</li>
+                <li>Each theme includes custom colors, fonts, and effects</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Deletion Challenge Modal */}
@@ -785,6 +954,7 @@ const App: React.FC = () => {
           onClose={() => setConditionalRulesHost(null)}
         />
       )}
+    </div>
     </div>
   )
 }

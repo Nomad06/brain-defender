@@ -1,26 +1,65 @@
 :root {
-    --bg1: #f8f9fa;
-    --bg2: #ffffff;
-    --card: #ffffff;
-    --card2: #f5f6f8;
-    --text: #2d3748;
-    --muted: #718096;
-    --border: #e2e8f0;
-    --accent: #5b8def;
-    --accent2: #7c9ef2;
-    --danger: #f56565;
-    --shadow: 0 2px 8px rgba(0,0,0,.06);
-    --radius: 12px;
+    /* Japanese Color Palette - Inspired by traditional aesthetics */
+    --washi-white: #faf7f2;          /* Washi paper background */
+    --shiro-white: #ffffff;          /* Pure white */
+    --sumi-black: #1a1a1a;           /* Sumi ink black */
+    --sumi-gray: #4a4a4a;            /* Lighter sumi gray */
+    --kinari-cream: #f5f1e8;         /* Natural cream */
+    --seiheki-blue: #2e5f6f;         /* Deep blue-green */
+    --ai-indigo: #165e83;            /* Traditional indigo */
+    --beni-red: #c73e3a;             /* Beni (safflower) red */
+    --sakura-pink: #ffc0cb;          /* Cherry blossom */
+    --gold-accent: #d4af37;          /* Gold accent */
+    --bamboo-green: #6b8e23;         /* Bamboo green */
+    --mist-gray: #d8d8d8;            /* Morning mist */
+
+    /* Semantic colors mapped to Japanese palette */
+    --bg1: var(--washi-white);
+    --bg2: var(--shiro-white);
+    --card: var(--shiro-white);
+    --card2: var(--kinari-cream);
+    --text: var(--sumi-black);
+    --muted: var(--sumi-gray);
+    --border: var(--mist-gray);
+    --accent: var(--seiheki-blue);
+    --accent2: var(--ai-indigo);
+    --danger: var(--beni-red);
+    --success: var(--bamboo-green);
+    --gold: var(--gold-accent);
+
+    /* Shadows - subtle like shoji screens */
+    --shadow: 0 2px 12px rgba(46, 95, 111, 0.08);
+    --shadow-lg: 0 4px 20px rgba(46, 95, 111, 0.12);
+    --glow: 0 0 20px rgba(212, 175, 55, 0.3);
+
+    /* Border radius - minimal and architectural */
+    --radius: 4px;
+    --radius-lg: 8px;
+
+    /* Typography - Japanese-inspired */
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    --serif: "Noto Serif JP", Georgia, "Times New Roman", serif;
+
+    /* Spacing based on traditional Japanese proportions */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
   }
   
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
     font-family: var(--sans);
     color: var(--text);
     background: var(--bg1);
+    /* Subtle Japanese pattern overlay */
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(46, 95, 111, 0.03) 0%, transparent 50%);
   }
   
   a { color: var(--accent); text-decoration: none; }
@@ -35,6 +74,28 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle paper texture effect */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.01) 2px,
+        rgba(0, 0, 0, 0.01) 4px
+      );
+    pointer-events: none;
+    opacity: 0.3;
   }
   
   .row { display: flex; gap: 10px; align-items: center; }
@@ -45,50 +106,80 @@
   .h2 { font-size: 13px; font-weight: 500; color: var(--muted); }
   
   .btn {
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     background: var(--bg2);
     color: var(--text);
     padding: 10px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all .2s ease;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     font-weight: 500;
-    font-family: inherit;
-    font-size: inherit;
+    position: relative;
+    overflow: hidden;
   }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(46, 95, 111, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
   .btn:hover {
     background: var(--card2);
     border-color: var(--accent);
+    box-shadow: var(--shadow);
   }
-  .btn:active { transform: translateY(1px); }
-  .btn:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+
+  .btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
   }
   
   .btn.primary {
     border-color: var(--accent);
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--seiheki-blue) 0%, var(--ai-indigo) 100%);
     color: white;
+    font-weight: 600;
   }
-  .btn.primary:hover { 
-    background: var(--accent2);
-    border-color: var(--accent2);
+
+  .btn.primary::before {
+    background: rgba(255, 255, 255, 0.2);
   }
-  
+
+  .btn.primary:hover {
+    background: linear-gradient(135deg, var(--ai-indigo) 0%, var(--seiheki-blue) 100%);
+    border-color: var(--ai-indigo);
+    box-shadow: var(--shadow-lg), var(--glow);
+  }
+
   .btn.danger {
     border-color: var(--danger);
     background: var(--danger);
     color: white;
+    font-weight: 600;
   }
-  .btn.danger:hover { 
-    background: #e53e3e;
-    border-color: #e53e3e;
+
+  .btn.danger::before {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .btn.danger:hover {
+    background: #a83432;
+    border-color: #a83432;
+    box-shadow: var(--shadow-lg);
   }
   
   .input {
@@ -100,19 +191,10 @@
     padding: 10px 14px;
     outline: none;
     transition: all .2s ease;
-    font-family: inherit;
-    font-size: inherit;
   }
   .input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(91, 141, 239, .1);
-  }
-  .input:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .input::placeholder {
-    color: var(--muted);
   }
   
   .kbd {
@@ -200,4 +282,173 @@
     font-family: var(--mono);
     resize: vertical;
     min-height: 80px;
+  }
+
+  /* ========================================
+     JAPANESE STYLE ENHANCEMENTS
+     ======================================== */
+
+  /* Ink brush stroke animation */
+  @keyframes inkStroke {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    100% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  /* Cherry blossom falling animation */
+  @keyframes sakuraFall {
+    0% {
+      transform: translateY(-10px) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* Zen ripple effect */
+  @keyframes zenRipple {
+    0% {
+      transform: scale(0.8);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  /* Meditation pulse */
+  @keyframes meditationPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  /* Shoji screen slide */
+  @keyframes shojiSlide {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Torii gate fade in */
+  @keyframes toriiGateFade {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Japanese wave pattern (seigaiha) background */
+  .japanese-wave-bg {
+    background-image:
+      radial-gradient(circle at 0% 50%, rgba(46, 95, 111, 0.05) 25%, transparent 25%),
+      radial-gradient(circle at 100% 50%, rgba(46, 95, 111, 0.05) 25%, transparent 25%);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+  }
+
+  /* Bamboo grid pattern */
+  .bamboo-grid {
+    background-image:
+      linear-gradient(90deg, rgba(107, 142, 35, 0.05) 1px, transparent 1px),
+      linear-gradient(rgba(107, 142, 35, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Gold accent border (like kintsugi) */
+  .kintsugi-border {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Washi paper texture */
+  .washi-texture {
+    background: var(--washi-white);
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  /* Zen focus state */
+  .zen-focus {
+    animation: meditationPulse 3s ease-in-out infinite;
+  }
+
+  /* Samurai determination (sharp, decisive) */
+  .samurai-transition {
+    transition: all 0.15s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  /* Flowing like water (smooth, natural) */
+  .water-flow {
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Typography enhancements */
+  .japanese-title {
+    font-family: var(--serif);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    position: relative;
+  }
+
+  /* Accent line under titles (like underline in Japanese calligraphy) */
+  .japanese-title::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    border-radius: 2px;
+  }
+
+  /* Lantern glow effect */
+  .lantern-glow {
+    box-shadow:
+      0 0 20px rgba(212, 175, 55, 0.4),
+      0 0 40px rgba(212, 175, 55, 0.2),
+      inset 0 0 10px rgba(212, 175, 55, 0.1);
+  }
+
+  /* Seasonal theme support */
+  [data-season="spring"] {
+    --accent: #ffb7c5; /* Sakura pink */
+  }
+
+  [data-season="summer"] {
+    --accent: #00a381; /* Fresh green */
+  }
+
+  [data-season="autumn"] {
+    --accent: #d66a4c; /* Maple red */
+  }
+
+  [data-season="winter"] {
+    --accent: #5a79a5; /* Winter blue */
   }

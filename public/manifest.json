@@ -5,7 +5,7 @@
     "version": "2.0.0",
     "manifest_version": 3,
     "action": {
-      "default_title": "Brain Defender",
+      "default_title": "Focusan - 集中",
       "default_popup": "src/popup/index.html"
     },
     "options_page": "src/options/index.html",

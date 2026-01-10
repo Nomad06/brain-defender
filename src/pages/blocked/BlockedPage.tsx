@@ -7,6 +7,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { t, getRandomBlockedPhrase, initI18n } from '../../shared/i18n'
 import { messagingClient } from '../../shared/messaging/client'
+import { getRandomHaiku, getRandomSamuraiQuote } from '../../shared/haiku'
+import ZenGarden from './ZenGarden'
 
 // Eye exercise trajectories
 type TrajectoryPoint = { x: number; y: number }
@@ -77,7 +79,9 @@ const BREATH_PHASES: BreathPhase[] = [
 const BlockedPage: React.FC = () => {
   const [blockedUrl, setBlockedUrl] = useState<string>('')
   const [motivationalPhrase, setMotivationalPhrase] = useState<string>('')
-  const [activeExercise, setActiveExercise] = useState<'none' | 'eye' | 'breath' | 'stretch'>('none')
+  const [activeExercise, setActiveExercise] = useState<'none' | 'eye' | 'breath' | 'stretch' | 'zen'>('none')
+  const [haiku, setHaiku] = useState<{ lines: [string, string, string] } | null>(null)
+  const [samuraiQuote, setSamuraiQuote] = useState<string>('')
 
   // Eye exercise state
   const eyeCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -95,6 +99,11 @@ const BlockedPage: React.FC = () => {
     initI18n().then(() => {
       const phrase = getRandomBlockedPhrase()
       setMotivationalPhrase(phrase)
+
+      // Get haiku and samurai quote
+      const randomHaiku = getRandomHaiku()
+      setHaiku(randomHaiku)
+      setSamuraiQuote(getRandomSamuraiQuote())
     })
 
     // Get blocked URL from query params
@@ -355,8 +364,18 @@ const BlockedPage: React.FC = () => {
     setActiveExercise('none')
   }
 
+  // Zen Garden Exercise
+  const startZenExercise = () => {
+    setActiveExercise('zen')
+  }
+
+  const stopZenExercise = () => {
+    setActiveExercise('none')
+  }
+
   return (
     <div
+      className="washi-texture"
       style={{
         minHeight: '100vh',
         display: 'grid',
@@ -364,12 +383,26 @@ const BlockedPage: React.FC = () => {
         padding: '18px',
       }}
     >
-      <div className="card" style={{ maxWidth: '980px', padding: '18px', width: '100%' }}>
-        {/* Header */}
+      <div className="card" style={{ maxWidth: '980px', padding: '24px', width: '100%' }}>
+        {/* Japanese-style Header with Torii Gate Icon */}
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '24px',
+            animation: 'toriiGateFade 0.8s ease-out',
+          }}
+        >
+          <div style={{ fontSize: '48px', marginBottom: '8px' }}>⛩️</div>
+          <div className="japanese-title" style={{ fontSize: '24px', marginBottom: '12px' }}>
+            Focusan - 集中
+          </div>
+        </div>
+
+        {/* Status badges */}
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             flexWrap: 'wrap',
             gap: '10px',
             marginBottom: '20px',
@@ -380,9 +413,9 @@ const BlockedPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '6px 12px',
-              borderRadius: '999px',
-              border: '1px solid var(--border)',
+              padding: '6px 16px',
+              borderRadius: 'var(--radius)',
+              border: '2px solid var(--border)',
               background: 'var(--card2)',
               fontFamily: 'var(--mono)',
               fontSize: '12px',
@@ -391,31 +424,78 @@ const BlockedPage: React.FC = () => {
             🚫 {blockedUrl}
           </div>
           <div
+            className="kintsugi-border"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '6px 12px',
-              borderRadius: '999px',
-              border: '1px solid var(--border)',
+              padding: '6px 16px',
+              borderRadius: 'var(--radius)',
               background: 'var(--card2)',
               fontFamily: 'var(--mono)',
               fontSize: '12px',
+              fontWeight: 600,
             }}
           >
             🛡️ BLOCKED
           </div>
         </div>
 
+        {/* Haiku Display */}
+        {haiku && (
+          <div
+            className="card bamboo-grid"
+            style={{
+              padding: '24px',
+              background: 'var(--kinari-cream)',
+              border: '2px solid var(--border)',
+              marginBottom: '20px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--serif)',
+                fontSize: '18px',
+                lineHeight: 1.8,
+                color: 'var(--sumi-black)',
+                fontStyle: 'italic',
+              }}
+            >
+              {haiku.lines.map((line, i) => (
+                <div key={i} style={{ marginBottom: i === 2 ? 0 : '8px' }}>
+                  {line}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Samurai Quote */}
+        <div
+          style={{
+            fontSize: 'clamp(20px, 2.5vw, 32px)',
+            fontWeight: 600,
+            lineHeight: 1.3,
+            letterSpacing: '0.02em',
+            margin: '20px 0',
+            color: 'var(--seiheki-blue)',
+            textAlign: 'center',
+            fontFamily: 'var(--serif)',
+          }}
+        >
+          「{samuraiQuote}」
+        </div>
+
         {/* Motivational Phrase */}
         <div
           style={{
-            fontSize: 'clamp(28px, 3.2vw, 54px)',
-            fontWeight: 600,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            margin: '6px 0 0',
-            color: 'var(--text)',
+            fontSize: 'clamp(16px, 2vw, 20px)',
+            fontWeight: 500,
+            lineHeight: 1.4,
+            margin: '16px 0',
+            color: 'var(--muted)',
+            textAlign: 'center',
           }}
         >
           {motivationalPhrase}
@@ -478,18 +558,21 @@ const BlockedPage: React.FC = () => {
 
           {/* Exercise Buttons */}
           {activeExercise === 'none' && (
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button className="btn" onClick={startEyeExercise} style={{ flex: 1, minWidth: '160px' }}>
-                👁 {t('exercises.eyeTraining')}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
+              <button className="btn samurai-transition" onClick={startZenExercise}>
+                🪨 Zen Garden
               </button>
-              <button className="btn" onClick={startBreathExercise} style={{ flex: 1, minWidth: '160px' }}>
+              <button className="btn samurai-transition" onClick={startBreathExercise}>
                 🫁 {t('exercises.breathing')}
               </button>
-              <button className="btn" onClick={startStretchExercise} style={{ flex: 1, minWidth: '160px' }}>
+              <button className="btn samurai-transition" onClick={startEyeExercise}>
+                👁 {t('exercises.eyeTraining')}
+              </button>
+              <button className="btn samurai-transition" onClick={startStretchExercise}>
                 🧍 {t('exercises.stretch')}
               </button>
-              <button className="btn" onClick={handleCloseTab} style={{ flex: 1, minWidth: '160px' }}>
-                ❌ {t('blocked.closeTab')}
+              <button className="btn danger samurai-transition" onClick={handleCloseTab}>
+                ✕ {t('blocked.closeTab')}
               </button>
             </div>
           )}
@@ -630,6 +713,47 @@ const BlockedPage: React.FC = () => {
                 className="btn"
                 onClick={stopStretchExercise}
                 style={{ marginTop: '16px', fontSize: '11px', padding: '6px 12px' }}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          )}
+
+          {/* Zen Garden Exercise Content */}
+          {activeExercise === 'zen' && (
+            <div
+              style={{
+                marginTop: '20px',
+                padding: '16px',
+                background: 'var(--card)',
+                borderRadius: '8px',
+                border: '2px solid var(--gold)',
+              }}
+            >
+              <div className="h2" style={{ marginBottom: '12px', textAlign: 'center' }}>
+                🪨 Zen Garden - 枯山水
+              </div>
+              <div className="muted" style={{ fontSize: '12px', marginBottom: '16px', textAlign: 'center' }}>
+                Rake the sand mindfully. Let your thoughts flow like water through the garden.
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                <ZenGarden width={Math.min(600, window.innerWidth - 100)} height={400} />
+              </div>
+              <div
+                style={{
+                  textAlign: 'center',
+                  fontStyle: 'italic',
+                  color: 'var(--muted)',
+                  fontSize: '13px',
+                  marginTop: '12px',
+                }}
+              >
+                "In the garden of the mind, cultivate stillness."
+              </div>
+              <button
+                className="btn"
+                onClick={stopZenExercise}
+                style={{ marginTop: '16px', fontSize: '11px', padding: '6px 12px', display: 'block', margin: '16px auto 0' }}
               >
                 {t('common.close')}
               </button>

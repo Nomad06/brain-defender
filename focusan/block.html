@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focusan - Site Blocked</title>
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/block.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Noto+Serif+JP:wght@700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="block-container">
+        <div class="content-wrapper">
+            <!-- Breathing Circle Animation -->
+            <div class="breath-container">
+                <div class="breath-circle"></div>
+                <div class="breath-circle-inner"></div>
+            </div>
+
+            <!-- Zen Message -->
+            <h1 class="kanji-title">継続</h1>
+            <h2 class="subtitle">Keizoku — Continuity</h2>
+
+            <p class="message">
+                Return to your purpose.<br>
+                This distraction is but a ripple on the water.
+            </p>
+
+            <button id="close-tab-btn" class="return-btn">Close Tab</button>
+        </div>
+
+        <!-- Quote at bottom -->
+        <div class="quote-container">
+            <p class="quote">"The warrior who is trapped in the present moment is not a warrior."</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('close-tab-btn').addEventListener('click', () => {
+            // Emulate tab close if possible, or history back
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.close();
+            }
+        });
+    </script>
+</body>
+
+</html>

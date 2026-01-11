@@ -2,13 +2,24 @@
  * Blocked Page for Brain Defender
  * Shown when user tries to access a blocked site
  * Includes exercises: eye training, breathing, and physical stretch
+ * Theme-aware content display using abstraction layer
  */
 
 import React, { useState, useEffect, useRef } from 'react'
-import { t, getRandomBlockedPhrase, initI18n } from '../../shared/i18n'
+import { t, initI18n, getCurrentLanguage } from '../../shared/i18n'
 import { messagingClient } from '../../shared/messaging/client'
-import { getRandomHaiku, getRandomSamuraiQuote } from '../../shared/haiku'
+import { useThemeContent } from '../../shared/themes/useThemeContent'
+import type { ExerciseType } from '../../shared/themes/content-config'
+import { HaikuCard } from './components/HaikuCard'
+import { QuoteCard } from './components/QuoteCard'
+import { PhraseCard } from './components/PhraseCard'
+import { ThemedHeader } from './components/ThemedHeader'
+import { BreathingCircles } from './components/BreathingCircles'
+import { ZenCard } from './components/ZenCard'
+import { ZenQuoteFooter } from './components/ZenQuoteFooter'
+import { getRandomZenPhrase, getRandomZenQuote } from '../../shared/japanese-zen'
 import ZenGarden from './ZenGarden'
+import MountainBreathing from './MountainBreathing'
 
 // Eye exercise trajectories
 type TrajectoryPoint = { x: number; y: number }
@@ -78,10 +89,15 @@ const BREATH_PHASES: BreathPhase[] = [
 
 const BlockedPage: React.FC = () => {
   const [blockedUrl, setBlockedUrl] = useState<string>('')
-  const [motivationalPhrase, setMotivationalPhrase] = useState<string>('')
-  const [activeExercise, setActiveExercise] = useState<'none' | 'eye' | 'breath' | 'stretch' | 'zen'>('none')
-  const [haiku, setHaiku] = useState<{ lines: [string, string, string] } | null>(null)
-  const [samuraiQuote, setSamuraiQuote] = useState<string>('')
+  const [activeExercise, setActiveExercise] = useState<ExerciseType | 'none'>('none')
+
+  // Use theme content hook for abstraction
+  const { theme, contentConfig, content } = useThemeContent()
+
+  // Japanese zen content (used when theme is japanese)
+  const [zenPhrase] = useState(() => getRandomZenPhrase())
+  const [zenQuote] = useState(() => getRandomZenQuote())
+  const currentLanguage = getCurrentLanguage()
 
   // Eye exercise state
   const eyeCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -95,16 +111,8 @@ const BlockedPage: React.FC = () => {
   const [breathPhase, setBreathPhase] = useState('')
 
   useEffect(() => {
-    // Initialize i18n first, then set phrase
-    initI18n().then(() => {
-      const phrase = getRandomBlockedPhrase()
-      setMotivationalPhrase(phrase)
-
-      // Get haiku and samurai quote
-      const randomHaiku = getRandomHaiku()
-      setHaiku(randomHaiku)
-      setSamuraiQuote(getRandomSamuraiQuote())
-    })
+    // Initialize i18n
+    initI18n()
 
     // Get blocked URL from query params
     const params = new URLSearchParams(window.location.search)
@@ -373,6 +381,15 @@ const BlockedPage: React.FC = () => {
     setActiveExercise('none')
   }
 
+  // Mountain Breathing Exercise
+  const startMountainExercise = () => {
+    setActiveExercise('mountain')
+  }
+
+  const stopMountainExercise = () => {
+    setActiveExercise('none')
+  }
+
   return (
     <div
       className="washi-texture"
@@ -384,19 +401,10 @@ const BlockedPage: React.FC = () => {
       }}
     >
       <div className="card" style={{ maxWidth: '980px', padding: '24px', width: '100%' }}>
-        {/* Japanese-style Header with Torii Gate Icon */}
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '24px',
-            animation: 'toriiGateFade 0.8s ease-out',
-          }}
-        >
-          <div style={{ fontSize: '48px', marginBottom: '8px' }}>⛩️</div>
-          <div className="japanese-title" style={{ fontSize: '24px', marginBottom: '12px' }}>
-            Focusan - 集中
-          </div>
-        </div>
+        {/* Theme-aware Header */}
+        {theme && contentConfig && (
+          <ThemedHeader theme={theme} contentConfig={contentConfig} />
+        )}
 
         {/* Status badges */}
         <div
@@ -441,65 +449,32 @@ const BlockedPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Haiku Display */}
-        {haiku && (
-          <div
-            className="card bamboo-grid"
-            style={{
-              padding: '24px',
-              background: 'var(--kinari-cream)',
-              border: '2px solid var(--border)',
-              marginBottom: '20px',
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--serif)',
-                fontSize: '18px',
-                lineHeight: 1.8,
-                color: 'var(--sumi-black)',
-                fontStyle: 'italic',
-              }}
-            >
-              {haiku.lines.map((line, i) => (
-                <div key={i} style={{ marginBottom: i === 2 ? 0 : '8px' }}>
-                  {line}
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Theme-aware Motivational Content */}
+        {theme?.metadata.id === 'japanese' ? (
+          <>
+            {/* Japanese Zen Theme: Breathing Circles + Zen Phrase */}
+            <BreathingCircles size={200} />
+            <ZenCard zenPhrase={zenPhrase} language={currentLanguage} />
+          </>
+        ) : (
+          <>
+            {/* Other themes: Use content config */}
+            {content?.haiku && (
+              <HaikuCard haiku={content.haiku} language={content.language} />
+            )}
+
+            {content?.quote && (
+              <QuoteCard quote={content.quote} />
+            )}
+
+            {content?.phrase && (
+              <PhraseCard phrase={content.phrase} />
+            )}
+          </>
         )}
 
-        {/* Samurai Quote */}
-        <div
-          style={{
-            fontSize: 'clamp(20px, 2.5vw, 32px)',
-            fontWeight: 600,
-            lineHeight: 1.3,
-            letterSpacing: '0.02em',
-            margin: '20px 0',
-            color: 'var(--seiheki-blue)',
-            textAlign: 'center',
-            fontFamily: 'var(--serif)',
-          }}
-        >
-          「{samuraiQuote}」
-        </div>
-
-        {/* Motivational Phrase */}
-        <div
-          style={{
-            fontSize: 'clamp(16px, 2vw, 20px)',
-            fontWeight: 500,
-            lineHeight: 1.4,
-            margin: '16px 0',
-            color: 'var(--muted)',
-            textAlign: 'center',
-          }}
-        >
-          {motivationalPhrase}
-        </div>
+        {/* Shoji Divider */}
+        <div className="shoji-divider"></div>
 
         {/* Instructions */}
         <div
@@ -556,21 +531,39 @@ const BlockedPage: React.FC = () => {
             {t('blocked.breathe')}
           </div>
 
-          {/* Exercise Buttons */}
-          {activeExercise === 'none' && (
+          {/* Exercise Buttons - Theme-aware ordering */}
+          {activeExercise === 'none' && contentConfig && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
-              <button className="btn samurai-transition" onClick={startZenExercise}>
-                🪨 Zen Garden
-              </button>
-              <button className="btn samurai-transition" onClick={startBreathExercise}>
-                🫁 {t('exercises.breathing')}
-              </button>
-              <button className="btn samurai-transition" onClick={startEyeExercise}>
-                👁 {t('exercises.eyeTraining')}
-              </button>
-              <button className="btn samurai-transition" onClick={startStretchExercise}>
-                🧍 {t('exercises.stretch')}
-              </button>
+              {contentConfig.layout.exerciseOrder.map(exercise => {
+                const exerciseButtons: Record<ExerciseType, React.ReactElement> = {
+                  zen: (
+                    <button key="zen" className="btn samurai-transition" onClick={startZenExercise}>
+                      🪨 Zen Garden
+                    </button>
+                  ),
+                  mountain: (
+                    <button key="mountain" className="btn caucasus-transition" onClick={startMountainExercise}>
+                      ⛰️ {t('exercises.mountain')}
+                    </button>
+                  ),
+                  breath: (
+                    <button key="breath" className="btn samurai-transition" onClick={startBreathExercise}>
+                      🫁 {t('exercises.breathing')}
+                    </button>
+                  ),
+                  eye: (
+                    <button key="eye" className="btn samurai-transition" onClick={startEyeExercise}>
+                      👁 {t('exercises.eyeTraining')}
+                    </button>
+                  ),
+                  stretch: (
+                    <button key="stretch" className="btn samurai-transition" onClick={startStretchExercise}>
+                      🧍 {t('exercises.stretch')}
+                    </button>
+                  )
+                }
+                return exerciseButtons[exercise]
+              })}
               <button className="btn danger samurai-transition" onClick={handleCloseTab}>
                 ✕ {t('blocked.closeTab')}
               </button>
@@ -759,7 +752,57 @@ const BlockedPage: React.FC = () => {
               </button>
             </div>
           )}
+
+          {/* Mountain Breathing Exercise Content */}
+          {activeExercise === 'mountain' && (
+            <div
+              className="warrior-card tower-shadow"
+              style={{
+                marginTop: '20px',
+                padding: '16px',
+              }}
+            >
+              <div className="h2" style={{ marginBottom: '12px', textAlign: 'center' }}>
+                ⛰️ {t('exercises.mountainTitle')}
+              </div>
+              <div className="muted" style={{ fontSize: '12px', marginBottom: '16px', textAlign: 'center' }}>
+                {t('exercises.mountainInstruction')}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                <MountainBreathing
+                  width={Math.min(600, window.innerWidth - 100)}
+                  height={400}
+                  onComplete={stopMountainExercise}
+                />
+              </div>
+              <div
+                className="mountain-quote"
+                style={{
+                  textAlign: 'center',
+                  fontStyle: 'italic',
+                  fontSize: '13px',
+                  marginTop: '12px',
+                  border: 'none',
+                  paddingLeft: 0,
+                }}
+              >
+                "Стойкость камня — в его основании, стойкость человека — в его духе"
+              </div>
+              <button
+                className="btn caucasus-btn"
+                onClick={stopMountainExercise}
+                style={{ marginTop: '16px', fontSize: '11px', padding: '6px 12px', display: 'block', margin: '16px auto 0' }}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Japanese Zen Quote Footer (only for japanese theme) */}
+        {theme?.metadata.id === 'japanese' && (
+          <ZenQuoteFooter quote={zenQuote} language={currentLanguage} />
+        )}
       </div>
 
       <style>{`

@@ -5,8 +5,8 @@
 
 export interface Haiku {
   lines: [string, string, string] // 5-7-5 syllable structure
+  linesRu?: [string, string, string] // Russian translation
   theme: 'focus' | 'discipline' | 'patience' | 'mindfulness' | 'strength'
-  translation?: string
 }
 
 export const HAIKU_COLLECTION: Haiku[] = [
@@ -16,6 +16,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'While the restless river flows',
       'Strength in stillness found',
     ],
+    linesRu: [
+      'Гора стоит твердо',
+      'Река беспокойно течет',
+      'Сила в покое',
+    ],
     theme: 'strength',
   },
   {
@@ -23,6 +28,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Bamboo bends with wind',
       'Yet returns to standing tall',
       'Flexible, not weak',
+    ],
+    linesRu: [
+      'Бамбук гнется с ветром',
+      'Но возвращается прямо',
+      'Гибкий, не слабый',
     ],
     theme: 'discipline',
   },
@@ -32,6 +42,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Each moment fleeting and pure',
       'Focus on right now',
     ],
+    linesRu: [
+      'Цветы сакуры падают',
+      'Каждый миг чист и мимолетен',
+      'Фокус на настоящем',
+    ],
     theme: 'mindfulness',
   },
   {
@@ -39,6 +54,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'The archer breathes deep',
       'Arrow finds its destined path',
       'One target, one mind',
+    ],
+    linesRu: [
+      'Лучник дышит глубоко',
+      'Стрела находит свой путь',
+      'Одна цель, один разум',
     ],
     theme: 'focus',
   },
@@ -48,6 +68,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Through snow and bitter cold wind',
       'Patient strength prevails',
     ],
+    linesRu: [
+      'Зимой слива цветет',
+      'Сквозь снег и холодный ветер',
+      'Терпение побеждает',
+    ],
     theme: 'patience',
   },
   {
@@ -55,6 +80,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Still water reflects',
       'The moon in perfect mirror',
       'Calm mind sees clearly',
+    ],
+    linesRu: [
+      'Тихая вода отражает',
+      'Луну в идеальном зеркале',
+      'Спокойный ум видит ясно',
     ],
     theme: 'mindfulness',
   },
@@ -64,6 +94,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Smoothed by endless river flow',
       'Time shapes discipline',
     ],
+    linesRu: [
+      'Камень под водой',
+      'Сглажен вечным течением',
+      'Время формирует волю',
+    ],
     theme: 'discipline',
   },
   {
@@ -71,6 +106,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Crane stands on one leg',
       'Balanced in the morning mist',
       'Focus brings balance',
+    ],
+    linesRu: [
+      'Журавль на одной ноге',
+      'В утреннем тумане',
+      'Фокус даёт баланс',
     ],
     theme: 'focus',
   },
@@ -80,6 +120,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Each stroke deliberate, sure',
       'Mind and brush as one',
     ],
+    linesRu: [
+      'Тушь течет по бумаге',
+      'Каждый мазок уверенный',
+      'Разум и кисть едины',
+    ],
     theme: 'mindfulness',
   },
   {
@@ -87,6 +132,11 @@ export const HAIKU_COLLECTION: Haiku[] = [
       'Morning dew sparkles',
       'Soon vanishes in sunlight',
       'Seize this precious moment',
+    ],
+    linesRu: [
+      'Утренняя роса блестит',
+      'Скоро исчезнет в солнце',
+      'Лови этот миг',
     ],
     theme: 'focus',
   },
@@ -195,24 +245,24 @@ export function getHaikuByTheme(theme: Haiku['theme']): Haiku {
  * Samurai quotes for additional motivation
  */
 export const SAMURAI_QUOTES = [
-  'The warrior\'s path is in training.',
-  'One arrow, one life.',
-  'Fall seven times, stand up eight.',
-  'The sword is the soul of the samurai.',
-  'Victory is for those who endure.',
-  'A calm mind is stronger than brute force.',
-  'The mountain does not move for the wind.',
-  'In stillness, find your strength.',
-  'Discipline is choosing between what you want now and what you want most.',
-  'The master has failed more times than the beginner has even tried.',
-  'Your focus determines your reality.',
-  'The journey of a thousand miles begins with a single step.',
-  'When the student is ready, the teacher appears.',
-  'Do not seek to follow in the footsteps of wise men; seek what they sought.',
-  'The obstacle is the path.',
+  { en: 'The warrior\'s path is in training.', ru: 'Путь воина - в тренировке.' },
+  { en: 'One arrow, one life.', ru: 'Одна стрела, одна жизнь.' },
+  { en: 'Fall seven times, stand up eight.', ru: 'Упал семь раз, встань восемь.' },
+  { en: 'The sword is the soul of the samurai.', ru: 'Меч - это душа самурая.' },
+  { en: 'Victory is for those who endure.', ru: 'Победа для тех, кто терпит.' },
+  { en: 'A calm mind is stronger than brute force.', ru: 'Спокойный ум сильнее грубой силы.' },
+  { en: 'The mountain does not move for the wind.', ru: 'Гора не двигается для ветра.' },
+  { en: 'In stillness, find your strength.', ru: 'В тишине найди свою силу.' },
+  { en: 'Discipline is choosing between what you want now and what you want most.', ru: 'Дисциплина - выбор между тем, что хочешь сейчас, и тем, что хочешь больше всего.' },
+  { en: 'The master has failed more times than the beginner has even tried.', ru: 'Мастер терпел неудачи чаще, чем новичок пытался.' },
+  { en: 'Your focus determines your reality.', ru: 'Твой фокус определяет твою реальность.' },
+  { en: 'The journey of a thousand miles begins with a single step.', ru: 'Путь в тысячу миль начинается с одного шага.' },
+  { en: 'When the student is ready, the teacher appears.', ru: 'Когда ученик готов, появляется учитель.' },
+  { en: 'Do not seek to follow in the footsteps of wise men; seek what they sought.', ru: 'Не ищи следов мудрецов; ищи то, что они искали.' },
+  { en: 'The obstacle is the path.', ru: 'Препятствие - это путь.' },
 ]
 
-export function getRandomSamuraiQuote(): string {
+export function getRandomSamuraiQuote(language: 'en' | 'ru' = 'en'): string {
   const index = Math.floor(Math.random() * SAMURAI_QUOTES.length)
-  return SAMURAI_QUOTES[index]
+  return SAMURAI_QUOTES[index][language]
 }

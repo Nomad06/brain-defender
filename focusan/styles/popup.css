@@ -1,0 +1,221 @@
+/* Popup Styling */
+body {
+    width: 350px;
+    height: 500px;
+    background-color: var(--color-washi);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-ai-indigo);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.logo-icon {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-seigaiha);
+    border-radius: 50%;
+    position: relative;
+}
+
+.logo-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-seigaiha);
+    border-radius: 50%;
+}
+
+.settings-btn {
+    color: var(--color-stone);
+    transition: var(--transition-fast);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+}
+
+.settings-btn:hover {
+    color: var(--color-ai-indigo);
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+}
+
+.zen-quote {
+    text-align: center;
+    color: var(--color-stone);
+    animation: fadeIn 1s ease-out;
+}
+
+.kanji {
+    display: block;
+    font-family: var(--font-family-serif);
+    font-size: 1.5rem;
+    color: var(--color-ai-indigo);
+    margin-bottom: 2px;
+}
+
+.meaning {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+}
+
+/* Timer */
+.timer-wrapper {
+    position: relative;
+    width: 220px;
+    height: 220px;
+}
+
+.timer-circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring__circle {
+    transition: 0.35s stroke-dashoffset;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    stroke-dasharray: 628;
+    stroke-dashoffset: 0;
+    /* Full circle initially */
+    stroke-linecap: round;
+}
+
+.time-display {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.time {
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--color-ai-indigo);
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.status {
+    font-size: 0.85rem;
+    color: var(--color-take);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--spacing-xs);
+    font-weight: 500;
+}
+
+/* Controls */
+.controls {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn {
+    padding: 12px 32px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: 1rem;
+    transition: var(--transition-normal);
+    letter-spacing: 0.02em;
+}
+
+.btn-primary {
+    background-color: var(--color-ai-indigo);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-float);
+    background-color: #1a2b42;
+    /* Slightly lighter indigo */
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: var(--spacing-md);
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-stone);
+    margin-bottom: 2px;
+}
+
+.stat-item .value {
+    font-weight: 600;
+    color: var(--color-ai-indigo);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

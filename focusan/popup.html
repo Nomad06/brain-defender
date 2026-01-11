@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focusan - Popup</title>
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon"></div> <!-- Circle target icon -->
+                <span class="logo-text">Focusan</span>
+            </div>
+            <button class="settings-btn" aria-label="Settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M19.4 15A1.65 1.65 0 0 0 20.2 12A1.65 1.65 0 0 0 19.4 9M12 21A1.65 1.65 0 0 0 15 20.2A1.65 1.65 0 0 0 12 19.4M4.6 15A1.65 1.65 0 0 0 3.8 12A1.65 1.65 0 0 0 4.6 9M12 3A1.65 1.65 0 0 0 9 3.8A1.65 1.65 0 0 0 12 4.6M16.24 16.24A1.65 1.65 0 0 0 18.36 14.12A1.65 1.65 0 0 0 16.24 16.24M16.24 7.76A1.65 1.65 0 0 0 14.12 5.64A1.65 1.65 0 0 0 16.24 7.76M7.76 16.24A1.65 1.65 0 0 0 5.64 18.36A1.65 1.65 0 0 0 7.76 16.24M7.76 7.76A1.65 1.65 0 0 0 9.88 5.64A1.65 1.65 0 0 0 7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Zen Quote/Character -->
+            <div class="zen-quote">
+                <span class="kanji">没頭</span>
+                <span class="meaning">Bottō — Immersion</span>
+            </div>
+
+            <!-- Timer Circle -->
+            <div class="timer-wrapper">
+                <div class="timer-circle">
+                    <svg class="progress-ring" width="220" height="220">
+                        <circle class="progress-ring__circle-bg" stroke="var(--color-sumi-light)" stroke-width="8" fill="transparent" r="100" cx="110" cy="110"/>
+                        <circle class="progress-ring__circle" stroke="var(--color-seigaiha)" stroke-width="8" fill="transparent" r="100" cx="110" cy="110"/>
+                    </svg>
+                    <div class="time-display">
+                        <span id="time" class="time">25:00</span>
+                        <span class="status">Focus</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button id="toggle-btn" class="btn btn-primary">Start Focus</button>
+            </div>
+        </main>
+        
+        <!-- Footer / Daily Stat -->
+        <footer class="footer">
+            <div class="stat-item">
+                <span class="label">Today's Focus</span>
+                <span class="value">2h 15m</span>
+            </div>
+        </footer>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

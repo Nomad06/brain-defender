@@ -6,6 +6,8 @@
 import browser from 'webextension-polyfill'
 import { defaultTheme } from './default'
 import { focusanTheme } from './focusan'
+import { caucasusTheme } from './caucasus'
+import { japaneseTheme } from './japanese'
 import type { Theme, ThemeRegistry, ThemePreference } from './types'
 
 const STORAGE_KEY = 'theme_preference'
@@ -17,6 +19,8 @@ const STORAGE_KEY = 'theme_preference'
 export const THEMES: ThemeRegistry = {
   default: defaultTheme,
   focusan: focusanTheme,
+  caucasus: caucasusTheme,
+  japanese: japaneseTheme,
   // Add new themes here:
   // mytheme: myTheme,
 }
@@ -162,4 +166,4 @@ export async function switchTheme(themeId: string): Promise<boolean> {
 
 // Re-export types and themes for convenience
 export type { Theme, ThemePreference } from './types'
-export { defaultTheme, focusanTheme }
+export { defaultTheme, focusanTheme, caucasusTheme, japaneseTheme }

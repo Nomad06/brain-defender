@@ -4,6 +4,7 @@
  */
 
 import type { Theme } from './types'
+import { defaultContentConfig } from './content-config'
 
 export const defaultTheme: Theme = {
   metadata: {
@@ -47,4 +48,7 @@ export const defaultTheme: Theme = {
   customCSS: `
     /* Default theme has no custom CSS */
   `,
+
+  // Content configuration for blocked pages
+  contentConfig: defaultContentConfig,
 }

@@ -1,0 +1,45 @@
+# Focusan Design Walkthrough
+
+I have completed the design and implementation of the **Focusan** extension pages. The design follows the Japanese Zen and Bushidō principles, utilizing a color palette of indigo, off-white, and bamboo green.
+
+## 1. Popup (Small Window)
+The popup serves as the primary interface for starting focus sessions. It features a circular timer designed to look like a Zen circle (Enso) and displays daily Japanese characters to inspire focus.
+
+![Popup Page](/Users/user/.gemini/antigravity/brain/f77ea0c2-e9d9-4be6-b8c8-be04b1407d54/popup_screenshot_1768111502927.png)
+
+**Features:**
+- **Timer**: A visual countdown ring that unifies the concept of *Bottō* (immersion).
+- **Daily Quote**: A randomly selected Zen concept (e.g., "Immersion") to set the tone.
+- **Minimal Controls**: Simple start/pause interactions to reduce cognitive load.
+
+## 2. Block Page
+When a user visits a distracted site, they are greeted with this calming barrier instead of a harsh error message.
+
+![Block Page](/Users/user/.gemini/antigravity/brain/f77ea0c2-e9d9-4be6-b8c8-be04b1407d54/block_screenshot_1768111519377.png)
+
+**Features:**
+- **Breathing Animation**: A gentle, pulsing circle guides the user to take a breath before returning to work.
+- **Reminders**: Text emphasizing *Keizoku* (continuity) rather than punishment.
+- **Aesthetics**: Deep blue background to induce calmness.
+
+## 3. Settings Page
+The settings page allows users to configure their focus environment.
+
+### Dashboard
+Overview of focus statistics to track *Kaizen* (continuous improvement).
+
+![Settings - Dashboard](/Users/user/.gemini/antigravity/brain/f77ea0c2-e9d9-4be6-b8c8-be04b1407d54/options_settings_1768111590892.png) 
+*(Note: Screenshot above shows the Settings tab, below are specific sections)*
+
+### Blocklist Management
+Simple interface to manage distracted sites.
+
+![Settings - Blocklist](/Users/user/.gemini/antigravity/brain/f77ea0c2-e9d9-4be6-b8c8-be04b1407d54/options_blocklist_1768111544997.png)
+
+### Schedule
+Set work hours to automatically enforce discipline.
+
+![Settings - Schedule](/Users/user/.gemini/antigravity/brain/f77ea0c2-e9d9-4be6-b8c8-be04b1407d54/options_schedule_1768111574013.png)
+
+## Verification
+All pages have been verified in the browser. The responsive layouts work as expected, and the animations (breathing, appearing text) perform smoothly.

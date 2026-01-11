@@ -4,6 +4,7 @@
  */
 
 import type { Theme } from './types'
+import { focusanContentConfig } from './content-config'
 
 export const focusanTheme: Theme = {
   metadata: {
@@ -48,8 +49,8 @@ export const focusanTheme: Theme = {
   },
 
   typography: {
-    sans: '"Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif',
-    mono: '"Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    sans: '"Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "MS PGothic", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif',
+    mono: '"Noto Sans Mono", "Hiragino Sans", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
 
   effects: {
@@ -207,5 +208,239 @@ export const focusanTheme: Theme = {
         rgba(46, 95, 111, 0.03) 50%,
         transparent 100%);
     }
+
+    /* Serif Typography for Japanese Poetry */
+    .japanese-serif {
+      font-family: "Noto Serif JP", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "HG Mincho E", "MS Mincho", "MS PMincho", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+
+    /* Vertical Japanese Text Support */
+    .tategaki {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+    }
+
+    /* Japanese Quotation Marks Styling */
+    .japanese-quote {
+      position: relative;
+      padding: 0 0.5em;
+    }
+
+    .japanese-quote::before {
+      content: '「';
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .japanese-quote::after {
+      content: '」';
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Enso Circle (Zen Circle) */
+    .enso-circle {
+      width: 100px;
+      height: 100px;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      position: relative;
+      opacity: 0.6;
+      /* Imperfect circle like hand-drawn enso */
+      border-top-left-radius: 48% 52%;
+      border-top-right-radius: 52% 48%;
+      border-bottom-right-radius: 48% 52%;
+      border-bottom-left-radius: 52% 48%;
+    }
+
+    /* Sakura Petal Decoration */
+    .sakura-petal {
+      position: relative;
+      display: inline-block;
+    }
+
+    .sakura-petal::before {
+      content: '🌸';
+      position: absolute;
+      font-size: 0.7em;
+      opacity: 0.3;
+      animation: sakuraFall 8s infinite ease-in-out;
+    }
+
+    /* Torii Gate Shadow */
+    .torii-shadow {
+      filter: drop-shadow(0 4px 8px rgba(46, 95, 111, 0.2));
+      transition: filter 0.3s ease;
+    }
+
+    .torii-shadow:hover {
+      filter: drop-shadow(0 8px 16px rgba(46, 95, 111, 0.3));
+    }
+
+    /* Japanese Mon (Family Crest) Circle */
+    .mon-circle {
+      width: 60px;
+      height: 60px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 30%,
+        var(--palette-kinari-cream) 0%,
+        var(--palette-washi-white) 100%);
+    }
+
+    /* Shoji Screen Divider */
+    .shoji-divider {
+      height: 2px;
+      background: linear-gradient(to right,
+        transparent 0%,
+        var(--border) 10%,
+        var(--border) 90%,
+        transparent 100%);
+      position: relative;
+      margin: 2rem 0;
+    }
+
+    .shoji-divider::before,
+    .shoji-divider::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .shoji-divider::before { left: 10%; }
+    .shoji-divider::after { right: 10%; }
+
+    /* Kanji Character Highlight */
+    .kanji-highlight {
+      font-size: 1.2em;
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Brush Stroke Border */
+    .brush-border {
+      position: relative;
+      padding: 1rem;
+    }
+
+    .brush-border::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--accent) 10%,
+        var(--accent) 90%,
+        transparent 100%);
+      opacity: 0.8;
+    }
+
+    /* Meditation Glow Effect */
+    .meditation-glow {
+      box-shadow:
+        0 0 20px rgba(46, 95, 111, 0.15),
+        0 0 40px rgba(46, 95, 111, 0.1),
+        inset 0 0 20px rgba(46, 95, 111, 0.05);
+      animation: meditationPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes meditationPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 20px rgba(46, 95, 111, 0.15),
+          0 0 40px rgba(46, 95, 111, 0.1),
+          inset 0 0 20px rgba(46, 95, 111, 0.05);
+      }
+      50% {
+        box-shadow:
+          0 0 30px rgba(46, 95, 111, 0.25),
+          0 0 60px rgba(46, 95, 111, 0.15),
+          inset 0 0 30px rgba(46, 95, 111, 0.08);
+      }
+    }
+
+    /* Paper Lantern Effect */
+    .paper-lantern {
+      background: linear-gradient(135deg,
+        var(--palette-washi-white) 0%,
+        var(--palette-kinari-cream) 50%,
+        var(--palette-washi-white) 100%);
+      box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.05),
+        0 4px 16px rgba(212, 175, 55, 0.2);
+      border: 1px solid var(--palette-gold-accent);
+    }
+
+    /* Tatami Mat Texture */
+    .tatami-texture {
+      background-image:
+        repeating-linear-gradient(0deg,
+          transparent 0px,
+          rgba(107, 142, 35, 0.02) 1px,
+          transparent 2px,
+          transparent 10px),
+        repeating-linear-gradient(90deg,
+          transparent 0px,
+          rgba(107, 142, 35, 0.02) 1px,
+          transparent 2px,
+          transparent 10px);
+      background-color: var(--palette-kinari-cream);
+    }
+
+    /* Calligraphy Ink Drip Effect */
+    .ink-drip {
+      position: relative;
+    }
+
+    .ink-drip::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      width: 2px;
+      height: 10px;
+      background: linear-gradient(to bottom,
+        var(--text) 0%,
+        transparent 100%);
+      opacity: 0.3;
+    }
+
+    /* Focus Mode Indicator */
+    [data-theme="focusan"] body {
+      position: relative;
+    }
+
+    /* Seasonal Accent Colors (applied via data attributes) */
+    [data-season="spring"] .seasonal-accent {
+      color: var(--palette-sakura-pink);
+    }
+
+    [data-season="summer"] .seasonal-accent {
+      color: var(--palette-bamboo-green);
+    }
+
+    [data-season="autumn"] .seasonal-accent {
+      color: #d66a4c; /* Maple red */
+    }
+
+    [data-season="winter"] .seasonal-accent {
+      color: #5a79a5; /* Winter blue */
+    }
   `,
+
+  // Content configuration for blocked pages
+  contentConfig: focusanContentConfig,
 }

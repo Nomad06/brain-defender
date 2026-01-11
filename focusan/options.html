@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focusan - Settings</title>
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/options.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Serif+JP:wght@700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="options-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"></div>
+                <span class="brand-text">Focusan</span>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </button>
+                <button class="nav-item" data-tab="blocklist">
+                    <span class="icon">🛡️</span>
+                    Blocklist
+                </button>
+                <button class="nav-item" data-tab="schedule">
+                    <span class="icon">📅</span>
+                    Schedule
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </button>
+            </nav>
+
+            <div class="footer-quote">
+                "One thing at a time."
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <header class="section-header">
+                    <h2>Overview</h2>
+                    <p>Your journey of focus.</p>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Focus Time</span>
+                        <span class="stat-value">12h 30m</span>
+                        <span class="stat-trend positive">+15% this week</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Distractions Blocked</span>
+                        <span class="stat-value">42</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Current Streak</span>
+                        <span class="stat-value">3 Days</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blocklist Tab -->
+            <section id="blocklist" class="tab-content">
+                <header class="section-header">
+                    <h2>Blocklist</h2>
+                    <p>Sites that disturb your peace.</p>
+                </header>
+
+                <div class="input-group">
+                    <input type="text" placeholder="Enter website (e.g., facebook.com)" class="input-field">
+                    <button class="btn btn-primary">Add Site</button>
+                </div>
+
+                <ul class="site-list">
+                    <li class="site-item">
+                        <div class="site-info">
+                            <span class="site-name">twitter.com</span>
+                            <span class="site-category">Social Media</span>
+                        </div>
+                        <button class="btn-icon delete" aria-label="Remove">×</button>
+                    </li>
+                    <li class="site-item">
+                        <div class="site-info">
+                            <span class="site-name">youtube.com</span>
+                            <span class="site-category">Video</span>
+                        </div>
+                        <button class="btn-icon delete" aria-label="Remove">×</button>
+                    </li>
+                    <li class="site-item">
+                        <div class="site-info">
+                            <span class="site-name">reddit.com</span>
+                            <span class="site-category">Social Media</span>
+                        </div>
+                        <button class="btn-icon delete" aria-label="Remove">×</button>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Schedule Tab -->
+            <section id="schedule" class="tab-content">
+                <header class="section-header">
+                    <h2>Schedule</h2>
+                    <p>Define your periods of deep work.</p>
+                </header>
+
+                <div class="schedule-card">
+                    <div class="schedule-header">
+                        <h3>Work Hours</h3>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="schedule-days">
+                        <span class="day active">M</span>
+                        <span class="day active">T</span>
+                        <span class="day active">W</span>
+                        <span class="day active">T</span>
+                        <span class="day active">F</span>
+                        <span class="day">S</span>
+                        <span class="day">S</span>
+                    </div>
+                    <div class="time-range">
+                        <div class="time-input">
+                            <label>Start</label>
+                            <input type="time" value="09:00">
+                        </div>
+                        <span class="separator">to</span>
+                        <div class="time-input">
+                            <label>End</label>
+                            <input type="time" value="17:00">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section id="settings" class="tab-content">
+                <header class="section-header">
+                    <h2>Preferences</h2>
+                    <p>Customize your experience.</p>
+                </header>
+
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-text">
+                            <h3>Focus Mode Duration</h3>
+                            <p>Default length for timer sessions (minutes).</p>
+                        </div>
+                        <input type="number" value="25" class="input-number">
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-text">
+                            <h3>Sound Effects</h3>
+                            <p>Play a gentle gong when session ends.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>

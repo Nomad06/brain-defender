@@ -4,10 +4,11 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
+import browser from 'webextension-polyfill'
 import type { Theme } from './types'
 import type { ThemeContentConfig, MotivationalContent } from './content-config'
 import { getContentConfigForTheme, getMotivationalContent } from './content-config'
-import { getCurrentTheme } from './index'
+import { getCurrentTheme, applyTheme } from './index'
 
 interface UseThemeContentReturn {
   theme: Theme | null
@@ -41,6 +42,8 @@ export function useThemeContent(): UseThemeContentReturn {
         if (mounted) {
           setTheme(currentTheme)
           setIsLoading(false)
+          // Apply theme to DOM
+          applyTheme(currentTheme)
         }
       } catch (error) {
         console.error('[useThemeContent] Error loading theme:', error)
@@ -52,8 +55,22 @@ export function useThemeContent(): UseThemeContentReturn {
 
     loadTheme()
 
+    // Listen for theme changes in storage
+    const handleStorageChange = (
+      changes: Record<string, browser.Storage.StorageChange>,
+      areaName: string
+    ) => {
+      if (areaName === 'sync' && changes.theme_preference) {
+        console.log('[useThemeContent] Theme changed, reloading...')
+        loadTheme()
+      }
+    }
+
+    browser.storage.onChanged.addListener(handleStorageChange)
+
     return () => {
       mounted = false
+      browser.storage.onChanged.removeListener(handleStorageChange)
     }
   }, [])
 

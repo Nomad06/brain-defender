@@ -104,3 +104,4 @@ export function getRandomBlockedPhrase(): string {
 }
 
 export { translations, type Language }
+export { useLanguage } from './useLanguage'

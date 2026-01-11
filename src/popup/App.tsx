@@ -165,148 +165,117 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="container washi-texture">
-      <div className="card" style={{ padding: '16px', minWidth: '320px' }}>
-        {/* Show Pomodoro modal or main content */}
-        {showPomodoroModal ? (
-          <PomodoroModal
-            onClose={() => setShowPomodoroModal(false)}
-            onStart={async () => {
-              await loadFocusSession()
-              setShowPomodoroModal(false)
-            }}
-          />
-        ) : (
-          <>
-            {/* Japanese-style header */}
-            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-              <div style={{ fontSize: '32px', marginBottom: '4px' }}>⛩️</div>
-              <div className="japanese-title" style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>
-                Focusan
+    <div className="container" style={{ width: '350px', height: '500px', display: 'flex', flexDirection: 'column', background: 'var(--washi-white)', padding: '24px' }}>
+      {showPomodoroModal ? (
+        <PomodoroModal
+          onClose={() => setShowPomodoroModal(false)}
+          onStart={async () => {
+            await loadFocusSession()
+            setShowPomodoroModal(false)
+          }}
+        />
+      ) : (
+        <>
+          {/* Header */}
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--sumi-black)', fontWeight: 600, fontSize: '1.1rem' }}>
+              <div style={{ width: '20px', height: '20px', border: '2px solid var(--accent)', borderRadius: '50%', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '6px', height: '6px', background: 'var(--accent)', borderRadius: '50%' }} />
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em' }}>
-                集中 · FOCUS
+              <span>Focusan</span>
+            </div>
+            <button 
+              onClick={handleOpenOptions}
+              style={{ color: 'var(--color-stone)', padding: '4px', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M19.4 15A1.65 1.65 0 0 0 20.2 12A1.65 1.65 0 0 0 19.4 9M12 21A1.65 1.65 0 0 0 15 20.2A1.65 1.65 0 0 0 12 19.4M4.6 15A1.65 1.65 0 0 0 3.8 12A1.65 1.65 0 0 0 4.6 9M12 3A1.65 1.65 0 0 0 9 3.8A1.65 1.65 0 0 0 12 4.6M16.24 16.24A1.65 1.65 0 0 0 18.36 14.12A1.65 1.65 0 0 0 16.24 16.24M16.24 7.76A1.65 1.65 0 0 0 14.12 5.64A1.65 1.65 0 0 0 16.24 7.76M7.76 16.24A1.65 1.65 0 0 0 5.64 18.36A1.65 1.65 0 0 0 7.76 16.24M7.76 7.76A1.65 1.65 0 0 0 9.88 5.64A1.65 1.65 0 0 0 7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </header>
+
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
+            {/* Zen Quote */}
+            <div style={{ textAlign: 'center', color: 'var(--color-stone)', animation: 'fadeIn 1s ease-out' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-family-serif)', fontSize: '1.5rem', color: 'var(--sumi-black)', marginBottom: '2px' }}>没頭</span>
+              <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.8 }}>Bottō — Immersion</span>
+            </div>
+
+            {/* Timer Circle */}
+            <div style={{ position: 'relative', width: '220px', height: '220px' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="220" height="220" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="110" cy="110" r="100" stroke="var(--color-sumi-light)" strokeWidth="8" fill="transparent" />
+                  <circle 
+                    cx="110" cy="110" r="100" 
+                    stroke="var(--accent)" 
+                    strokeWidth="8" 
+                    fill="transparent" 
+                    strokeDasharray={2 * Math.PI * 100}
+                    strokeDashoffset={isSessionActive ? (2 * Math.PI * 100) * (1 - (remainingTime / 1500)) : 0} 
+                    strokeLinecap="round"
+                    style={{ transition: 'stroke-dashoffset 0.35s' }}
+                  />
+                </svg>
+                <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <span style={{ fontSize: '3.5rem', fontWeight: 300, color: 'var(--sumi-black)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                    {isSessionActive ? formatTime(remainingTime) : '25:00'}
+                  </span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--color-take)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px', fontWeight: 500 }}>
+                    {isSessionActive 
+                      ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus') 
+                      : 'Ready'}
+                  </span>
+                </div>
               </div>
             </div>
 
-          <div style={{
-            fontSize: '12px',
-            color: 'var(--muted)',
-            textAlign: 'center',
-            marginBottom: '12px',
-            padding: '8px',
-            background: 'var(--card2)',
-            borderRadius: 'var(--radius)',
-            border: '1px solid var(--border)'
-          }}>
-            <span>{t('popup.blockList')}</span>{' '}
-            <span className="kbd" style={{ background: 'var(--accent)', color: 'white', fontWeight: 600 }}>{sitesCount}</span>
-          </div>
-
-          <div className="col" style={{ gap: '8px' }}>
-            <button className="btn primary samurai-transition" onClick={handleAddCurrentSite}>
-              ⛔ {t('popup.addCurrent')}
-            </button>
-            <button className="btn samurai-transition" onClick={handleOpenOptions}>
-              ⚙️ {t('popup.openOptions')}
-            </button>
-          </div>
-
-          <div style={{
-            fontSize: '11px',
-            color: 'var(--muted)',
-            textAlign: 'center',
-            marginTop: '12px',
-            fontStyle: 'italic'
-          }}>
-            {t('popup.hint', { example: 'news.example.com' })}
-          </div>
-
-          {/* Focus Session - Active */}
-          {isSessionActive && (
-            <div
-              className="card bamboo-grid"
-              style={{
-                padding: '14px',
-                background: 'var(--kinari-cream)',
-                marginTop: '16px',
-                border: '2px solid var(--accent)',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '10px',
-                }}
-              >
-                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--accent)' }}>
-                  🧘 {t('focusSession.title')}
+            {/* Controls */}
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+              {isSessionActive ? (
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button 
+                    onClick={handlePauseFocusSession}
+                    style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
+                  >
+                    {currentSession?.state === SessionState.PAUSED ? 'Resume' : 'Pause'}
+                  </button>
+                  <button 
+                    onClick={handleStopFocusSession}
+                    style={{ padding: '12px 24px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer' }}
+                  >
+                    Stop
+                  </button>
                 </div>
-                <div className="kbd lantern-glow" style={{
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  background: 'var(--accent)',
-                  color: 'white',
-                  padding: '4px 10px'
-                }}>
-                  {formatTime(remainingTime)}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <button
-                  className="btn samurai-transition"
-                  onClick={handlePauseFocusSession}
-                  style={{ flex: 1, fontSize: '11px', padding: '8px' }}
+              ) : (
+                <button 
+                  onClick={handleStartFocusSession}
+                  style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
                 >
-                  {currentSession?.state === SessionState.PAUSED
-                    ? '▶ ' + t('focusSession.resume')
-                    : '⏸ ' + t('focusSession.pause')}
+                  Start Focus
                 </button>
-                <button
-                  className="btn danger samurai-transition"
-                  onClick={handleStopFocusSession}
-                  style={{ flex: 1, fontSize: '11px', padding: '8px' }}
-                >
-                  ⏹ {t('focusSession.stop')}
-                </button>
-              </div>
+              )}
             </div>
-          )}
-
-          {/* Focus Session - Start */}
-          {!isSessionActive && (
-            <div
-              className="card"
-              style={{
-                padding: '14px',
-                background: 'var(--card2)',
-                marginTop: '16px',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <div style={{
-                fontSize: '13px',
-                marginBottom: '10px',
-                fontWeight: '600',
-                textAlign: 'center',
-                color: 'var(--text)'
-              }}>
-                🧘 {t('focusSession.startTitle')}
-              </div>
-              <button
-                className="btn primary samurai-transition"
-                onClick={handleStartFocusSession}
-                style={{ width: '100%', fontSize: '12px', padding: '10px' }}
+            
+            {!isSessionActive && (
+              <button 
+                onClick={handleAddCurrentSite}
+                style={{ background: 'none', border: 'none', color: 'var(--color-stone)', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                ⏱ {t('focusSession.start25min')}
+                <span>+</span> Add current site to blocklist
               </button>
+            )}
+          </main>
+
+          <footer style={{ borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '16px', marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
+              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-stone)', marginBottom: '2px' }}>Blocked Sites</span>
+              <span style={{ fontWeight: 600, color: 'var(--sumi-black)' }}>{sitesCount}</span>
             </div>
-          )}
-          </>
-        )}
-      </div>
+          </footer>
+        </>
+      )}
     </div>
   )
 }

@@ -390,134 +390,157 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="washi-texture" style={{ minHeight: '100vh', padding: '20px 0' }}>
-    <div className="container" style={{ maxWidth: '920px', margin: '0 auto' }}>
-      <div className="card" style={{ padding: '24px' }}>
-        {/* Japanese-style Header */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '8px' }}>⛩️</div>
-          <div className="japanese-title" style={{ fontSize: '28px', marginBottom: '8px' }}>
-            Focusan Settings
-          </div>
-          <div style={{ fontSize: '14px', color: 'var(--muted)', letterSpacing: '0.1em' }}>
-            集中 · FOCUS MANAGEMENT
-          </div>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-washi)', fontFamily: 'var(--font-family-primary)' }}>
+      {/* Sidebar */}
+      <aside style={{ width: '250px', background: 'white', borderRight: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '48px', fontWeight: 600, color: 'var(--color-ai-indigo)' }}>
+          <div style={{ width: '24px', height: '24px', background: 'var(--color-seigaiha)', borderRadius: '50%' }} />
+          <span>Focusan</span>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <div style={{
-            padding: '8px 16px',
-            background: 'var(--kinari-cream)',
-            borderRadius: 'var(--radius)',
-            border: '2px solid var(--border)'
-          }}>
-            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Blocked Sites:</span>{' '}
-            <span className="kbd" style={{
-              background: 'var(--accent)',
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '14px'
-            }}>{sites.length}</span>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+          <button
+            onClick={() => setActiveTab('sites')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 16px', borderRadius: '8px',
+              textAlign: 'left', color: activeTab === 'sites' ? 'white' : 'var(--color-stone)',
+              background: activeTab === 'sites' ? 'var(--color-ai-indigo)' : 'transparent',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>🛡️</span> Blocklist
+          </button>
+          <button
+            onClick={() => setActiveTab('stats')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 16px', borderRadius: '8px',
+              textAlign: 'left', color: activeTab === 'stats' ? 'white' : 'var(--color-stone)',
+              background: activeTab === 'stats' ? 'var(--color-ai-indigo)' : 'transparent',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>📊</span> Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab('achievements')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 16px', borderRadius: '8px',
+              textAlign: 'left', color: activeTab === 'achievements' ? 'white' : 'var(--color-stone)',
+              background: activeTab === 'achievements' ? 'var(--color-ai-indigo)' : 'transparent',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>🏆</span> Achievements
+          </button>
+          <button
+            onClick={() => setActiveTab('appearance')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 16px', borderRadius: '8px',
+              textAlign: 'left', color: activeTab === 'appearance' ? 'white' : 'var(--color-stone)',
+              background: activeTab === 'appearance' ? 'var(--color-ai-indigo)' : 'transparent',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>🎨</span> Appearance
+          </button>
+        </nav>
+
+        <div style={{ fontSize: '0.75rem', color: 'var(--color-stone)', fontStyle: 'italic', opacity: 0.8 }}>
+          "One thing at a time."
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main style={{ flex: 1, overflowY: 'auto', padding: '40px 60px' }}>
+        {/* Header Area */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div>
+            <h2 style={{ fontFamily: 'var(--font-family-primary)', fontSize: '2rem', marginBottom: '8px', color: 'var(--color-ai-indigo)' }}>
+              {activeTab === 'sites' && 'Blocklist'}
+              {activeTab === 'stats' && 'Overview'}
+              {activeTab === 'achievements' && 'Achievements'}
+              {activeTab === 'appearance' && 'Appearance'}
+            </h2>
+            <p style={{ color: 'var(--color-stone)' }}>
+              {activeTab === 'sites' && 'Sites that disturb your peace.'}
+              {activeTab === 'stats' && 'Your journey of focus.'}
+              {activeTab === 'achievements' && 'Milestones on your path.'}
+              {activeTab === 'appearance' && 'Customize your experience.'}
+            </p>
           </div>
           <select
             className="btn samurai-transition"
             value={language}
             onChange={e => handleLanguageChange(e.target.value)}
-            style={{ padding: '8px 12px', fontSize: '12px' }}
+            style={{ padding: '8px 12px', fontSize: '12px', background: 'white' }}
           >
             <option value="ru">🇷🇺 {t('options.languageRu')}</option>
             <option value="en">🇬🇧 {t('options.languageEn')}</option>
           </select>
         </div>
 
-        <div className="space"></div>
-
-        {/* Add Site Section */}
-        <div className="card bamboo-grid" style={{ padding: '18px', background: 'var(--kinari-cream)', border: '2px solid var(--border)' }}>
-          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
-            ⛔ {t('options.manualAdd')}
-          </div>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-            <input
-              className="input"
-              value={newSiteInput}
-              onChange={e => setNewSiteInput(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleAddSite()}
-              placeholder={t('options.inputPlaceholder')}
-              style={{ flex: 1 }}
-            />
-            <button className="btn primary samurai-transition" onClick={handleAddSite}>
-              ➕ {t('options.addButton')}
-            </button>
-          </div>
-          <button className="btn samurai-transition" onClick={handleAddCurrentSite} style={{ width: '100%' }}>
-            🌐 {t('options.addCurrent')}
-          </button>
-          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '12px', fontStyle: 'italic' }}>
-            {t('options.normalizationHint')}
-          </div>
-        </div>
-
-        <div className="space"></div>
-
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '2px solid var(--border)', marginBottom: '20px' }}>
-          <button
-            className="btn samurai-transition"
-            onClick={() => setActiveTab('sites')}
-            style={{
-              borderRadius: 'var(--radius) var(--radius) 0 0',
-              borderBottom: activeTab === 'sites' ? '3px solid var(--accent)' : '3px solid transparent',
-              background: activeTab === 'sites' ? 'var(--kinari-cream)' : 'transparent',
-              fontWeight: activeTab === 'sites' ? 600 : 400,
-            }}
-          >
-            📋 {t('options.tabSites')}
-          </button>
-          <button
-            className="btn samurai-transition"
-            onClick={() => setActiveTab('stats')}
-            style={{
-              borderRadius: 'var(--radius) var(--radius) 0 0',
-              borderBottom: activeTab === 'stats' ? '3px solid var(--accent)' : '3px solid transparent',
-              background: activeTab === 'stats' ? 'var(--kinari-cream)' : 'transparent',
-              fontWeight: activeTab === 'stats' ? 600 : 400,
-            }}
-          >
-            📊 {t('options.tabStats')}
-          </button>
-          <button
-            className="btn samurai-transition"
-            onClick={() => setActiveTab('achievements')}
-            style={{
-              borderRadius: 'var(--radius) var(--radius) 0 0',
-              borderBottom: activeTab === 'achievements' ? '3px solid var(--accent)' : '3px solid transparent',
-              background: activeTab === 'achievements' ? 'var(--kinari-cream)' : 'transparent',
-              fontWeight: activeTab === 'achievements' ? 600 : 400,
-            }}
-          >
-            🏆 {t('options.tabAchievements')}
-          </button>
-          <button
-            className="btn samurai-transition"
-            onClick={() => setActiveTab('appearance')}
-            style={{
-              borderRadius: 'var(--radius) var(--radius) 0 0',
-              borderBottom: activeTab === 'appearance' ? '3px solid var(--accent)' : '3px solid transparent',
-              background: activeTab === 'appearance' ? 'var(--kinari-cream)' : 'transparent',
-              fontWeight: activeTab === 'appearance' ? 600 : 400,
-            }}
-          >
-            🎨 Appearance
-          </button>
-        </div>
-
         {/* Sites Tab */}
         {activeTab === 'sites' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div className="h2">{t('options.currentList')}</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            <div className="card bamboo-grid" style={{ padding: '24px', background: 'white', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '12px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                <input
+                  className="input"
+                  value={newSiteInput}
+                  onChange={e => setNewSiteInput(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleAddSite()}
+                  placeholder={t('options.inputPlaceholder')}
+                  style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}
+                />
+                <button className="btn primary samurai-transition" onClick={handleAddSite} style={{ background: 'var(--color-ai-indigo)', color: 'white', padding: '0 24px' }}>
+                  {t('options.addButton')}
+                </button>
+              </div>
+              <button className="btn samurai-transition" onClick={handleAddCurrentSite} style={{ width: '100%', padding: '10px', background: 'var(--color-mizu)', color: 'var(--color-seigaiha)', border: 'none' }}>
+                🌐 {t('options.addCurrent')}
+              </button>
+            </div>
+
+            {/* Selection Bar */}
+            {selectedSites.size > 0 && (
+              <div className="card" style={{ padding: '12px', background: 'var(--card2)', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <span className="kbd">{selectedSites.size} selected</span>
+                  <button className="btn" onClick={handleSelectAll} style={{ fontSize: '12px', padding: '6px 12px' }}>All</button>
+                  <button className="btn" onClick={handleDeselectAll} style={{ fontSize: '12px', padding: '6px 12px' }}>None</button>
+                </div>
+                <button className="btn danger" onClick={handleBulkDelete} style={{ fontSize: '12px', padding: '6px 12px' }}>Delete</button>
+              </div>
+            )}
+
+            {/* Bulk Add */}
+            <div className="card" style={{ padding: '16px', background: 'var(--card2)', marginBottom: '12px' }}>
+              <div style={{ fontWeight: 600, marginBottom: '8px' }}>Bulk Add</div>
+              <textarea
+                className="input"
+                value={bulkSitesInput}
+                onChange={e => setBulkSitesInput(e.target.value)}
+                placeholder="example.com\nanother.com"
+                style={{ minHeight: '60px', width: '100%', marginBottom: '8px', fontSize: '12px' }}
+              />
+              <button className="btn primary" onClick={handleBulkAdd} style={{ fontSize: '12px' }}>Add All</button>
+            </div>
+
+            <div className="card" style={{ padding: '8px', background: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button className="btn" onClick={handleExport} style={{ fontSize: '12px' }}>{t('options.export')}</button>
+                  <button className="btn" onClick={() => {
+                    const input = document.createElement('input')
+                    input.type = 'file'
+                    input.accept = '.json'
+                    input.onchange = e => {
+                      const file = (e.target as HTMLInputElement).files?.[0]
+                      if (file) handleImport(file)
+                    }
+                    input.click()
+                  }} style={{ fontSize: '12px' }}>{t('options.import')}</button>
+                </div>
                 <select
                   className="btn"
                   value={categoryFilter}
@@ -531,276 +554,102 @@ const App: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                <button className="btn" onClick={handleExport}>
-                  {t('options.export')}
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => {
-                    const input = document.createElement('input')
-                    input.type = 'file'
-                    input.accept = '.json'
-                    input.onchange = e => {
-                      const file = (e.target as HTMLInputElement).files?.[0]
-                      if (file) handleImport(file)
-                    }
-                    input.click()
-                  }}
-                >
-                  {t('options.import')}
-                </button>
               </div>
-            </div>
 
-            {/* Selection Bar */}
-            {selectedSites.size > 0 && (
-              <div className="card" style={{ padding: '12px', background: 'var(--card2)', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span className="kbd">{selectedSites.size} {t('options.selected')}</span>
-                    <button className="btn" onClick={handleSelectAll} style={{ fontSize: '12px', padding: '6px 12px' }}>
-                      {t('options.selectAll')}
-                    </button>
-                    <button className="btn" onClick={handleDeselectAll} style={{ fontSize: '12px', padding: '6px 12px' }}>
-                      {t('options.deselectAll')}
-                    </button>
-                  </div>
-                  <button className="btn danger" onClick={handleBulkDelete} style={{ fontSize: '12px', padding: '6px 12px' }}>
-                    {t('options.deleteSelected')}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Bulk Add Section */}
-            <div className="card" style={{ padding: '16px', background: 'var(--card2)', marginBottom: '12px' }}>
-              <div className="h2">{t('options.bulkAdd')}</div>
-              <div className="space"></div>
-              <textarea
-                className="input"
-                value={bulkSitesInput}
-                onChange={e => setBulkSitesInput(e.target.value)}
-                placeholder={t('options.bulkAddPlaceholder')}
-                style={{ minHeight: '100px', fontFamily: 'var(--mono)', fontSize: '12px', resize: 'vertical', width: '100%' }}
-              />
-              <div className="space"></div>
-              <button className="btn primary" onClick={handleBulkAdd}>
-                {t('options.addAll')}
-              </button>
-            </div>
-
-            <div className="space"></div>
-
-            {/* Sites List */}
-            <div className="list">
-              {filteredSites.length === 0 ? (
-                <div className="muted" style={{ textAlign: 'center', padding: '20px' }}>
-                  {t('options.noSites')}
-                </div>
-              ) : (
-                filteredSites.map(site => (
-                  <div
-                    key={site.host}
-                    className="card"
-                    style={{
-                      padding: '12px',
-                      marginBottom: '8px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedSites.has(site.host)}
-                        onChange={() => handleToggleSite(site.host)}
-                      />
-                      <div>
-                        <div style={{ fontWeight: '500' }}>{site.host}</div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
-                          {site.category && (
-                            <span className="muted" style={{ fontSize: '11px' }}>
-                              {site.category}
-                            </span>
-                          )}
-                          {site.schedule && (
-                            <span className="kbd" style={{ fontSize: '10px', padding: '2px 6px' }}>
-                              📅 {t('options.scheduleLabel')}
-                            </span>
-                          )}
-                          {site.conditionalRules && site.conditionalRules.length > 0 && (
-                            <span className="kbd" style={{ fontSize: '10px', padding: '2px 6px' }}>
-                              🔀 {t('options.conditionsLabel')} ({site.conditionalRules.length})
-                            </span>
-                          )}
+              <div className="list" style={{ padding: '0' }}>
+                {filteredSites.length === 0 ? (
+                  <div className="muted" style={{ textAlign: 'center', padding: '40px' }}>{t('options.noSites')}</div>
+                ) : (
+                  filteredSites.map(site => (
+                    <div key={site.host} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedSites.has(site.host)}
+                          onChange={() => handleToggleSite(site.host)}
+                          style={{ width: '18px', height: '18px', accentColor: 'var(--color-ai-indigo)' }}
+                        />
+                        <div>
+                          <div style={{ fontWeight: 500, fontSize: '1rem' }}>{site.host}</div>
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                            {site.category && <span style={{ fontSize: '0.75rem', color: 'var(--color-stone)', background: 'var(--color-mizu)', padding: '2px 6px', borderRadius: '4px' }}>{site.category}</span>}
+                            {site.schedule && <span style={{ fontSize: '0.75rem', color: 'var(--color-stone)', background: 'var(--color-sumi-light)', padding: '2px 6px', borderRadius: '4px' }}>📅 Schedule</span>}
+                          </div>
                         </div>
                       </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="btn" onClick={() => handleOpenSchedule(site.host)} title={t('options.scheduleButtonTitle')}>📅</button>
+                        <button className="btn" onClick={() => handleOpenConditionalRules(site.host)} title={t('options.conditionsButtonTitle')}>🔀</button>
+                        <button className="btn danger" onClick={() => handleRemoveSite(site.host)}>×</button>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        className="btn"
-                        onClick={() => handleOpenSchedule(site.host)}
-                        style={{ fontSize: '11px', padding: '6px 10px' }}
-                        title={t('options.scheduleButtonTitle')}
-                      >
-                        📅
-                      </button>
-                      <button
-                        className="btn"
-                        onClick={() => handleOpenConditionalRules(site.host)}
-                        style={{ fontSize: '11px', padding: '6px 10px' }}
-                        title={t('options.conditionsButtonTitle')}
-                      >
-                        🔀
-                      </button>
-                      <button className="btn danger" onClick={() => handleRemoveSite(site.host)} style={{ fontSize: '12px' }}>
-                        {t('common.remove')}
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Stats Tab */}
         {activeTab === 'stats' && stats && (
-          <div>
-            <div className="card" style={{ padding: '16px', background: 'var(--card2)' }}>
-              <div className="h2">{t('options.overallStats')}</div>
-              <div className="space"></div>
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                <div className="card" style={{ padding: '16px', flex: 1, minWidth: '150px' }}>
-                  <div className="muted">{t('stats.totalBlocks')}</div>
-                  <div className="h1">{stats.totalBlocks}</div>
-                </div>
-                <div className="card" style={{ padding: '16px', flex: 1, minWidth: '150px' }}>
-                  <div className="muted">{t('stats.streakDays')}</div>
-                  <div className="h1">{stats.streakDays}</div>
-                </div>
-                <div className="card" style={{ padding: '16px', flex: 1, minWidth: '150px' }}>
-                  <div className="muted">{t('stats.totalSites')}</div>
-                  <div className="h1">{stats.totalSites}</div>
-                </div>
+          <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+              <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: 'var(--shadow-sm)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-stone)', marginBottom: '8px' }}>{t('stats.totalBlocks')}</span>
+                <span style={{ display: 'block', fontSize: '1.8rem', fontWeight: 600, color: 'var(--color-ai-indigo)' }}>{stats.totalBlocks}</span>
+              </div>
+              <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: 'var(--shadow-sm)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-stone)', marginBottom: '8px' }}>{t('stats.streakDays')}</span>
+                <span style={{ display: 'block', fontSize: '1.8rem', fontWeight: 600, color: 'var(--color-ai-indigo)' }}>{stats.streakDays}</span>
+              </div>
+              <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: 'var(--shadow-sm)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-stone)', marginBottom: '8px' }}>{t('stats.totalSites')}</span>
+                <span style={{ display: 'block', fontSize: '1.8rem', fontWeight: 600, color: 'var(--color-ai-indigo)' }}>{stats.totalSites}</span>
               </div>
             </div>
 
-            <div className="space"></div>
-
-            <div className="h2">{t('stats.bySite')}</div>
-            <div className="space"></div>
-            <div className="list">
+            <div className="h2" style={{ marginBottom: '16px' }}>{t('stats.bySite')}</div>
+            <div style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)' }}>
               {Object.entries(stats.bySite)
                 .sort(([, a], [, b]) => b.blocks - a.blocks)
                 .map(([host, siteStats]) => (
-                  <div key={host} className="card" style={{ padding: '12px', marginBottom: '8px' }}>
-                    <div style={{ fontWeight: '500', marginBottom: '4px' }}>{host}</div>
-                    <div className="muted" style={{ fontSize: '12px' }}>
-                      {t('stats.blocks')}: {siteStats.blocks}
-                    </div>
+                  <div key={host} style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                    <div style={{ fontWeight: 500 }}>{host}</div>
+                    <div className="muted">{siteStats.blocks} blocks</div>
                   </div>
                 ))}
             </div>
-
-            <div className="space"></div>
-            <button className="btn danger" onClick={handleClearStats}>
-              {t('options.clearStats')}
-            </button>
+            <button className="btn danger" onClick={handleClearStats} style={{ marginTop: '24px' }}>{t('options.clearStats')}</button>
           </div>
         )}
 
         {/* Achievements Tab */}
         {activeTab === 'achievements' && achievements && achievementProgress && (
-          <div>
-            {/* Progress Summary */}
-            <div className="card" style={{ padding: '16px', background: 'var(--card2)', marginBottom: '16px' }}>
-              <div className="h1">{achievements.unlocked.length} / {Object.keys(ACHIEVEMENT_DEFINITIONS).length}</div>
-              <div className="muted">{t('options.achievementsUnlocked')}</div>
-              <div className="space"></div>
-              <div style={{ height: '12px', background: 'var(--card)', borderRadius: '6px', overflow: 'hidden' }}>
-                <div
-                  style={{
-                    height: '100%',
-                    width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%`,
-                    background: 'var(--accent)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
+          <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            <div className="card" style={{ padding: '24px', background: 'white', marginBottom: '24px', borderRadius: '12px' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '8px' }}>{achievements.unlocked.length} / {Object.keys(ACHIEVEMENT_DEFINITIONS).length} Unlocked</div>
+              <div style={{ height: '8px', background: 'rgba(0,0,0,0.05)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%`, background: 'var(--color-ai-indigo)' }} />
               </div>
             </div>
 
-            {/* Achievements Grid */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: '12px',
-              }}
-            >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
               {Object.entries(ACHIEVEMENT_DEFINITIONS).map(([type, def]) => {
                 const achievementType = type as AchievementType
                 const progress = achievementProgress[achievementType]
                 const isUnlocked = achievements.unlocked.includes(achievementType)
 
                 return (
-                  <div
-                    key={type}
-                    className="card"
-                    style={{
-                      padding: '16px',
-                      opacity: isUnlocked ? 1 : 0.6,
-                      border: isUnlocked ? '2px solid var(--accent)' : '1px solid var(--border)',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <div style={{ fontSize: '32px', textAlign: 'center', marginBottom: '8px' }}>
-                      {def.icon}
-                    </div>
-                    <div style={{ fontWeight: '600', textAlign: 'center', marginBottom: '4px' }}>
-                      {def.name}
-                    </div>
-                    <div className="muted" style={{ fontSize: '11px', textAlign: 'center', marginBottom: '8px' }}>
-                      {def.description}
-                    </div>
+                  <div key={type} className="card" style={{ padding: '24px', background: 'white', borderRadius: '12px', border: isUnlocked ? '2px solid var(--color-gold)' : '1px solid rgba(0,0,0,0.05)', opacity: isUnlocked ? 1 : 0.7 }}>
+                    <div style={{ fontSize: '32px', textAlign: 'center', marginBottom: '12px' }}>{def.icon}</div>
+                    <div style={{ fontWeight: 600, textAlign: 'center', marginBottom: '4px' }}>{def.name}</div>
+                    <div style={{ fontSize: '0.8rem', textAlign: 'center', color: 'var(--color-stone)', marginBottom: '12px' }}>{def.description}</div>
                     {isUnlocked ? (
-                      <div
-                        style={{
-                          color: 'var(--accent)',
-                          textAlign: 'center',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                        }}
-                      >
-                        ✓ {t('options.unlocked')}
-                      </div>
+                      <div style={{ color: 'var(--color-take)', textAlign: 'center', fontWeight: 600, fontSize: '0.8rem' }}>✓ Unlocked</div>
                     ) : (
-                      <>
-                        <div
-                          style={{
-                            height: '6px',
-                            background: 'var(--card2)',
-                            borderRadius: '3px',
-                            overflow: 'hidden',
-                            marginTop: '8px',
-                          }}
-                        >
-                          <div
-                            style={{
-                              height: '100%',
-                              width: `${progress?.progress || 0}%`,
-                              background: 'var(--accent)',
-                              transition: 'width 0.3s ease',
-                            }}
-                          />
-                        </div>
-                        {progress && 'current' in progress && 'target' in progress && (
-                          <div className="muted" style={{ fontSize: '10px', textAlign: 'center', marginTop: '4px' }}>
-                            {progress.current} / {progress.target}
-                          </div>
-                        )}
-                      </>
+                      <div style={{ height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '999px', overflow: 'hidden', marginTop: 'auto' }}>
+                        <div style={{ height: '100%', width: `${progress?.progress || 0}%`, background: 'var(--color-gold)' }} />
+                      </div>
                     )}
                   </div>
                 )
@@ -811,131 +660,37 @@ const App: React.FC = () => {
 
         {/* Appearance Tab */}
         {activeTab === 'appearance' && (
-          <div>
-            <div className="h2" style={{ marginBottom: '16px' }}>🎨 Theme Settings</div>
-            <p className="muted" style={{ marginBottom: '24px' }}>
-              Choose a theme to customize the appearance of the extension
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-              {availableThemes.map((theme) => {
-                const isActive = theme.metadata.id === currentThemeId
-                return (
-                  <div
+          <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="h2" style={{ marginBottom: '16px' }}>Seasonal Themes</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+                {availableThemes.map(theme => (
+                  <button
                     key={theme.metadata.id}
                     onClick={() => handleThemeChange(theme.metadata.id)}
-                    className="zen-card"
                     style={{
-                      padding: '20px',
+                      padding: '16px',
+                      border: currentThemeId === theme.metadata.id ? '2px solid var(--color-ai-indigo)' : '1px solid var(--border)',
+                      borderRadius: '8px',
+                      background: currentThemeId === theme.metadata.id ? 'var(--color-mizu)' : 'white',
                       cursor: 'pointer',
-                      border: isActive ? '3px solid var(--accent)' : '2px solid var(--border)',
-                      background: isActive ? 'var(--card2)' : 'var(--card)',
-                      transition: 'all 0.2s ease',
-                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}
                   >
-                    {isActive && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '12px',
-                          right: '12px',
-                          background: 'var(--accent)',
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '10px',
-                          fontWeight: 600,
-                        }}
-                      >
-                        ACTIVE
-                      </div>
-                    )}
-
-                    <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '12px' }}>
-                      {theme.metadata.emoji}
-                    </div>
-
-                    <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                      <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)' }}>
-                        {theme.metadata.name}
-                      </div>
-                      {theme.metadata.version && (
-                        <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>
-                          v{theme.metadata.version}
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="muted" style={{ fontSize: '12px', textAlign: 'center', marginBottom: '12px' }}>
-                      {theme.metadata.description}
-                    </p>
-
-                    {theme.metadata.author && (
-                      <div style={{ fontSize: '10px', color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center' }}>
-                        {theme.metadata.author}
-                      </div>
-                    )}
-
-                    {/* Color preview */}
-                    <div style={{ marginTop: '16px', display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                      <div
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: theme.colors.accent,
-                          border: '2px solid var(--border)',
-                        }}
-                        title="Accent"
-                      />
-                      <div
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: theme.colors.bg1,
-                          border: '2px solid var(--border)',
-                        }}
-                        title="Background"
-                      />
-                      <div
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: theme.colors.text,
-                          border: '2px solid var(--border)',
-                        }}
-                        title="Text"
-                      />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="space"></div>
-
-            <div style={{ background: 'var(--card2)', padding: '16px', borderRadius: 'var(--radius)', marginTop: '24px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>ℹ️ Theme Information</div>
-              <ul className="muted" style={{ fontSize: '12px', margin: 0, paddingLeft: '20px' }}>
-                <li>Themes change the visual appearance of all extension pages</li>
-                <li>Your theme preference is saved and synced across devices</li>
-                <li>The active theme is applied immediately when selected</li>
-                <li>Each theme includes custom colors, fonts, and effects</li>
-              </ul>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: theme.colors.accent }} />
+                    <span style={{ fontWeight: 500 }}>{theme.metadata.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Deletion Challenge Modal */}
-      {deletingHosts.length > 0 && (
-        <DeleteChallengeModal hosts={deletingHosts} onConfirm={confirmRemoveSites} onCancel={cancelRemoveSites} />
-      )}
-
-      {/* Schedule Modal */}
+      {/* Modals */}
       {schedulingHost && (
         <ScheduleModal
           host={schedulingHost.host}
@@ -945,7 +700,6 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Conditional Rules Modal */}
       {conditionalRulesHost && (
         <ConditionalRulesModal
           host={conditionalRulesHost.host}
@@ -954,7 +708,14 @@ const App: React.FC = () => {
           onClose={() => setConditionalRulesHost(null)}
         />
       )}
-    </div>
+
+      {deletingHosts.length > 0 && (
+        <DeleteChallengeModal
+          hosts={deletingHosts}
+          onConfirm={confirmRemoveSites}
+          onCancel={cancelRemoveSites}
+        />
+      )}
     </div>
   )
 }

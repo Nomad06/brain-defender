@@ -4,10 +4,7 @@
  */
 
 import browser from 'webextension-polyfill'
-import { defaultTheme } from './default'
 import { focusanTheme } from './focusan'
-import { caucasusTheme } from './caucasus'
-import { japaneseTheme } from './japanese'
 import type { Theme, ThemeRegistry, ThemePreference } from './types'
 
 const STORAGE_KEY = 'theme_preference'
@@ -17,10 +14,7 @@ const STORAGE_KEY = 'theme_preference'
  * To add a new theme: import it and add to this object
  */
 export const THEMES: ThemeRegistry = {
-  default: defaultTheme,
   focusan: focusanTheme,
-  caucasus: caucasusTheme,
-  japanese: japaneseTheme,
   // Add new themes here:
   // mytheme: myTheme,
 }
@@ -46,10 +40,10 @@ export async function getCurrentThemeId(): Promise<string> {
   try {
     const result = await browser.storage.sync.get(STORAGE_KEY)
     const preference = result[STORAGE_KEY] as ThemePreference | undefined
-    return preference?.themeId || 'default'
+    return preference?.themeId || 'focusan'
   } catch (error) {
     console.error('[Theme] Error getting theme preference:', error)
-    return 'default'
+    return 'focusan'
   }
 }
 
@@ -58,7 +52,7 @@ export async function getCurrentThemeId(): Promise<string> {
  */
 export async function getCurrentTheme(): Promise<Theme> {
   const themeId = await getCurrentThemeId()
-  return getThemeById(themeId) || defaultTheme
+  return getThemeById(themeId) || focusanTheme
 }
 
 /**
@@ -166,4 +160,4 @@ export async function switchTheme(themeId: string): Promise<boolean> {
 
 // Re-export types and themes for convenience
 export type { Theme, ThemePreference } from './types'
-export { defaultTheme, focusanTheme, caucasusTheme, japaneseTheme }
+export { focusanTheme }

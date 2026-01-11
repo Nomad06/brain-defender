@@ -1,446 +1,240 @@
 /**
- * Focusan Theme - Japanese Aesthetic Style
- * Traditional Japanese design with washi paper, sumi ink, and zen elements
+ * Focusan Theme (formerly Japanese Zen)
+ * Inspired by traditional Japanese aesthetics: Wabi-sabi, Ma, Seigaiha
+ * Color palette: Nippon Iro (Traditional Japanese Colors)
  */
 
 import type { Theme } from './types'
-import { focusanContentConfig } from './content-config'
 
 export const focusanTheme: Theme = {
-  metadata: {
-    id: 'focusan',
-    name: 'Focusan - 集中',
-    description: 'Japanese-inspired design with traditional aesthetics',
-    emoji: '⛩️',
-    version: '1.0.0',
-    author: 'Inspired by Japanese Zen and Bushido',
-  },
-
-  colors: {
-    // Main semantic colors
-    bg1: '#faf7f2', // washi-white
-    bg2: '#ffffff', // shiro-white
-    card: '#ffffff',
-    card2: '#f5f1e8', // kinari-cream
-    text: '#1a1a1a', // sumi-black
-    muted: '#4a4a4a', // sumi-gray
-    border: '#d8d8d8', // mist-gray
-    accent: '#2e5f6f', // seiheki-blue
-    accent2: '#165e83', // ai-indigo
-    danger: '#c73e3a', // beni-red
-    success: '#6b8e23', // bamboo-green
-    gold: '#d4af37', // gold-accent
-
-    // Extended Japanese palette
-    palette: {
-      'washi-white': '#faf7f2',
-      'shiro-white': '#ffffff',
-      'sumi-black': '#1a1a1a',
-      'sumi-gray': '#4a4a4a',
-      'kinari-cream': '#f5f1e8',
-      'seiheki-blue': '#2e5f6f',
-      'ai-indigo': '#165e83',
-      'beni-red': '#c73e3a',
-      'sakura-pink': '#ffc0cb',
-      'gold-accent': '#d4af37',
-      'bamboo-green': '#6b8e23',
-      'mist-gray': '#d8d8d8',
+    metadata: {
+        id: 'focusan',
+        name: 'Focusan',
+        description: 'Minimalist design inspired by Japanese aesthetic principles',
+        emoji: '🇯🇵',
+        author: 'Brain Defender',
+        version: '2.0.0',
     },
-  },
 
-  typography: {
-    sans: '"Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "MS PGothic", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif',
-    mono: '"Noto Sans Mono", "Hiragino Sans", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  },
+    colors: {
+        // Backgrounds
+        bg1: '#F9F9F7', // Washi (Rice Paper) - warm off-white
+        bg2: '#F0F0F0', // Sumi Light (Light Ink Wash)
+        card: '#FFFFFF',
+        card2: '#FAFAF8',
 
-  effects: {
-    shadow: '0 2px 8px rgba(0,0,0,.04)', // Subtle like shoji screens
-    shadowLg: '0 8px 32px rgba(0,0,0,.08)', // Soft depth
-    radius: '8px', // Less rounded, more Japanese
-    radiusLg: '12px',
-  },
+        // Text
+        text: '#0F1A2A', // Kachi-iro (Winning Color/Dark Indigo)
+        muted: '#8C8C8C', // Stone Grey
 
-  animations: {
-    available: ['inkStroke', 'sakuraFall', 'zenRipple', 'fadeIn'],
-  },
+        // UI Elements
+        border: 'rgba(0, 0, 0, 0.08)',
+        accent: '#274C77', // Seigaiha (Deep Ocean Blue)
+        accent2: '#E0F2F1', // Mizu (Water/Light Cyan) - for hover states
+        danger: '#C44536', // Akabeni (Vermilion Red)
+        success: '#4A6E46', // Take (Bamboo Green)
+        gold: '#D4AF37', // Gold - Kintsugi accent
 
-  // Custom CSS for Japanese aesthetics
-  customCSS: `
-    /* Japanese Wave Pattern Background */
-    .japanese-wave-bg {
-      background-image: radial-gradient(circle at 100% 150%, var(--palette-seiheki-blue) 24%, var(--palette-washi-white) 25%, var(--palette-washi-white) 28%, var(--palette-seiheki-blue) 29%, var(--palette-seiheki-blue) 36%, var(--palette-washi-white) 36%, var(--palette-washi-white) 40%, transparent 40%, transparent),
-                        radial-gradient(circle at 0 150%, var(--palette-seiheki-blue) 24%, var(--palette-washi-white) 25%, var(--palette-washi-white) 28%, var(--palette-seiheki-blue) 29%, var(--palette-seiheki-blue) 36%, var(--palette-washi-white) 36%, var(--palette-washi-white) 40%, transparent 40%, transparent),
-                        radial-gradient(circle at 50% 100%, var(--palette-washi-white) 10%, var(--palette-seiheki-blue) 11%, var(--palette-seiheki-blue) 23%, var(--palette-washi-white) 24%, var(--palette-washi-white) 30%),
-                        radial-gradient(circle at 100% 50%, var(--palette-washi-white) 5%, var(--palette-seiheki-blue) 6%, var(--palette-seiheki-blue) 15%, var(--palette-washi-white) 16%, var(--palette-washi-white) 20%),
-                        radial-gradient(circle at 0 50%, var(--palette-washi-white) 5%, var(--palette-seiheki-blue) 6%, var(--palette-seiheki-blue) 15%, var(--palette-washi-white) 16%, var(--palette-washi-white) 20%),
-                        radial-gradient(circle at 50% 50%, var(--palette-seiheki-blue) 7%, var(--palette-washi-white) 8%, var(--palette-washi-white) 12%, var(--palette-seiheki-blue) 13%, var(--palette-seiheki-blue) 18%, var(--palette-washi-white) 19%, var(--palette-washi-white) 20%);
-      background-size: 100px 50px;
-      background-color: var(--palette-washi-white);
-      opacity: 0.15;
+        // Extended palette for advanced usage
+        palette: {
+            indigo: '#0F1A2A',
+            ocean: '#274C77',
+            water: '#E0F2F1',
+            bamboo: '#4A6E46',
+            vermilion: '#C44536',
+            stone: '#8C8C8C',
+            gold: '#D4AF37',
+            washi: '#F9F9F7',
+            sumi: '#F0F0F0',
+        },
+    },
+
+    typography: {
+        sans: "'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+        mono: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace",
+    },
+
+    effects: {
+        shadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        shadowLg: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        radius: '8px',
+        radiusLg: '12px',
+    },
+
+    animations: {
+        available: ['fadeInUp', 'fadeIn', 'breath', 'breathInner'],
+    },
+
+    customCSS: `
+    /* Focusan Theme Custom Styles */
+
+    /* Font Loading */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;600&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+    /* Additional CSS Variables */
+    :root[data-theme="focusan"] {
+      /* Spacing Scale (8px base) */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+
+      /* Additional shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-float: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+      /* Border Radius Variants */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      /* Transitions */
+      --transition-fast: 0.15s ease-out;
+      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Typography - Serif for Zen content */
+      --font-serif: 'Noto Serif JP', serif;
+
+      /* Specific color names for semantic use */
+      --color-ai-indigo: #0F1A2A;
+      --color-seigaiha: #274C77;
+      --color-mizu: #E0F2F1;
+      --color-washi: #F9F9F7;
+      --color-sumi-light: #F0F0F0;
+      --color-take: #4A6E46;
+      --color-akabeni: #C44536;
+      --color-stone: #8C8C8C;
+      --color-gold: #D4AF37;
     }
 
-    /* Washi Paper Texture */
-    .washi-texture {
-      background-color: var(--bg1);
-      background-image:
-        linear-gradient(90deg, transparent 79px, rgba(218, 218, 218, 0.03) 79px, rgba(218, 218, 218, 0.03) 81px, transparent 81px),
-        linear-gradient(transparent 79px, rgba(218, 218, 218, 0.03) 79px, rgba(218, 218, 218, 0.03) 81px, transparent 81px),
-        linear-gradient(transparent, rgba(234, 234, 234, 0.05) 50%, transparent 50%);
-      background-size: 81px 81px, 81px 81px, 100% 2px;
-    }
-
-    /* Bamboo Grid Pattern */
-    .bamboo-grid {
-      background-image:
-        linear-gradient(rgba(107, 142, 35, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(107, 142, 35, 0.05) 1px, transparent 1px);
-      background-size: 20px 20px;
-    }
-
-    /* Ink Stroke Animation */
-    @keyframes inkStroke {
-      0% {
-        transform: scaleX(0);
-        transform-origin: left;
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        transform: scaleX(1);
-        transform-origin: left;
-      }
-    }
-
-    /* Sakura Fall Animation */
-    @keyframes sakuraFall {
-      0% {
-        transform: translateY(-10px) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* Zen Ripple Animation */
-    @keyframes zenRipple {
-      0% {
-        transform: scale(0);
-        opacity: 0.8;
-      }
-      100% {
-        transform: scale(4);
-        opacity: 0;
-      }
-    }
-
-    /* Japanese Title Styling */
-    .japanese-title {
-      font-family: var(--font-sans);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--accent);
-    }
-
-    /* Torii Gate Styling */
-    .torii-gate {
-      font-size: 2rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-
-    /* Zen Card Styling */
-    .zen-card {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .zen-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg,
-        var(--accent) 0%,
-        var(--palette-sakura-pink) 50%,
-        var(--accent) 100%);
-    }
-
-    /* Haiku Styling */
-    .haiku-text {
-      font-family: var(--font-sans);
-      font-style: italic;
-      line-height: 1.8;
-      color: var(--muted);
-      text-align: center;
-      padding: 1rem;
-      border-left: 3px solid var(--accent);
-      background: linear-gradient(to right,
-        rgba(46, 95, 111, 0.05) 0%,
-        transparent 100%);
-    }
-
-    /* Gold Accent Elements */
-    .gold-accent {
-      color: var(--gold);
-      text-shadow: 0 1px 2px rgba(212, 175, 55, 0.3);
-    }
-
-    /* Samurai Quote Styling */
-    .samurai-quote {
-      font-weight: 600;
-      color: var(--text);
-      border-top: 2px solid var(--accent);
-      border-bottom: 2px solid var(--accent);
-      padding: 1rem 0;
-      margin: 1rem 0;
-      text-align: center;
-      background: linear-gradient(to bottom,
-        transparent 0%,
-        rgba(46, 95, 111, 0.03) 50%,
-        transparent 100%);
-    }
-
-    /* Serif Typography for Japanese Poetry */
-    .japanese-serif {
-      font-family: "Noto Serif JP", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "HG Mincho E", "MS Mincho", "MS PMincho", Georgia, serif;
-      font-weight: 400;
-      letter-spacing: 0.03em;
-    }
-
-    /* Vertical Japanese Text Support */
-    .tategaki {
-      writing-mode: vertical-rl;
-      text-orientation: upright;
-    }
-
-    /* Japanese Quotation Marks Styling */
-    .japanese-quote {
-      position: relative;
-      padding: 0 0.5em;
-    }
-
-    .japanese-quote::before {
-      content: '「';
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .japanese-quote::after {
-      content: '」';
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* Enso Circle (Zen Circle) */
-    .enso-circle {
-      width: 100px;
-      height: 100px;
-      border: 3px solid var(--accent);
-      border-radius: 50%;
-      position: relative;
-      opacity: 0.6;
-      /* Imperfect circle like hand-drawn enso */
-      border-top-left-radius: 48% 52%;
-      border-top-right-radius: 52% 48%;
-      border-bottom-right-radius: 48% 52%;
-      border-bottom-left-radius: 52% 48%;
-    }
-
-    /* Sakura Petal Decoration */
-    .sakura-petal {
-      position: relative;
-      display: inline-block;
-    }
-
-    .sakura-petal::before {
-      content: '🌸';
-      position: absolute;
-      font-size: 0.7em;
-      opacity: 0.3;
-      animation: sakuraFall 8s infinite ease-in-out;
-    }
-
-    /* Torii Gate Shadow */
-    .torii-shadow {
-      filter: drop-shadow(0 4px 8px rgba(46, 95, 111, 0.2));
-      transition: filter 0.3s ease;
-    }
-
-    .torii-shadow:hover {
-      filter: drop-shadow(0 8px 16px rgba(46, 95, 111, 0.3));
-    }
-
-    /* Japanese Mon (Family Crest) Circle */
-    .mon-circle {
-      width: 60px;
-      height: 60px;
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 30% 30%,
-        var(--palette-kinari-cream) 0%,
-        var(--palette-washi-white) 100%);
-    }
-
-    /* Shoji Screen Divider */
-    .shoji-divider {
-      height: 2px;
-      background: linear-gradient(to right,
-        transparent 0%,
-        var(--border) 10%,
-        var(--border) 90%,
-        transparent 100%);
-      position: relative;
-      margin: 2rem 0;
-    }
-
-    .shoji-divider::before,
-    .shoji-divider::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      width: 10px;
-      height: 10px;
-      background: var(--accent);
-      border-radius: 50%;
-    }
-
-    .shoji-divider::before { left: 10%; }
-    .shoji-divider::after { right: 10%; }
-
-    /* Kanji Character Highlight */
-    .kanji-highlight {
-      font-size: 1.2em;
-      color: var(--accent);
-      font-weight: 700;
-      text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-    }
-
-    /* Brush Stroke Border */
-    .brush-border {
-      position: relative;
-      padding: 1rem;
-    }
-
-    .brush-border::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg,
-        transparent 0%,
-        var(--accent) 10%,
-        var(--accent) 90%,
-        transparent 100%);
-      opacity: 0.8;
-    }
-
-    /* Meditation Glow Effect */
-    .meditation-glow {
-      box-shadow:
-        0 0 20px rgba(46, 95, 111, 0.15),
-        0 0 40px rgba(46, 95, 111, 0.1),
-        inset 0 0 20px rgba(46, 95, 111, 0.05);
-      animation: meditationPulse 4s ease-in-out infinite;
-    }
-
-    @keyframes meditationPulse {
-      0%, 100% {
-        box-shadow:
-          0 0 20px rgba(46, 95, 111, 0.15),
-          0 0 40px rgba(46, 95, 111, 0.1),
-          inset 0 0 20px rgba(46, 95, 111, 0.05);
-      }
-      50% {
-        box-shadow:
-          0 0 30px rgba(46, 95, 111, 0.25),
-          0 0 60px rgba(46, 95, 111, 0.15),
-          inset 0 0 30px rgba(46, 95, 111, 0.08);
-      }
-    }
-
-    /* Paper Lantern Effect */
-    .paper-lantern {
-      background: linear-gradient(135deg,
-        var(--palette-washi-white) 0%,
-        var(--palette-kinari-cream) 50%,
-        var(--palette-washi-white) 100%);
-      box-shadow:
-        inset 0 1px 3px rgba(0, 0, 0, 0.05),
-        0 4px 16px rgba(212, 175, 55, 0.2);
-      border: 1px solid var(--palette-gold-accent);
-    }
-
-    /* Tatami Mat Texture */
-    .tatami-texture {
-      background-image:
-        repeating-linear-gradient(0deg,
-          transparent 0px,
-          rgba(107, 142, 35, 0.02) 1px,
-          transparent 2px,
-          transparent 10px),
-        repeating-linear-gradient(90deg,
-          transparent 0px,
-          rgba(107, 142, 35, 0.02) 1px,
-          transparent 2px,
-          transparent 10px);
-      background-color: var(--palette-kinari-cream);
-    }
-
-    /* Calligraphy Ink Drip Effect */
-    .ink-drip {
-      position: relative;
-    }
-
-    .ink-drip::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      width: 2px;
-      height: 10px;
-      background: linear-gradient(to bottom,
-        var(--text) 0%,
-        transparent 100%);
-      opacity: 0.3;
-    }
-
-    /* Focus Mode Indicator */
+    /* Global Enhancements */
     [data-theme="focusan"] body {
-      position: relative;
+      background-color: var(--color-washi);
+      color: var(--color-ai-indigo);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Seasonal Accent Colors (applied via data attributes) */
-    [data-season="spring"] .seasonal-accent {
-      color: var(--palette-sakura-pink);
+    /* Breathing Animation for Blocked Page */
+    @keyframes breath {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.1;
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 0.2;
+      }
     }
 
-    [data-season="summer"] .seasonal-accent {
-      color: var(--palette-bamboo-green);
+    @keyframes breathInner {
+      0% {
+        transform: scale(0.9);
+      }
+      100% {
+        transform: scale(1.1);
+      }
     }
 
-    [data-season="autumn"] .seasonal-accent {
-      color: #d66a4c; /* Maple red */
+    /* Fade In Up Animation (Staggered) */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    [data-season="winter"] .seasonal-accent {
-      color: #5a79a5; /* Winter blue */
+    /* Simple Fade In */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Button Enhancements */
+    [data-theme="focusan"] button {
+      border-radius: var(--radius-full);
+      transition: all var(--transition-normal);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    [data-theme="focusan"] button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-float);
+    }
+
+    [data-theme="focusan"] button:active {
+      transform: translateY(0);
+    }
+
+    /* Card Enhancements */
+    [data-theme="focusan"] .card,
+    [data-theme="focusan"] [class*="card"] {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-md);
+    }
+
+    /* Input Enhancements */
+    [data-theme="focusan"] input,
+    [data-theme="focusan"] select,
+    [data-theme="focusan"] textarea {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      transition: var(--transition-fast);
+    }
+
+    [data-theme="focusan"] input:focus,
+    [data-theme="focusan"] select:focus,
+    [data-theme="focusan"] textarea:focus {
+      outline: none;
+      border-color: var(--color-seigaiha);
+      box-shadow: 0 0 0 3px rgba(39, 76, 119, 0.1);
+    }
+
+    /* Tabular Numbers for Timers/Stats */
+    [data-theme="focusan"] .timer,
+    [data-theme="focusan"] .stat,
+    [data-theme="focusan"] [class*="time"],
+    [data-theme="focusan"] [class*="count"] {
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Serif Font for Zen Content */
+    [data-theme="focusan"] .zen-quote,
+    [data-theme="focusan"] .kanji,
+    [data-theme="focusan"] .quote,
+    [data-theme="focusan"] [data-zen] {
+      font-family: var(--font-serif);
+    }
+
+    /* Subtle Animations */
+    [data-theme="focusan"] * {
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      [data-theme="focusan"] * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   `,
-
-  // Content configuration for blocked pages
-  contentConfig: focusanContentConfig,
 }

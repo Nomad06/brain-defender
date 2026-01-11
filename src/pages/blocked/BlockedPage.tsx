@@ -19,7 +19,7 @@ import { ZenCard } from './components/ZenCard'
 import { ZenQuoteFooter } from './components/ZenQuoteFooter'
 import { getRandomZenPhrase, getRandomZenQuote } from '../../shared/japanese-zen'
 import ZenGarden from './ZenGarden'
-import MountainBreathing from './MountainBreathing'
+
 
 // Eye exercise trajectories
 type TrajectoryPoint = { x: number; y: number }
@@ -380,14 +380,7 @@ const BlockedPage: React.FC = () => {
     setActiveExercise('none')
   }
 
-  // Mountain Breathing Exercise
-  const startMountainExercise = () => {
-    setActiveExercise('mountain')
-  }
 
-  const stopMountainExercise = () => {
-    setActiveExercise('none')
-  }
 
   return (
     <div
@@ -422,9 +415,9 @@ const BlockedPage: React.FC = () => {
         <div className="content-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 2 }}>
 
           {/* Theme-aware Motivational Content */}
-          {theme?.metadata.id === 'japanese' ? (
+          {theme?.metadata.id === 'focusan' ? (
             <>
-              {/* Japanese Zen Theme: Breathing Circles + Zen Phrase */}
+              {/* Focusan Theme: Breathing Circles + Zen Phrase */}
               <BreathingCircles size={200} />
               <ZenCard zenPhrase={zenPhrase} language={currentLanguage} />
             </>
@@ -445,15 +438,15 @@ const BlockedPage: React.FC = () => {
             </>
           )}
 
-          {/* Japanese Zen Quote Footer (only for japanese theme) */}
-          {theme?.metadata.id === 'japanese' && (
+          {/* Focusan Zen Quote Footer (only for focusan theme) */}
+          {theme?.metadata.id === 'focusan' && (
             <ZenQuoteFooter quote={zenQuote} language={currentLanguage} />
           )}
         </div>
       </div>
 
-      {/* Zen Close Button - Minimalist style for Japanese theme */}
-      {theme?.metadata.id === 'japanese' ? (
+      {/* Zen Close Button - Minimalist style for Focusan theme */}
+      {theme?.metadata.id === 'focusan' ? (
         <div style={{ width: '100%', maxWidth: '800px', display: 'flex', justifyContent: 'center', marginTop: '48px' }}>
           <button
             onClick={handleCloseTab}
@@ -499,11 +492,7 @@ const BlockedPage: React.FC = () => {
                       🪨 Zen Garden
                     </button>
                   ),
-                  mountain: (
-                    <button key="mountain" className="btn caucasus-transition" onClick={startMountainExercise} style={{ padding: '12px' }}>
-                      ⛰️ {t('exercises.mountain')}
-                    </button>
-                  ),
+
                   breath: (
                     <button key="breath" className="btn samurai-transition" onClick={startBreathExercise} style={{ padding: '12px' }}>
                       🫁 {t('exercises.breathing')}
@@ -528,59 +517,53 @@ const BlockedPage: React.FC = () => {
             </div>
           )}
 
-        {/* Eye Exercise Content */}
-        {activeExercise === 'eye' && (
-          <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-            {/* Keep existing Eye content but unstyled if needed, or rely on inner logic */}
-            <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.eyeTrainingTitle')}</div>
-            <canvas ref={eyeCanvasRef} style={{ width: '100%', height: '200px', borderRadius: '8px', background: 'var(--card2)', display: 'block', marginBottom: '12px' }} />
-            <div style={{ height: '4px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${eyeProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
+          {/* Eye Exercise Content */}
+          {activeExercise === 'eye' && (
+            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              {/* Keep existing Eye content but unstyled if needed, or rely on inner logic */}
+              <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.eyeTrainingTitle')}</div>
+              <canvas ref={eyeCanvasRef} style={{ width: '100%', height: '200px', borderRadius: '8px', background: 'var(--card2)', display: 'block', marginBottom: '12px' }} />
+              <div style={{ height: '4px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${eyeProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
+              </div>
+              <button className="btn" onClick={stopEyeExercise} style={{ fontSize: '11px', padding: '6px 12px', marginTop: '12px' }}>{t('exercises.stop')}</button>
             </div>
-            <button className="btn" onClick={stopEyeExercise} style={{ fontSize: '11px', padding: '6px 12px', marginTop: '12px' }}>{t('exercises.stop')}</button>
-          </div>
-        )}
+          )}
 
-        {/* Breath Exercise Content */}
-        {activeExercise === 'breath' && (
-          <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)', textAlign: 'center' }}>
-            <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.breathingTitle')}</div>
-            <canvas ref={breathCanvasRef} style={{ width: '300px', height: '300px', borderRadius: '50%', background: 'var(--card2)', display: 'block', margin: '0 auto 12px' }} />
-            <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '12px' }}>{breathPhase}</div>
-            <div style={{ height: '4px', width: '200px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden', margin: '0 auto 12px' }}>
-              <div style={{ height: '100%', width: `${breathProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
+          {/* Breath Exercise Content */}
+          {activeExercise === 'breath' && (
+            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)', textAlign: 'center' }}>
+              <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.breathingTitle')}</div>
+              <canvas ref={breathCanvasRef} style={{ width: '300px', height: '300px', borderRadius: '50%', background: 'var(--card2)', display: 'block', margin: '0 auto 12px' }} />
+              <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '12px' }}>{breathPhase}</div>
+              <div style={{ height: '4px', width: '200px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden', margin: '0 auto 12px' }}>
+                <div style={{ height: '100%', width: `${breathProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
+              </div>
+              <button className="btn" onClick={stopBreathExercise}>{t('exercises.stop')}</button>
             </div>
-            <button className="btn" onClick={stopBreathExercise}>{t('exercises.stop')}</button>
-          </div>
-        )}
+          )}
 
-        {/* Stretch Exercise Content */}
-        {activeExercise === 'stretch' && (
-          <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-            <div className="h2">{t('exercises.stretchTitle')}</div>
-            <div className="muted" style={{ margin: '16px 0', padding: '10px', background: 'var(--card2)', borderLeft: '3px solid var(--danger)' }}>{t('exercises.stretchWarning')}</div>
-            <button className="btn" onClick={stopStretchExercise}>{t('common.close')}</button>
-          </div>
-        )}
-
-        {/* Zen Garden Exercise Content */}
-        {activeExercise === 'zen' && (
-          <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '2px solid var(--gold)' }}>
-            <div className="h2" style={{ textAlign: 'center', marginBottom: '12px' }}>🪨 Zen Garden - 枯山水</div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <ZenGarden width={Math.min(600, window.innerWidth - 100)} height={400} />
+          {/* Stretch Exercise Content */}
+          {activeExercise === 'stretch' && (
+            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              <div className="h2">{t('exercises.stretchTitle')}</div>
+              <div className="muted" style={{ margin: '16px 0', padding: '10px', background: 'var(--card2)', borderLeft: '3px solid var(--danger)' }}>{t('exercises.stretchWarning')}</div>
+              <button className="btn" onClick={stopStretchExercise}>{t('common.close')}</button>
             </div>
-            <button className="btn" onClick={stopZenExercise} style={{ display: 'block', margin: '16px auto' }}>{t('common.close')}</button>
-          </div>
-        )}
+          )}
 
-        {/* Mountain Breathing */}
-        {activeExercise === 'mountain' && (
-          <div style={{ padding: '16px' }}>
-            <MountainBreathing width={Math.min(600, window.innerWidth - 100)} height={400} onComplete={stopMountainExercise} />
-            <button className="btn" onClick={stopMountainExercise} style={{ display: 'block', margin: '16px auto' }}>{t('common.close')}</button>
-          </div>
-        )}
+          {/* Zen Garden Exercise Content */}
+          {activeExercise === 'zen' && (
+            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '2px solid var(--gold)' }}>
+              <div className="h2" style={{ textAlign: 'center', marginBottom: '12px' }}>🪨 Zen Garden - 枯山水</div>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <ZenGarden width={Math.min(600, window.innerWidth - 100)} height={400} />
+              </div>
+              <button className="btn" onClick={stopZenExercise} style={{ display: 'block', margin: '16px auto' }}>{t('common.close')}</button>
+            </div>
+          )}
+
+
         </div>
       )}
 

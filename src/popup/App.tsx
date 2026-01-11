@@ -15,6 +15,18 @@ const App: React.FC = () => {
   const [remainingTime, setRemainingTime] = useState<number>(0)
   const [showPomodoroModal, setShowPomodoroModal] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
+  const [currentHost, setCurrentHost] = useState<string>('')
+
+  // Detect current host
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+      const tab = tabs[0]
+      if (tab?.url) {
+        const host = normalizeHost(tab.url)
+        if (host) setCurrentHost(host)
+      }
+    })
+  }, [])
 
   // Load sites count
   const loadSitesCount = async () => {
@@ -165,7 +177,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="container" style={{ width: '350px', height: '500px', display: 'flex', flexDirection: 'column', background: 'var(--washi-white)', padding: '24px' }}>
+    <div className="container" style={{ width: '350px', minHeight: '500px', display: 'flex', flexDirection: 'column', background: 'var(--washi-white)', padding: '24px', boxSizing: 'border-box' }}>
       {showPomodoroModal ? (
         <PomodoroModal
           onClose={() => setShowPomodoroModal(false)}
@@ -184,13 +196,13 @@ const App: React.FC = () => {
               </div>
               <span>Focusan</span>
             </div>
-            <button 
+            <button
               onClick={handleOpenOptions}
               style={{ color: 'var(--color-stone)', padding: '4px', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M19.4 15A1.65 1.65 0 0 0 20.2 12A1.65 1.65 0 0 0 19.4 9M12 21A1.65 1.65 0 0 0 15 20.2A1.65 1.65 0 0 0 12 19.4M4.6 15A1.65 1.65 0 0 0 3.8 12A1.65 1.65 0 0 0 4.6 9M12 3A1.65 1.65 0 0 0 9 3.8A1.65 1.65 0 0 0 12 4.6M16.24 16.24A1.65 1.65 0 0 0 18.36 14.12A1.65 1.65 0 0 0 16.24 16.24M16.24 7.76A1.65 1.65 0 0 0 14.12 5.64A1.65 1.65 0 0 0 16.24 7.76M7.76 16.24A1.65 1.65 0 0 0 5.64 18.36A1.65 1.65 0 0 0 7.76 16.24M7.76 7.76A1.65 1.65 0 0 0 9.88 5.64A1.65 1.65 0 0 0 7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M19.4 15A1.65 1.65 0 0 0 20.2 12A1.65 1.65 0 0 0 19.4 9M12 21A1.65 1.65 0 0 0 15 20.2A1.65 1.65 0 0 0 12 19.4M4.6 15A1.65 1.65 0 0 0 3.8 12A1.65 1.65 0 0 0 4.6 9M12 3A1.65 1.65 0 0 0 9 3.8A1.65 1.65 0 0 0 12 4.6M16.24 16.24A1.65 1.65 0 0 0 18.36 14.12A1.65 1.65 0 0 0 16.24 16.24M16.24 7.76A1.65 1.65 0 0 0 14.12 5.64A1.65 1.65 0 0 0 16.24 7.76M7.76 16.24A1.65 1.65 0 0 0 5.64 18.36A1.65 1.65 0 0 0 7.76 16.24M7.76 7.76A1.65 1.65 0 0 0 9.88 5.64A1.65 1.65 0 0 0 7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </header>
@@ -207,13 +219,13 @@ const App: React.FC = () => {
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="220" height="220" style={{ transform: 'rotate(-90deg)' }}>
                   <circle cx="110" cy="110" r="100" stroke="var(--color-sumi-light)" strokeWidth="8" fill="transparent" />
-                  <circle 
-                    cx="110" cy="110" r="100" 
-                    stroke="var(--accent)" 
-                    strokeWidth="8" 
-                    fill="transparent" 
+                  <circle
+                    cx="110" cy="110" r="100"
+                    stroke="var(--accent)"
+                    strokeWidth="8"
+                    fill="transparent"
                     strokeDasharray={2 * Math.PI * 100}
-                    strokeDashoffset={isSessionActive ? (2 * Math.PI * 100) * (1 - (remainingTime / 1500)) : 0} 
+                    strokeDashoffset={isSessionActive && currentSession ? (2 * Math.PI * 100) * (1 - (remainingTime / (currentSession.duration * 60))) : 0}
                     strokeLinecap="round"
                     style={{ transition: 'stroke-dashoffset 0.35s' }}
                   />
@@ -223,8 +235,8 @@ const App: React.FC = () => {
                     {isSessionActive ? formatTime(remainingTime) : '25:00'}
                   </span>
                   <span style={{ fontSize: '0.85rem', color: 'var(--color-take)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px', fontWeight: 500 }}>
-                    {isSessionActive 
-                      ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus') 
+                    {isSessionActive
+                      ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus')
                       : 'Ready'}
                   </span>
                 </div>
@@ -235,13 +247,13 @@ const App: React.FC = () => {
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               {isSessionActive ? (
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button 
+                  <button
                     onClick={handlePauseFocusSession}
                     style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
                   >
                     {currentSession?.state === SessionState.PAUSED ? 'Resume' : 'Pause'}
                   </button>
-                  <button 
+                  <button
                     onClick={handleStopFocusSession}
                     style={{ padding: '12px 24px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer' }}
                   >
@@ -249,7 +261,7 @@ const App: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <button 
+                <button
                   onClick={handleStartFocusSession}
                   style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
                 >
@@ -257,23 +269,80 @@ const App: React.FC = () => {
                 </button>
               )}
             </div>
-            
-            {!isSessionActive && (
-              <button 
-                onClick={handleAddCurrentSite}
-                style={{ background: 'none', border: 'none', color: 'var(--color-stone)', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-              >
-                <span>+</span> Add current site to blocklist
-              </button>
-            )}
+
+            {/* Footer / Status Card */}
+            <div style={{
+              marginTop: 'auto',
+              width: '100%',
+              background: 'var(--card2)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+              border: '1px solid rgba(0,0,0,0.05)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'var(--bg2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--accent)'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6-8 10-8 10z" />
+                  </svg>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                  <span style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Protected</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--sumi-black)' }}>{sitesCount} Sites</span>
+                </div>
+              </div>
+
+              {!isSessionActive && currentHost && (
+                <button
+                  onClick={handleAddCurrentSite}
+                  style={{
+                    background: 'var(--bg1)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: 'var(--sumi-black)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                    e.currentTarget.style.color = 'var(--accent)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.08)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.color = 'var(--sumi-black)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                  }}
+                  title={`Block ${currentHost}`}
+                >
+                  <span style={{ fontSize: '14px', lineHeight: 1 }}>+</span> Block
+                </button>
+              )}
+            </div>
           </main>
 
-          <footer style={{ borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '16px', marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
-            <div style={{ textAlign: 'center' }}>
-              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-stone)', marginBottom: '2px' }}>Blocked Sites</span>
-              <span style={{ fontWeight: 600, color: 'var(--sumi-black)' }}>{sitesCount}</span>
-            </div>
-          </footer>
+          {/* Spacer to replace old footer margin if needed, but the main content now handles it */}
         </>
       )}
     </div>
@@ -291,6 +360,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
   const [additionalSites, setAdditionalSites] = useState<string[]>([])
   const [newSiteInput, setNewSiteInput] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
+  const [duration, setDuration] = useState<number>(25)
 
   // Load sites
   useEffect(() => {
@@ -344,7 +414,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
   const handleStartSession = async () => {
     try {
       const sitesToBlock = [...Array.from(selectedMainSites), ...additionalSites]
-      await messagingClient.startFocusSession(25, sitesToBlock)
+      await messagingClient.startFocusSession(duration, sitesToBlock)
       onStart()
     } catch (err) {
       console.error('[PomodoroModal] Error starting session:', err)
@@ -381,6 +451,22 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
         </div>
       ) : (
         <>
+          {/* Duration Input */}
+          <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card2)', padding: '8px 12px', borderRadius: '8px' }}>
+            <label style={{ fontWeight: '500', fontSize: '12px', flex: 1 }}>
+              Duration (minutes):
+            </label>
+            <input
+              type="number"
+              className="input"
+              value={duration}
+              onChange={e => setDuration(Math.max(1, parseInt(e.target.value) || 25))}
+              min="1"
+              max="180"
+              style={{ width: '60px', fontSize: '12px', padding: '4px 8px' }}
+            />
+          </div>
+
           {/* Main sites list */}
           <div style={{ marginBottom: '12px' }}>
             <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '12px' }}>

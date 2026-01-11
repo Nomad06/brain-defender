@@ -4,7 +4,7 @@
  */
 
 import browser from 'webextension-polyfill'
-import { getCurrentSession, stopFocusSession, SessionState } from '../shared/domain/focus-sessions'
+import { getCurrentSession, stopFocusSession, SessionState, ALARM_SESSION_NAME } from '../shared/domain/focus-sessions'
 import { cleanupExpiredWhitelist, getSites } from '../shared/storage/storage'
 import { rebuildRules } from './dnr-manager'
 import { normalizeHost } from '../shared/utils/domain'
@@ -14,7 +14,7 @@ import { addTimeSpent } from '../shared/domain/stats'
  * Alarm names
  */
 export const ALARM_NAMES = {
-  FOCUS_SESSION_END: 'focusSessionEnd',
+  FOCUS_SESSION_END: ALARM_SESSION_NAME,
   SCHEDULE_CHECK: 'scheduleCheck',
   WHITELIST_CLEANUP: 'whitelistCleanup',
   TIME_TRACKING: 'timeTracking',
@@ -151,37 +151,6 @@ async function handleTimeTracking(): Promise<void> {
     await rebuildRules()
   } catch (err) {
     console.error('[Alarms] Error tracking time:', err)
-  }
-}
-
-/**
- * Schedule focus session end alarm
- *
- * @param endTime - Timestamp when session should end
- */
-export async function scheduleFocusSessionEnd(endTime: number): Promise<void> {
-  try {
-    const delayInMinutes = Math.max(1, (endTime - Date.now()) / 60000)
-
-    await browser.alarms.create(ALARM_NAMES.FOCUS_SESSION_END, {
-      delayInMinutes,
-    })
-
-    console.log(`[Alarms] Focus session end scheduled in ${delayInMinutes.toFixed(1)} minutes`)
-  } catch (err) {
-    console.error('[Alarms] Error scheduling focus session end:', err)
-  }
-}
-
-/**
- * Cancel focus session end alarm
- */
-export async function cancelFocusSessionEnd(): Promise<void> {
-  try {
-    await browser.alarms.clear(ALARM_NAMES.FOCUS_SESSION_END)
-    console.log('[Alarms] Focus session end alarm cancelled')
-  } catch (err) {
-    console.error('[Alarms] Error cancelling focus session end:', err)
   }
 }
 

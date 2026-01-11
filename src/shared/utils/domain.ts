@@ -20,12 +20,21 @@ export function normalizeHost(input: string | null | undefined): string | null {
     const trimmed = String(input || '').trim()
     if (!trimmed) return null
 
+    // Ignore internal browser pages and schemas
+    if (/^(chrome|chrome-extension|about|file|edge|brave|opera|moz-extension):/i.test(trimmed)) {
+      return null
+    }
+
     // If user entered without protocol, add https://
     const withProto = /^[a-zA-Z]+:\/\//.test(trimmed) ? trimmed : `https://${trimmed}`
 
     let u: URL
     try {
       u = new URL(withProto)
+      // Only allow http/https protocols for blocking
+      if (!['http:', 'https:'].includes(u.protocol)) {
+        return null
+      }
     } catch {
       // If unable to parse as URL, try as domain directly
 

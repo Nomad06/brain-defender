@@ -22,6 +22,12 @@ import { getAllThemes, getCurrentThemeId, switchTheme, getCurrentTheme, type The
 type Tab = 'sites' | 'stats' | 'achievements' | 'appearance'
 
 const App: React.FC = () => {
+  // New site configuration state
+  const [newSiteSchedule, setNewSiteSchedule] = useState<Schedule | null>(null)
+  const [newSiteRules, setNewSiteRules] = useState<ConditionalRule[]>([])
+  const [showNewScheduleModal, setShowNewScheduleModal] = useState<boolean>(false)
+  const [showNewRulesModal, setShowNewRulesModal] = useState<boolean>(false)
+
   const [sites, setSites] = useState<SiteObject[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [achievements, setAchievements] = useState<AchievementsData | null>(null)
@@ -126,8 +132,13 @@ const App: React.FC = () => {
     }
 
     try {
-      await messagingClient.addSite(host)
+      await messagingClient.addSite(host, {
+        schedule: newSiteSchedule,
+        conditionalRules: newSiteRules.length > 0 ? newSiteRules : undefined
+      })
       setNewSiteInput('')
+      setNewSiteSchedule(null)
+      setNewSiteRules([])
       await loadSites()
     } catch (err) {
       console.error('[Options] Error adding site:', err)
@@ -242,36 +253,6 @@ const App: React.FC = () => {
     } catch (err) {
       console.error('[Options] Error saving conditional rules:', err)
       alert('Failed to save conditional rules')
-    }
-  }
-
-  // Add current tab
-  const handleAddCurrentSite = async () => {
-    try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
-      const tab = tabs[0]
-
-      if (!tab?.url) {
-        alert(t('errors.noActiveTab'))
-        return
-      }
-
-      const host = normalizeHost(tab.url)
-      if (!host) {
-        alert(t('errors.invalidDomain'))
-        return
-      }
-
-      if (sites.some(s => s.host === host)) {
-        alert(t('errors.siteAlreadyAdded'))
-        return
-      }
-
-      await messagingClient.addSite(host)
-      await loadSites()
-    } catch (err) {
-      console.error('[Options] Error adding current site:', err)
-      alert(t('errors.failedToAdd'))
     }
   }
 
@@ -586,30 +567,79 @@ const App: React.FC = () => {
                   {t('options.addButton')}
                 </button>
               </div>
-              <button
-                className="samurai-transition"
-                onClick={handleAddCurrentSite}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: 'transparent',
-                  color: 'var(--sumi-gray)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--accent)'
-                  e.currentTarget.style.color = 'var(--accent)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                  e.currentTarget.style.color = 'var(--sumi-gray)'
-                }}
-              >
-                🌐 {t('options.addCurrent')}
-              </button>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  className="samurai-transition"
+                  onClick={() => setShowNewScheduleModal(true)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: newSiteSchedule ? 'rgba(46, 95, 111, 0.1)' : 'transparent',
+                    color: newSiteSchedule ? 'var(--accent)' : 'var(--sumi-gray)',
+                    border: newSiteSchedule ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    fontWeight: newSiteSchedule ? 600 : 400
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!newSiteSchedule) {
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.color = 'var(--accent)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!newSiteSchedule) {
+                      e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.color = 'var(--sumi-gray)'
+                    }
+                  }}
+                >
+                  <span>{newSiteSchedule ? '📅' : '📅'}</span>
+                  {t('options.scheduleButtonTitle') || 'Schedule'}
+                  {newSiteSchedule && <span style={{ fontSize: '0.8em', marginLeft: '4px' }}>✓</span>}
+                </button>
+                <button
+                  className="samurai-transition"
+                  onClick={() => setShowNewRulesModal(true)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: newSiteRules.length > 0 ? 'rgba(46, 95, 111, 0.1)' : 'transparent',
+                    color: newSiteRules.length > 0 ? 'var(--accent)' : 'var(--sumi-gray)',
+                    border: newSiteRules.length > 0 ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    fontWeight: newSiteRules.length > 0 ? 600 : 400
+                  }}
+                  onMouseEnter={(e) => {
+                    if (newSiteRules.length === 0) {
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.color = 'var(--accent)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (newSiteRules.length === 0) {
+                      e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.color = 'var(--sumi-gray)'
+                    }
+                  }}
+                >
+                  <span>{newSiteRules.length > 0 ? '🔀' : '🔀'}</span>
+                  {t('options.conditionsButtonTitle') || 'Conditions'}
+                  {newSiteRules.length > 0 && <span style={{ fontSize: '0.8em', marginLeft: '4px' }}>({newSiteRules.length})</span>}
+                </button>
+              </div>
             </div>
 
             {/* Selection Bar */}
@@ -1210,6 +1240,30 @@ const App: React.FC = () => {
       </main>
 
       {/* Modals */}
+      {showNewScheduleModal && (
+        <ScheduleModal
+          host={newSiteInput || 'New Site'}
+          initialSchedule={newSiteSchedule}
+          onSave={(schedule) => {
+            setNewSiteSchedule(schedule)
+            setShowNewScheduleModal(false)
+          }}
+          onCancel={() => setShowNewScheduleModal(false)}
+        />
+      )}
+
+      {showNewRulesModal && (
+        <ConditionalRulesModal
+          host={newSiteInput || 'New Site'}
+          initialRules={newSiteRules}
+          onSave={(rules) => {
+            setNewSiteRules(rules)
+            setShowNewRulesModal(false)
+          }}
+          onClose={() => setShowNewRulesModal(false)}
+        />
+      )}
+
       {schedulingHost && (
         <ScheduleModal
           host={schedulingHost.host}

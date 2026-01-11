@@ -5,10 +5,9 @@
 
 import type { Haiku } from '../haiku'
 import { getRandomHaiku, getRandomSamuraiQuote } from '../haiku'
-import { getRandomBlockedPhrase, getCurrentLanguage } from '../i18n'
-import { getRandomCaucasusWisdom, getRandomPhrase } from '../caucasus-wisdom'
+import { getCurrentLanguage } from '../i18n'
 
-export type ExerciseType = 'zen' | 'breath' | 'eye' | 'stretch' | 'mountain'
+export type ExerciseType = 'zen' | 'breath' | 'eye' | 'stretch'
 
 /**
  * Unified motivational content structure
@@ -70,33 +69,11 @@ export interface ThemeContentConfig {
     exerciseOrder: ExerciseType[]
 
     // Header style
-    headerStyle: 'default' | 'japanese' | 'caucasian' | 'custom'
+    headerStyle: 'japanese' | 'custom'
   }
 }
 
-/**
- * Default theme content configuration
- * Simple motivational phrases, standard layout
- */
-export const defaultContentConfig: ThemeContentConfig = {
-  themeId: 'default',
 
-  contentSources: {
-    phrase: {
-      enabled: true,
-      fetch: () => getRandomBlockedPhrase()
-    }
-  },
-
-  layout: {
-    showHaiku: false,
-    showQuote: false,
-    showPhrase: true,
-    showSeasonal: false,
-    exerciseOrder: ['breath', 'eye', 'stretch'],
-    headerStyle: 'default'
-  }
-}
 
 /**
  * Focusan theme content configuration
@@ -126,77 +103,19 @@ export const focusanContentConfig: ThemeContentConfig = {
   }
 }
 
-/**
- * Caucasus theme content configuration
- * Mountain proverbs, djigit wisdom, warrior spirit
- */
-export const caucasusContentConfig: ThemeContentConfig = {
-  themeId: 'caucasus',
 
-  contentSources: {
-    quote: {
-      enabled: true,
-      fetch: (lang) => {
-        const wisdom = getRandomCaucasusWisdom()
-        return lang === 'ru' ? wisdom.ru : wisdom.en
-      }
-    },
-    phrase: {
-      enabled: true,
-      fetch: () => {
-        const phrase = getRandomPhrase()
-        const lang = getCurrentLanguage()
-        return lang === 'ru' ? phrase.ru : phrase.en
-      }
-    }
-  },
-
-  layout: {
-    showHaiku: false,
-    showQuote: true,
-    showPhrase: true,
-    showSeasonal: false,
-    exerciseOrder: ['mountain', 'breath', 'eye', 'stretch'],
-    headerStyle: 'caucasian'
-  }
-}
 
 /**
  * Japanese Zen theme content configuration
  * Zen kanji quotes, breathing exercises, minimal philosophy
  */
-export const japaneseContentConfig: ThemeContentConfig = {
-  themeId: 'japanese',
 
-  contentSources: {
-    haiku: {
-      enabled: true,
-      fetch: () => getRandomHaiku()
-    },
-    quote: {
-      enabled: true,
-      fetch: (lang) => getRandomSamuraiQuote(lang)
-    }
-  },
-
-  layout: {
-    showHaiku: true,
-    showQuote: true,
-    showPhrase: false,
-    showSeasonal: false,
-    exerciseOrder: ['zen', 'breath', 'eye', 'stretch'],
-    headerStyle: 'japanese'
-  }
-}
 
 /**
  * Registry of all theme content configurations
  */
 export const THEME_CONTENT_CONFIGS: Record<string, ThemeContentConfig> = {
-  default: defaultContentConfig,
   focusan: focusanContentConfig,
-  caucasus: caucasusContentConfig,
-  japanese: japaneseContentConfig
 }
 
 /**
@@ -204,7 +123,7 @@ export const THEME_CONTENT_CONFIGS: Record<string, ThemeContentConfig> = {
  * Falls back to default config if theme not found
  */
 export function getContentConfigForTheme(themeId: string): ThemeContentConfig {
-  return THEME_CONTENT_CONFIGS[themeId] || defaultContentConfig
+  return THEME_CONTENT_CONFIGS[themeId] || focusanContentConfig
 }
 
 /**

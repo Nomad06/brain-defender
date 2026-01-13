@@ -7,10 +7,11 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { t } from '../shared/i18n'
 
 interface DeleteChallengeModalProps {
-  hosts: string[]  // Changed from single host to array
+  hosts: string[]
   onConfirm: () => void
   onCancel: () => void
 }
@@ -53,7 +54,7 @@ const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({ hosts, onCo
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     // Background
-    ctx.fillStyle = '#f0f0f0'
+    ctx.fillStyle = '#f9fafb' // gray-50
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     // Add noise lines
@@ -71,7 +72,7 @@ const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({ hosts, onCo
 
     for (let i = 0; i < code.length; i++) {
       const char = code[i]
-      const x = 20 + i * 35
+      const x = 30 + i * 35
       const y = 35 + (Math.random() - 0.5) * 10
       const rotation = (Math.random() - 0.5) * 0.4
 
@@ -233,222 +234,180 @@ const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({ hosts, onCo
   }, [])
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-      }}
-      onClick={onCancel}
-    >
-      <div
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onCancel}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
         ref={modalRef}
-        className="card"
-        style={{
-          maxWidth: '500px',
-          padding: '24px',
-          margin: '16px',
-          position: 'relative',
-        }}
+        className="w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden border border-border"
         onClick={e => e.stopPropagation()}
         tabIndex={-1}
       >
         {/* Header */}
-        <div className="h2" style={{ marginBottom: '8px' }}>
-          {t('options.deleteChallenge')}
-        </div>
-        <div className="muted" style={{ fontSize: '14px', marginBottom: '20px' }}>
-          {hosts.length === 1
-            ? t('options.deleteChallengeDescription', { host: hosts[0] })
-            : t('deleteChallenge.multipleDescription', { count: hosts.length })}
-        </div>
-        {hosts.length > 1 && (
-          <div className="muted" style={{ fontSize: '12px', marginBottom: '16px', maxHeight: '100px', overflowY: 'auto' }}>
-            {hosts.map(h => <div key={h}>{h}</div>)}
+        <div className="p-6 border-b border-border bg-gray-50/50">
+          <h2 className="text-xl font-semibold text-sumi-black mb-2">
+            {t('options.deleteChallenge')}
+          </h2>
+          <div className="text-sm text-sumi-gray">
+            {hosts.length === 1
+              ? t('options.deleteChallengeDescription', { host: hosts[0] })
+              : t('deleteChallenge.multipleDescription', { count: hosts.length })}
           </div>
-        )}
-
-        {/* Progress indicator */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-          <div
-            className="kbd"
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              background: step >= 1 ? 'var(--accent)' : 'var(--card2)',
-              color: step >= 1 ? 'white' : 'var(--muted)',
-            }}
-          >
-            1
-          </div>
-          <div
-            className="kbd"
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              background: step >= 2 ? 'var(--accent)' : 'var(--card2)',
-              color: step >= 2 ? 'white' : 'var(--muted)',
-            }}
-          >
-            2
-          </div>
-          <div
-            className="kbd"
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              background: step >= 3 ? 'var(--accent)' : 'var(--card2)',
-              color: step >= 3 ? 'white' : 'var(--muted)',
-            }}
-          >
-            3
-          </div>
-        </div>
-
-        {/* Step 1: CAPTCHA */}
-        {step === 1 && (
-          <div>
-            <div className="h3" style={{ marginBottom: '12px' }}>
-              {t('options.step1Captcha')}
+          {hosts.length > 1 && (
+            <div className="mt-2 text-xs text-sumi-gray bg-white border border-border rounded p-2 max-h-24 overflow-y-auto">
+              {hosts.map(h => <div key={h}>{h}</div>)}
             </div>
-            <canvas
-              ref={canvasRef}
-              width={250}
-              height={70}
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: '4px',
-                marginBottom: '12px',
-                display: 'block',
-              }}
-            />
-            <input
-              className="input"
-              type="text"
-              value={userCaptchaInput}
-              onChange={e => setUserCaptchaInput(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleCaptchaSubmit()}
-              placeholder={t('options.captchaPlaceholder')}
-              autoFocus
-              style={{ width: '100%', marginBottom: '12px' }}
-            />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn primary" onClick={handleCaptchaSubmit} style={{ flex: 1 }}>
-                {t('options.submit')}
-              </button>
-              <button
-                className="btn"
-                onClick={() => {
-                  const newCode = generateCaptcha()
-                  setCaptchaCode(newCode)
-                  setUserCaptchaInput('')
-                  drawCaptcha(newCode)
-                }}
+          )}
+        </div>
+
+        <div className="p-8">
+          {/* Progress indicator */}
+          <div className="flex gap-4 mb-8">
+            <div className={`flex-1 text-center py-2 rounded-lg font-mono text-sm font-bold transition-colors ${step >= 1 ? 'bg-accent text-white shadow-sm' : 'bg-gray-100 text-sumi-gray'
+              }`}>
+              1
+            </div>
+            <div className={`flex-1 text-center py-2 rounded-lg font-mono text-sm font-bold transition-colors ${step >= 2 ? 'bg-accent text-white shadow-sm' : 'bg-gray-100 text-sumi-gray'
+              }`}>
+              2
+            </div>
+            <div className={`flex-1 text-center py-2 rounded-lg font-mono text-sm font-bold transition-colors ${step >= 3 ? 'bg-accent text-white shadow-sm' : 'bg-gray-100 text-sumi-gray'
+              }`}>
+              3
+            </div>
+          </div>
+
+          <div className="min-h-[250px] flex flex-col justify-center">
+            {/* Step 1: CAPTCHA */}
+            {step === 1 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
               >
-                {t('options.regenerate')}
-              </button>
-            </div>
-          </div>
-        )}
+                <h3 className="text-lg font-medium text-sumi-black mb-4">
+                  {t('options.step1Captcha')}
+                </h3>
+                <canvas
+                  ref={canvasRef}
+                  width={250}
+                  height={80}
+                  className="w-full border border-border rounded-lg mb-4 bg-gray-50"
+                />
+                <input
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-white focus:border-accent outline-none text-lg font-mono mb-4 shadow-sm"
+                  type="text"
+                  value={userCaptchaInput}
+                  onChange={e => setUserCaptchaInput(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleCaptchaSubmit()}
+                  placeholder={t('options.captchaPlaceholder')}
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <button
+                    className="flex-1 px-4 py-2 rounded-lg bg-accent text-white hover:bg-opacity-90 font-medium shadow-sm"
+                    onClick={handleCaptchaSubmit}
+                  >
+                    {t('options.submit')}
+                  </button>
+                  <button
+                    className="flex-1 px-4 py-2 rounded-lg border border-border bg-white text-sumi-gray hover:bg-gray-50 font-medium"
+                    onClick={() => {
+                      const newCode = generateCaptcha()
+                      setCaptchaCode(newCode)
+                      setUserCaptchaInput('')
+                      drawCaptcha(newCode)
+                    }}
+                  >
+                    {t('options.regenerate')}
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
-        {/* Step 2: Math */}
-        {step === 2 && (
-          <div>
-            <div className="h3" style={{ marginBottom: '12px' }}>
-              {t('options.step2Math')}
-            </div>
-            <div
-              className="card"
-              style={{
-                padding: '20px',
-                textAlign: 'center',
-                fontSize: '28px',
-                fontWeight: 'bold',
-                marginBottom: '12px',
-                background: 'var(--card2)',
-              }}
-            >
-              {mathProblem} = ?
-            </div>
-            <input
-              className="input"
-              type="number"
-              value={userMathInput}
-              onChange={e => setUserMathInput(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleMathSubmit()}
-              placeholder={t('options.mathPlaceholder')}
-              autoFocus
-              style={{ width: '100%', marginBottom: '12px' }}
-            />
-            <button className="btn primary" onClick={handleMathSubmit} style={{ width: '100%' }}>
-              {t('options.submit')}
-            </button>
-          </div>
-        )}
+            {/* Step 2: Math */}
+            {step === 2 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <h3 className="text-lg font-medium text-sumi-black mb-4">
+                  {t('options.step2Math')}
+                </h3>
+                <div className="bg-gray-50 border border-border rounded-lg p-6 text-center text-4xl font-bold text-sumi-black mb-6 shadow-inner font-mono">
+                  {mathProblem} = ?
+                </div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-white focus:border-accent outline-none text-lg font-mono mb-4 shadow-sm"
+                  type="number"
+                  value={userMathInput}
+                  onChange={e => setUserMathInput(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleMathSubmit()}
+                  placeholder={t('options.mathPlaceholder')}
+                  autoFocus
+                />
+                <button
+                  className="w-full px-4 py-3 rounded-lg bg-accent text-white hover:bg-opacity-90 font-medium shadow-sm transition-colors"
+                  onClick={handleMathSubmit}
+                >
+                  {t('options.submit')}
+                </button>
+              </motion.div>
+            )}
 
-        {/* Step 3: Hold Button */}
-        {step === 3 && (
-          <div>
-            <div className="h3" style={{ marginBottom: '12px' }}>
-              {t('options.step3Hold')}
-            </div>
-            <div className="muted" style={{ fontSize: '14px', marginBottom: '12px' }}>
-              {t('options.holdDescription')}
-            </div>
-            <div
-              style={{
-                width: '100%',
-                height: '8px',
-                background: 'var(--card2)',
-                borderRadius: '4px',
-                marginBottom: '12px',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${holdProgress}%`,
-                  height: '100%',
-                  background: 'var(--accent)',
-                  transition: 'width 0.1s linear',
-                }}
-              />
-            </div>
-            <button
-              className="btn danger"
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleMouseDown}
-              onTouchEnd={handleMouseUp}
-              style={{
-                width: '100%',
-                padding: '16px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              {isHolding
-                ? `${t('options.holding')} ${Math.floor(holdProgress / 10)}s / 10s`
-                : t('options.holdToDelete')}
-            </button>
+            {/* Step 3: Hold Button */}
+            {step === 3 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <h3 className="text-lg font-medium text-sumi-black mb-2">
+                  {t('options.step3Hold')}
+                </h3>
+                <p className="text-sm text-sumi-gray mb-6">
+                  {t('options.holdDescription')}
+                </p>
+                <div className="w-full h-3 bg-gray-100 rounded-full mb-6 overflow-hidden border border-border/50">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-danger to-orange-500"
+                    style={{ width: `${holdProgress}%` }}
+                    transition={{ duration: 0.1, ease: "linear" }}
+                  />
+                </div>
+                <button
+                  className={`w-full py-4 rounded-xl text-lg font-bold transition-all transform active:scale-95 shadow-lg select-none ${isHolding
+                      ? 'bg-danger text-white scale-98 shadow-inner ring-4 ring-danger/20'
+                      : 'bg-white border-2 border-danger text-danger hover:bg-danger hover:text-white'
+                    }`}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleMouseDown}
+                  onTouchEnd={handleMouseUp}
+                >
+                  {isHolding
+                    ? `${t('options.holding')} ${Math.floor(holdProgress / 10)}s / 10s`
+                    : t('options.holdToDelete')}
+                </button>
+              </motion.div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Cancel button */}
-        <div className="space"></div>
-        <button className="btn" onClick={onCancel} style={{ width: '100%' }}>
-          {t('common.cancel')}
-        </button>
-      </div>
+        <div className="p-4 bg-gray-50/50 border-t border-border">
+          <button
+            className="w-full px-4 py-2 rounded-lg text-sumi-gray hover:bg-gray-100 hover:text-sumi-black transition-colors font-medium"
+            onClick={onCancel}
+          >
+            {t('common.cancel')}
+          </button>
+        </div>
+      </motion.div>
     </div>
   )
 }

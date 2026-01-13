@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 interface ZenGardenProps {
   width?: number
@@ -11,32 +12,12 @@ interface ZenGardenProps {
 }
 
 const ZenGarden: React.FC<ZenGardenProps> = ({ width = 600, height = 400 }) => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isRaking, setIsRaking] = useState(false)
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null)
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Initialize canvas with sand texture
-    const dpr = window.devicePixelRatio || 1
-    canvas.width = width * dpr
-    canvas.height = height * dpr
-    canvas.style.width = width + 'px'
-    canvas.style.height = height + 'px'
-    ctx.scale(dpr, dpr)
-
-    // Draw initial sand background
-    drawSandBackground(ctx, width, height)
-
-    // Place rocks
-    placeRocks(ctx, width, height)
-  }, [width, height])
-
+  // Draw Functions
   const drawSandBackground = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     // Sand gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, h)
@@ -119,6 +100,45 @@ const ZenGarden: React.FC<ZenGardenProps> = ({ width = 600, height = 400 }) => {
     }
   }
 
+  // Responsive Effect
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const updateSize = () => {
+      const { clientWidth } = container
+      const newWidth = clientWidth || width
+      const newHeight = height // Keep fixed height for now
+
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = newWidth * dpr
+      canvas.height = newHeight * dpr
+      canvas.style.width = newWidth + 'px'
+      canvas.style.height = newHeight + 'px'
+      ctx.scale(dpr, dpr)
+
+      drawSandBackground(ctx, newWidth, newHeight)
+      placeRocks(ctx, newWidth, newHeight)
+    }
+
+    updateSize()
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize()
+    })
+    resizeObserver.observe(container)
+
+    return () => resizeObserver.disconnect()
+  }, [width, height])
+
+
+  // Event Handlers
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -165,12 +185,22 @@ const ZenGarden: React.FC<ZenGardenProps> = ({ width = 600, height = 400 }) => {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    drawSandBackground(ctx, width, height)
-    placeRocks(ctx, width, height)
+    const rect = canvas.getBoundingClientRect()
+    const w = rect.width
+    const h = rect.height
+
+    drawSandBackground(ctx, w, h)
+    placeRocks(ctx, w, h)
   }
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <motion.div
+      ref={containerRef}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      style={{ position: 'relative', width: '100%', maxWidth: '100%', height: height + 'px', display: 'block' }}
+    >
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}
@@ -183,23 +213,18 @@ const ZenGarden: React.FC<ZenGardenProps> = ({ width = 600, height = 400 }) => {
           border: '2px solid var(--border)',
           boxShadow: 'var(--shadow-lg)',
           background: 'var(--kinari-cream)',
+          width: '100%',
+          height: '100%',
+          display: 'block'
         }}
       />
       <button
         onClick={handleReset}
-        className="btn"
-        style={{
-          position: 'absolute',
-          bottom: '12px',
-          right: '12px',
-          fontSize: '11px',
-          padding: '6px 12px',
-          opacity: 0.8,
-        }}
+        className="absolute bottom-3 right-3 text-xs px-3 py-1.5 opacity-80 bg-shiro-white/80 rounded border border-border hover:opacity-100 hover:bg-white transition-all shadow-sm font-mono text-sumi-gray"
       >
-        🔄 Reset Garden
+        🔄 Reset
       </button>
-    </div>
+    </motion.div>
   )
 }
 

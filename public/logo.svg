@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="brushGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a4a4a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="ink-texture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+    </filter>
+  </defs>
+  
+  <!-- Enso Circle (Zen Ring) - Stylized Brush Stroke -->
+  <path d="M256,40c-119.3,0-216,96.7-216,216c0,119.3,96.7,216,216,216c60.3,0,115-24.8,154-65l-15-15c-36,37-86.7,60-142,60C116,452,56,396,56,316c0-30,4-66,16-94c16-37,45-66,80-82c35-16,74-14,110,4c32,16,56,42,76,73" 
+        fill="none" 
+        stroke="url(#brushGradient)" 
+        stroke-width="24" 
+        stroke-linecap="round" 
+        filter="url(#ink-texture)"
+        opacity="0.9" />
+        
+  <!-- Torii Gate -->
+  <g transform="translate(136, 156)">
+    <!-- Top Bar (Kasagi) - Curves up at ends -->
+    <path d="M0,30 Q120,0 240,30 L240,55 Q120,25 0,55 Z" fill="#2e5f6f" />
+    
+    <!-- Second Bar (Shimaki) -->
+    <rect x="20" y="70" width="200" height="20" fill="#2e5f6f" />
+    
+    <!-- Vertical Posts (Hashira) -->
+    <path d="M50,55 L40,260 L70,260 L60,55 Z" fill="#165e83" />
+    <path d="M190,55 L180,260 L210,260 L200,55 Z" fill="#165e83" />
+    
+    <!-- Center Plaque (Gakuzuka) -->
+    <rect x="110" y="30" width="20" height="40" fill="#165e83" />
+    
+    <!-- Connecting Beam (Nuki) -->
+    <rect x="30" y="90" width="180" height="15" fill="#2e5f6f" />
+  </g>
+  
+  <!-- Sun/Focus Accent (Gold) -->
+  <circle cx="256" cy="270" r="30" fill="#d4af37" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;1;0.8" duration="4s" repeatCount="indefinite" />
+  </circle>
+
+</svg>

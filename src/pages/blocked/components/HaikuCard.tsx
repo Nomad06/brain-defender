@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import type { Haiku } from '../../../shared/haiku'
 
 interface HaikuCardProps {
@@ -16,32 +17,27 @@ export const HaikuCard: React.FC<HaikuCardProps> = ({ haiku, language }) => {
   const lines = (language === 'ru' && haiku.linesRu) ? haiku.linesRu : haiku.lines
 
   return (
-    <div
-      className="card bamboo-grid brush-border"
-      style={{
-        padding: '28px 24px',
-        background: 'var(--card2)',
-        border: '2px solid var(--border)',
-        marginBottom: '20px',
-        textAlign: 'center',
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-washi border-2 border-border p-8 mb-6 text-center shadow-lg max-w-md mx-auto relative overflow-hidden"
     >
-      <div
-        className="japanese-serif"
-        style={{
-          fontSize: '19px',
-          lineHeight: 1.9,
-          color: 'var(--text)',
-          fontStyle: 'italic',
-          letterSpacing: '0.05em',
-        }}
-      >
+      {/* Decorative vertical line */}
+      <div className="absolute left-6 top-6 bottom-6 w-[1px] bg-border/30" />
+
+      <div className="font-serif italic text-lg leading-loose text-sumi-black tracking-wide pl-4">
         {lines.map((line, i) => (
-          <div key={i} style={{ marginBottom: i === 2 ? 0 : '10px' }}>
+          <motion.div
+            key={i}
+            className="mb-3 last:mb-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 + i * 0.5, duration: 1 }}
+          >
             {line}
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }

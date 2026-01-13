@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { t, initI18n } from '../../shared/i18n'
 import { useLanguage } from '../../shared/i18n/useLanguage'
 import { messagingClient } from '../../shared/messaging/client'
@@ -380,39 +381,11 @@ const BlockedPage: React.FC = () => {
     setActiveExercise('none')
   }
 
-
-
   return (
-    <div
-      className="washi-texture"
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '24px',
-        color: 'var(--color-ai-indigo)',
-        overflowX: 'hidden'
-      }}
-    >
-      <style>{`
-        @keyframes breath {
-            0% { transform: scale(0.8); opacity: 0.1; }
-            100% { transform: scale(1.2); opacity: 0.2; }
-        }
-        @keyframes breathInner {
-            0% { transform: scale(0.9); }
-            100% { transform: scale(1.1); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        `}</style>
-
+    <div className="min-h-screen bg-washi flex flex-col items-center justify-center p-6 text-sumi-black overflow-x-hidden">
       {/* Main Block Content - Centered Zen Layout */}
-      <div className="block-container" style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', position: 'relative' }}>
-        <div className="content-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 2 }}>
+      <div className="w-full max-w-4xl min-h-[80vh] flex flex-col items-center justify-center relative">
+        <div className="w-full flex flex-col items-center justify-center text-center z-10">
 
           {/* Theme-aware Motivational Content */}
           {theme?.metadata.id === 'focusan' ? (
@@ -447,126 +420,154 @@ const BlockedPage: React.FC = () => {
 
       {/* Zen Close Button - Minimalist style for Focusan theme */}
       {theme?.metadata.id === 'focusan' ? (
-        <div style={{ width: '100%', maxWidth: '800px', display: 'flex', justifyContent: 'center', marginTop: '48px' }}>
-          <button
+        <div className="w-full max-w-4xl mt-12 flex justify-center">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
             onClick={handleCloseTab}
-            style={{
-              padding: '16px 40px',
-              background: 'transparent',
-              border: '1px solid var(--palette-indigo, var(--text))',
-              color: 'var(--palette-indigo, var(--text))',
-              fontSize: '1rem',
-              letterSpacing: '0.05em',
-              borderRadius: '9999px',
-              cursor: 'pointer',
-              transition: 'all var(--transition-normal, 0.3s)',
-              opacity: 0,
-              animation: 'fadeInUp 1s ease-out forwards 1.6s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--palette-indigo, var(--text))'
-              e.currentTarget.style.color = 'white'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = 'var(--palette-indigo, var(--text))'
-              e.currentTarget.style.transform = 'translateY(0)'
-            }}
+            className="px-10 py-4 border border-sumi-black/50 text-sumi-black text-base tracking-widest hover:bg-black/5 transition-colors font-serif"
           >
             {t('common.close')}
-          </button>
+          </motion.button>
         </div>
       ) : (
         /* Exercise Section - For non-Japanese themes */
-        <div className="card" style={{ width: '100%', maxWidth: '800px', padding: '24px', background: 'var(--card2)', borderRadius: '12px', marginTop: '24px', border: '1px solid var(--border)' }}>
-          <div className="h2" style={{ marginBottom: '16px' }}>{t('exercises.title')}</div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-4xl p-6 mt-6 bg-white/60 backdrop-blur-md rounded-xl shadow-zen border border-border"
+        >
+          <div className="text-xl font-semibold mb-4 text-sumi-black">{t('exercises.title')}</div>
 
           {/* Exercise Buttons */}
-          {activeExercise === 'none' && contentConfig && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
-              {contentConfig.layout.exerciseOrder.map(exercise => {
-                const exerciseButtons: Record<ExerciseType, React.ReactElement> = {
-                  zen: (
-                    <button key="zen" className="btn samurai-transition" onClick={startZenExercise} style={{ padding: '12px' }}>
-                      🪨 Zen Garden
-                    </button>
-                  ),
+          <AnimatePresence mode="wait">
+            {activeExercise === 'none' && contentConfig && (
+              <motion.div
+                key="buttons"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2"
+              >
+                {contentConfig.layout.exerciseOrder.map(exercise => {
+                  const exerciseButtons: Record<ExerciseType, React.ReactElement> = {
+                    zen: (
+                      <button key="zen" className="p-3 flex justify-center items-center gap-2 rounded-lg bg-white border border-border hover:border-accent hover:text-accent transition-all shadow-sm" onClick={startZenExercise}>
+                        <span>🪨</span> Zen Garden
+                      </button>
+                    ),
+                    breath: (
+                      <button key="breath" className="p-3 flex justify-center items-center gap-2 rounded-lg bg-white border border-border hover:border-accent hover:text-accent transition-all shadow-sm" onClick={startBreathExercise}>
+                        <span>🫁</span> {t('exercises.breathing')}
+                      </button>
+                    ),
+                    eye: (
+                      <button key="eye" className="p-3 flex justify-center items-center gap-2 rounded-lg bg-white border border-border hover:border-accent hover:text-accent transition-all shadow-sm" onClick={startEyeExercise}>
+                        <span>👁</span> {t('exercises.eyeTraining')}
+                      </button>
+                    ),
+                    stretch: (
+                      <button key="stretch" className="p-3 flex justify-center items-center gap-2 rounded-lg bg-white border border-border hover:border-accent hover:text-accent transition-all shadow-sm" onClick={startStretchExercise}>
+                        <span>🧍</span> {t('exercises.stretch')}
+                      </button>
+                    )
+                  }
+                  return exerciseButtons[exercise]
+                })}
+                <button className="p-3 flex justify-center items-center gap-2 rounded-lg border border-danger text-danger hover:bg-danger hover:text-white transition-all shadow-sm" onClick={handleCloseTab}>
+                  <span>✕</span> {t('blocked.closeTab')}
+                </button>
+              </motion.div>
+            )}
 
-                  breath: (
-                    <button key="breath" className="btn samurai-transition" onClick={startBreathExercise} style={{ padding: '12px' }}>
-                      🫁 {t('exercises.breathing')}
-                    </button>
-                  ),
-                  eye: (
-                    <button key="eye" className="btn samurai-transition" onClick={startEyeExercise} style={{ padding: '12px' }}>
-                      👁 {t('exercises.eyeTraining')}
-                    </button>
-                  ),
-                  stretch: (
-                    <button key="stretch" className="btn samurai-transition" onClick={startStretchExercise} style={{ padding: '12px' }}>
-                      🧍 {t('exercises.stretch')}
-                    </button>
-                  )
-                }
-                return exerciseButtons[exercise]
-              })}
-              <button className="btn danger samurai-transition" onClick={handleCloseTab} style={{ padding: '12px' }}>
-                ✕ {t('blocked.closeTab')}
-              </button>
-            </div>
-          )}
+            {/* Eye Exercise Content */}
+            {activeExercise === 'eye' && (
+              <motion.div
+                key="eye"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="p-4 bg-white rounded-lg border border-border"
+              >
+                <div className="text-lg font-semibold mb-3">{t('exercises.eyeTrainingTitle')}</div>
+                <div className="bg-gray-50 rounded-lg overflow-hidden border border-border mb-3 relative max-w-full">
+                  <canvas ref={eyeCanvasRef} className="w-full h-[200px] block" />
+                </div>
+                <div className="h-1 bg-gray-100 rounded-full overflow-hidden mb-3">
+                  <motion.div className="h-full bg-accent" style={{ width: `${eyeProgress}%` }} />
+                </div>
+                <button className="px-3 py-1.5 text-xs rounded border border-border hover:bg-gray-50 transition-colors" onClick={stopEyeExercise}>
+                  {t('exercises.stop')}
+                </button>
+              </motion.div>
+            )}
 
-          {/* Eye Exercise Content */}
-          {activeExercise === 'eye' && (
-            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-              {/* Keep existing Eye content but unstyled if needed, or rely on inner logic */}
-              <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.eyeTrainingTitle')}</div>
-              <canvas ref={eyeCanvasRef} style={{ width: '100%', height: '200px', borderRadius: '8px', background: 'var(--card2)', display: 'block', marginBottom: '12px' }} />
-              <div style={{ height: '4px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${eyeProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
-              </div>
-              <button className="btn" onClick={stopEyeExercise} style={{ fontSize: '11px', padding: '6px 12px', marginTop: '12px' }}>{t('exercises.stop')}</button>
-            </div>
-          )}
+            {/* Breath Exercise Content */}
+            {activeExercise === 'breath' && (
+              <motion.div
+                key="breath"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="p-4 bg-white rounded-lg border border-border text-center"
+              >
+                <div className="text-lg font-semibold mb-3">{t('exercises.breathingTitle')}</div>
+                <div className="flex justify-center mb-3">
+                  <div className="rounded-full bg-gray-50 border border-border overflow-hidden p-4">
+                    <canvas ref={breathCanvasRef} className="block w-[300px] h-[300px]" width={300} height={300} />
+                  </div>
+                </div>
+                <div className="text-xl font-medium mb-3 text-accent">{breathPhase}</div>
+                <div className="h-1 w-[200px] mx-auto bg-gray-100 rounded-full overflow-hidden mb-4">
+                  <motion.div className="h-full bg-accent" style={{ width: `${breathProgress}%` }} />
+                </div>
+                <button className="px-4 py-2 rounded border border-border hover:bg-gray-50 transition-colors" onClick={stopBreathExercise}>
+                  {t('exercises.stop')}
+                </button>
+              </motion.div>
+            )}
 
-          {/* Breath Exercise Content */}
-          {activeExercise === 'breath' && (
-            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)', textAlign: 'center' }}>
-              <div className="h2" style={{ marginBottom: '12px' }}>{t('exercises.breathingTitle')}</div>
-              <canvas ref={breathCanvasRef} style={{ width: '300px', height: '300px', borderRadius: '50%', background: 'var(--card2)', display: 'block', margin: '0 auto 12px' }} />
-              <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '12px' }}>{breathPhase}</div>
-              <div style={{ height: '4px', width: '200px', background: 'var(--card2)', borderRadius: '2px', overflow: 'hidden', margin: '0 auto 12px' }}>
-                <div style={{ height: '100%', width: `${breathProgress}%`, background: 'var(--accent)', transition: 'width 0.1s linear' }} />
-              </div>
-              <button className="btn" onClick={stopBreathExercise}>{t('exercises.stop')}</button>
-            </div>
-          )}
+            {/* Stretch Exercise Content */}
+            {activeExercise === 'stretch' && (
+              <motion.div
+                key="stretch"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="p-4 bg-white rounded-lg border border-border"
+              >
+                <div className="text-lg font-semibold">{t('exercises.stretchTitle')}</div>
+                <div className="my-4 p-3 bg-red-50 text-red-800 border-l-4 border-danger rounded text-sm">
+                  {t('exercises.stretchWarning')}
+                </div>
+                <button className="px-4 py-2 rounded border border-border hover:bg-gray-50 transition-colors" onClick={stopStretchExercise}>
+                  {t('common.close')}
+                </button>
+              </motion.div>
+            )}
 
-          {/* Stretch Exercise Content */}
-          {activeExercise === 'stretch' && (
-            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-              <div className="h2">{t('exercises.stretchTitle')}</div>
-              <div className="muted" style={{ margin: '16px 0', padding: '10px', background: 'var(--card2)', borderLeft: '3px solid var(--danger)' }}>{t('exercises.stretchWarning')}</div>
-              <button className="btn" onClick={stopStretchExercise}>{t('common.close')}</button>
-            </div>
-          )}
-
-          {/* Zen Garden Exercise Content */}
-          {activeExercise === 'zen' && (
-            <div style={{ padding: '16px', background: 'var(--card)', borderRadius: '8px', border: '2px solid var(--gold)' }}>
-              <div className="h2" style={{ textAlign: 'center', marginBottom: '12px' }}>🪨 Zen Garden - 枯山水</div>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <ZenGarden width={Math.min(600, window.innerWidth - 100)} height={400} />
-              </div>
-              <button className="btn" onClick={stopZenExercise} style={{ display: 'block', margin: '16px auto' }}>{t('common.close')}</button>
-            </div>
-          )}
-
-
-        </div>
+            {/* Zen Garden Exercise Content */}
+            {activeExercise === 'zen' && (
+              <motion.div
+                key="zen"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="p-4 bg-white rounded-lg border-2 border-gold shadow-gold/10"
+              >
+                <div className="text-lg font-semibold text-center mb-3 text-sumi-black">🪨 Zen Garden - 枯山水</div>
+                <div className="flex justify-center overflow-hidden">
+                  <ZenGarden width={Math.min(600, window.innerWidth - 60)} height={400} />
+                </div>
+                <button className="block mx-auto mt-4 px-6 py-2 rounded border border-border hover:bg-gray-50 transition-colors" onClick={stopZenExercise}>
+                  {t('common.close')}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
-
     </div>
   )
 }

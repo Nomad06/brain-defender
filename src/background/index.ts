@@ -31,12 +31,16 @@ async function handleInstalled(
       await initFocusSessions()
 
       // Show welcome notification
-      await browser.notifications.create({
-        type: 'basic',
-        iconUrl: browser.runtime.getURL('icons/icon-48.png'),
-        title: 'Brain Defender Installed',
-        message: 'Your digital attention guardian is ready to help you stay focused!',
-      })
+      try {
+        await browser.notifications.create(`install_${Date.now()}`, {
+          type: 'basic',
+          iconUrl: browser.runtime.getURL('icons/icon128.png'),
+          title: 'Brain Defender Installed',
+          message: 'Your digital attention guardian is ready to help you stay focused!',
+        })
+      } catch (notifErr) {
+        console.debug('[Background] Failed to show welcome notification:', notifErr)
+      }
     }
 
     if (details.reason === 'update') {

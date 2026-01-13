@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import { type Schedule, ScheduleMode } from '../shared/domain/schedule'
 import { t } from '../shared/i18n'
 
@@ -76,232 +77,177 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ host, initialSchedule, on
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '16px',
-      }}
-      onClick={onCancel}
-    >
-      <div
-        className="card"
-        style={{
-          maxWidth: '500px',
-          width: '100%',
-          padding: '24px',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-        }}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onCancel}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden border border-border"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="h2" style={{ marginBottom: '8px' }}>
-          {t('schedule.modalTitle', { host })}
+        <div className="p-6 border-b border-border bg-gray-50/50">
+          <h2 className="text-xl font-semibold text-sumi-black">
+            {t('schedule.modalTitle', { host })}
+          </h2>
         </div>
 
-        {/* Mode selector */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-            {t('schedule.scheduleMode')}
-          </label>
-          <select
-            className="input"
-            value={mode}
-            onChange={e => setMode(e.target.value as ScheduleMode)}
-            style={{ width: '100%' }}
-          >
-            <option value={ScheduleMode.ALWAYS}>{t('schedule.alwaysBlock')}</option>
-            <option value={ScheduleMode.WORK_HOURS}>{t('schedule.workHours')}</option>
-            <option value={ScheduleMode.WEEKENDS}>{t('schedule.weekendsOnly')}</option>
-            <option value={ScheduleMode.CUSTOM}>{t('schedule.customSchedule')}</option>
-            <option value={ScheduleMode.VACATION}>{t('schedule.vacation')}</option>
-          </select>
+        <div className="p-6 overflow-y-auto max-h-[70vh]">
+          {/* Mode selector */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-sumi-black mb-2">
+              {t('schedule.scheduleMode')}
+            </label>
+            <select
+              className="w-full px-4 py-2 rounded-lg border border-border bg-white focus:border-accent outline-none transition-colors"
+              value={mode}
+              onChange={e => setMode(e.target.value as ScheduleMode)}
+            >
+              <option value={ScheduleMode.ALWAYS}>{t('schedule.alwaysBlock')}</option>
+              <option value={ScheduleMode.WORK_HOURS}>{t('schedule.workHours')}</option>
+              <option value={ScheduleMode.WEEKENDS}>{t('schedule.weekendsOnly')}</option>
+              <option value={ScheduleMode.CUSTOM}>{t('schedule.customSchedule')}</option>
+              <option value={ScheduleMode.VACATION}>{t('schedule.vacation')}</option>
+            </select>
+          </div>
+
+          {/* Work hours settings */}
+          {mode === ScheduleMode.WORK_HOURS && (
+            <div className="bg-gray-50 p-4 rounded-lg border border-border mb-6">
+              <h3 className="text-sm font-medium mb-3 text-sumi-black">
+                {t('schedule.workHoursLabel')}
+              </h3>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label className="block text-xs text-sumi-gray mb-1">
+                    {t('schedule.from')}
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full px-3 py-2 rounded border border-border bg-white focus:border-accent outline-none"
+                    value={workStart}
+                    onChange={e => setWorkStart(e.target.value)}
+                  />
+                </div>
+                <div className="pt-5 text-sumi-gray">—</div>
+                <div className="flex-1">
+                  <label className="block text-xs text-sumi-gray mb-1">
+                    {t('schedule.to')}
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full px-3 py-2 rounded border border-border bg-white focus:border-accent outline-none"
+                    value={workEnd}
+                    onChange={e => setWorkEnd(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Custom schedule settings */}
+          {mode === ScheduleMode.CUSTOM && (
+            <div className="bg-gray-50 p-4 rounded-lg border border-border mb-6">
+              <h3 className="text-sm font-medium mb-3 text-sumi-black">
+                {t('schedule.customDaysLabel')}
+              </h3>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {DAYS.map(day => (
+                  <button
+                    key={day.value}
+                    type="button"
+                    className={`flex-1 min-w-[40px] py-2 px-1 text-xs rounded transition-colors ${customDays.has(day.value)
+                        ? 'bg-accent text-white shadow-sm'
+                        : 'bg-white border border-border text-sumi-gray hover:bg-gray-100'
+                      }`}
+                    onClick={() => toggleDay(day.value)}
+                  >
+                    {day.short}
+                  </button>
+                ))}
+              </div>
+              <h3 className="text-sm font-medium mb-3 text-sumi-black">
+                {t('schedule.customTimeLabel')}
+              </h3>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label className="block text-xs text-sumi-gray mb-1">
+                    {t('schedule.from')}
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full px-3 py-2 rounded border border-border bg-white focus:border-accent outline-none"
+                    value={customStart}
+                    onChange={e => setCustomStart(e.target.value)}
+                  />
+                </div>
+                <div className="pt-5 text-sumi-gray">—</div>
+                <div className="flex-1">
+                  <label className="block text-xs text-sumi-gray mb-1">
+                    {t('schedule.to')}
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full px-3 py-2 rounded border border-border bg-white focus:border-accent outline-none"
+                    value={customEnd}
+                    onChange={e => setCustomEnd(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Info messages */}
+          {mode === ScheduleMode.VACATION && (
+            <div className="bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-100 mb-6 text-sm">
+              {t('schedule.vacationDescription')}
+            </div>
+          )}
+
+          {mode === ScheduleMode.WEEKENDS && (
+            <div className="bg-gray-50 text-sumi-gray p-4 rounded-lg border border-border mb-6 text-sm">
+              {t('schedule.weekendsDescription')}
+            </div>
+          )}
+
+          {mode === ScheduleMode.WORK_HOURS && (
+            <div className="bg-gray-50 text-sumi-gray p-4 rounded-lg border border-border mb-6 text-sm">
+              {t('schedule.workHoursDescription', { start: workStart, end: workEnd })}
+            </div>
+          )}
+
+          {mode === ScheduleMode.CUSTOM && (
+            <div className="bg-gray-50 text-sumi-gray p-4 rounded-lg border border-border mb-6 text-sm">
+              {t('schedule.customDescription', { start: customStart, end: customEnd })}
+            </div>
+          )}
         </div>
-
-        {/* Work hours settings */}
-        {mode === ScheduleMode.WORK_HOURS && (
-          <div
-            className="card"
-            style={{ padding: '16px', background: 'var(--card2)', marginBottom: '20px' }}
-          >
-            <div className="h3" style={{ marginBottom: '12px', fontSize: '14px' }}>
-              {t('schedule.workHoursLabel')}
-            </div>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
-                  {t('schedule.from')}
-                </label>
-                <input
-                  type="time"
-                  className="input"
-                  value={workStart}
-                  onChange={e => setWorkStart(e.target.value)}
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <div style={{ paddingTop: '20px' }}>—</div>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
-                  {t('schedule.to')}
-                </label>
-                <input
-                  type="time"
-                  className="input"
-                  value={workEnd}
-                  onChange={e => setWorkEnd(e.target.value)}
-                  style={{ width: '100%' }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Custom schedule settings */}
-        {mode === ScheduleMode.CUSTOM && (
-          <div
-            className="card"
-            style={{ padding: '16px', background: 'var(--card2)', marginBottom: '20px' }}
-          >
-            <div className="h3" style={{ marginBottom: '12px', fontSize: '14px' }}>
-              {t('schedule.customDaysLabel')}
-            </div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-              {DAYS.map(day => (
-                <button
-                  key={day.value}
-                  type="button"
-                  className={customDays.has(day.value) ? 'btn primary' : 'btn'}
-                  onClick={() => toggleDay(day.value)}
-                  style={{
-                    flex: '1 1 auto',
-                    minWidth: '45px',
-                    padding: '8px 4px',
-                    fontSize: '12px',
-                  }}
-                >
-                  {day.short}
-                </button>
-              ))}
-            </div>
-            <div className="h3" style={{ marginBottom: '12px', fontSize: '14px' }}>
-              {t('schedule.customTimeLabel')}
-            </div>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
-                  {t('schedule.from')}
-                </label>
-                <input
-                  type="time"
-                  className="input"
-                  value={customStart}
-                  onChange={e => setCustomStart(e.target.value)}
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <div style={{ paddingTop: '20px' }}>—</div>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
-                  {t('schedule.to')}
-                </label>
-                <input
-                  type="time"
-                  className="input"
-                  value={customEnd}
-                  onChange={e => setCustomEnd(e.target.value)}
-                  style={{ width: '100%' }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Info messages */}
-        {mode === ScheduleMode.VACATION && (
-          <div
-            className="muted"
-            style={{
-              fontSize: '14px',
-              padding: '12px',
-              background: 'var(--card2)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-            }}
-          >
-            {t('schedule.vacationDescription')}
-          </div>
-        )}
-
-        {mode === ScheduleMode.WEEKENDS && (
-          <div
-            className="muted"
-            style={{
-              fontSize: '14px',
-              padding: '12px',
-              background: 'var(--card2)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-            }}
-          >
-            {t('schedule.weekendsDescription')}
-          </div>
-        )}
-
-        {mode === ScheduleMode.WORK_HOURS && (
-          <div
-            className="muted"
-            style={{
-              fontSize: '14px',
-              padding: '12px',
-              background: 'var(--card2)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-            }}
-          >
-            {t('schedule.workHoursDescription', { start: workStart, end: workEnd })}
-          </div>
-        )}
-
-        {mode === ScheduleMode.CUSTOM && (
-          <div
-            className="muted"
-            style={{
-              fontSize: '14px',
-              padding: '12px',
-              background: 'var(--card2)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-            }}
-          >
-            {t('schedule.customDescription', { start: customStart, end: customEnd })}
-          </div>
-        )}
 
         {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn" onClick={onCancel} style={{ flex: 1 }}>
+        <div className="p-6 border-t border-border bg-gray-50/50 flex gap-3">
+          <button
+            className="flex-1 px-4 py-2 rounded-lg border border-border bg-white text-sumi-gray hover:bg-gray-50 transition-colors"
+            onClick={onCancel}
+          >
             {t('common.cancel')}
           </button>
           {initialSchedule && (
-            <button className="btn danger" onClick={handleRemoveSchedule} style={{ flex: 1 }}>
+            <button
+              className="flex-1 px-4 py-2 rounded-lg border border-danger text-danger hover:bg-danger hover:text-white transition-colors"
+              onClick={handleRemoveSchedule}
+            >
               {t('schedule.removeSchedule')}
             </button>
           )}
-          <button className="btn primary" onClick={handleSave} style={{ flex: 1 }}>
+          <button
+            className="flex-1 px-4 py-2 rounded-lg bg-accent text-white hover:bg-opacity-90 transition-colors shadow-sm"
+            onClick={handleSave}
+          >
             {t('common.save')}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

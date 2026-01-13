@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 
 interface QuoteCardProps {
   quote: string
@@ -12,21 +13,16 @@ interface QuoteCardProps {
 
 export const QuoteCard: React.FC<QuoteCardProps> = ({ quote, icon = '⚔️' }) => {
   return (
-    <div
-      className="japanese-serif samurai-quote"
-      style={{
-        fontSize: 'clamp(18px, 2.5vw, 26px)',
-        fontWeight: 500,
-        lineHeight: 1.5,
-        letterSpacing: '0.04em',
-        margin: '24px 0',
-        color: 'var(--accent)',
-        textAlign: 'center',
-        padding: '16px 24px',
-        position: 'relative',
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="font-serif text-xl md:text-2xl font-medium tracking-wide leading-relaxed text-accent text-center py-6 px-8 relative max-w-2xl mx-auto"
     >
-      <span style={{ fontSize: '1.3em', color: 'var(--gold)' }}>{icon}</span> 「{quote}」
-    </div>
+      <div className="text-3xl text-gold mb-2 drop-shadow-sm">{icon}</div>
+      <span className="opacity-80">「</span>
+      <span className="mx-2">{quote}</span>
+      <span className="opacity-80">」</span>
+    </motion.div>
   )
 }

@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 
 interface PhraseCardProps {
   phrase: string
@@ -11,26 +12,14 @@ interface PhraseCardProps {
 
 export const PhraseCard: React.FC<PhraseCardProps> = ({ phrase }) => {
   return (
-    <div
-      className="card"
-      style={{
-        padding: '24px',
-        background: 'var(--card2)',
-        border: '2px solid var(--accent)',
-        marginBottom: '20px',
-        textAlign: 'center',
-      }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white/60 backdrop-blur-md border-2 border-accent p-8 mb-6 text-center rounded-xl shadow-zen max-w-lg mx-auto"
     >
-      <div
-        style={{
-          fontSize: 'clamp(18px, 2.5vw, 24px)',
-          fontWeight: 600,
-          lineHeight: 1.5,
-          color: 'var(--text)',
-        }}
-      >
+      <div className="text-xl md:text-2xl font-semibold leading-relaxed text-sumi-black">
         {phrase}
       </div>
-    </div>
+    </motion.div>
   )
 }

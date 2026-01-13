@@ -159,17 +159,8 @@ export async function startFocusSession(
       when: endTime,
     })
 
-    // Block sites for session (send message to background)
-    // Service worker will combine main list + Pomodoro list
-    try {
-      await browser.runtime.sendMessage({
-        type: 'START_FOCUS_SESSION',
-        sites: sitesToBlock || [],
-        until: endTime,
-      })
-    } catch (err) {
-      console.error('[FocusSessions] Error blocking sites:', err)
-    }
+    // Note: DNR rules are rebuilt by the background handler after this function returns
+    // No need to send another message here
 
     // Show notification
     try {
@@ -226,14 +217,8 @@ export async function stopFocusSession(): Promise<boolean> {
     await browser.alarms.clear(ALARM_SESSION_NAME)
     await browser.alarms.clear(ALARM_BREAK_NAME)
 
-    // Unblock sites
-    try {
-      await browser.runtime.sendMessage({
-        type: 'STOP_FOCUS_SESSION',
-      })
-    } catch (err) {
-      console.debug('[FocusSessions] Error unblocking sites:', err)
-    }
+    // Note: DNR rules are rebuilt by the background handler after this function returns
+    // No need to send another message here
 
     return true
   } catch (err) {

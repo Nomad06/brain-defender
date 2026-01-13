@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { Stats } from '../domain/stats'
 
 interface FocusShrineProps {
@@ -68,98 +69,75 @@ const FocusShrine: React.FC<FocusShrineProps> = ({ stats, width = 300, height = 
   const leafDensity = growthLevel / 100 // 0 to 1
 
   return (
-    <div
-      className="focus-shrine"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="relative overflow-hidden rounded-lg border-2 border-border shadow-zen-lg"
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        position: 'relative',
-        background: 'linear-gradient(180deg, #e8f4f8 0%, #f5f1e8 100%)',
-        borderRadius: 'var(--radius-lg)',
-        border: '2px solid var(--border)',
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-lg)',
+        background: 'linear-gradient(180deg, var(--washi-white) 0%, var(--kinari-cream) 100%)',
       }}
     >
       {/* Background elements */}
       <div
+        className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-b from-transparent to-[#c8b8a0]"
         style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '40%',
-          background: 'linear-gradient(180deg, transparent 0%, #c8b8a0 100%)',
           borderRadius: '50% 50% 0 0 / 20% 20% 0 0',
         }}
       />
 
       {/* Shrine platform */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '10%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '80%',
-          height: '8px',
-          background: 'var(--sumi-gray)',
-          borderRadius: '2px',
-        }}
-      />
+      <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[80%] h-2 bg-sumi-gray rounded-sm" />
 
       {/* Bonsai pot */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 'calc(10% + 8px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100px',
-          height: '40px',
-          background: 'linear-gradient(180deg, #8b6f47 0%, #6b5435 100%)',
-          borderRadius: '0 0 8px 8px',
-          border: '2px solid #5a4428',
-        }}
-      />
+      <div className="absolute bottom-[calc(10%+8px)] left-1/2 -translate-x-1/2 w-[100px] h-[40px] rounded-b-lg border-2 border-[#5a4428] bg-gradient-to-b from-[#8b6f47] to-[#6b5435]" />
 
       {/* Bonsai tree SVG */}
       <svg
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
-        style={{ position: 'absolute', top: 0, left: 0 }}
+        className="absolute top-0 left-0"
       >
         {/* Trunk */}
-        <path
+        <motion.path
           d={`M ${width / 2} ${height * 0.5} Q ${width / 2 - 10} ${height * 0.65} ${width / 2} ${height * 0.75}`}
           fill="none"
           stroke="#4a3728"
           strokeWidth="8"
           strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
         />
 
         {/* Branches - drawn based on growth level */}
         {growthLevel > 10 && (
           <>
             {/* Left branch 1 */}
-            <path
+            <motion.path
               d={`M ${width / 2} ${height * 0.55} Q ${width / 2 - 30} ${height * 0.52} ${width / 2 - 45} ${height * 0.48}`}
               fill="none"
               stroke="#4a3728"
               strokeWidth="4"
               strokeLinecap="round"
-              opacity={growthLevel > 15 ? 1 : 0.5}
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: growthLevel > 15 ? 1 : 0.5 }}
+              transition={{ duration: 1 }}
             />
 
             {/* Right branch 1 */}
-            <path
+            <motion.path
               d={`M ${width / 2} ${height * 0.58} Q ${width / 2 + 25} ${height * 0.55} ${width / 2 + 40} ${height * 0.52}`}
               fill="none"
               stroke="#4a3728"
               strokeWidth="4"
               strokeLinecap="round"
-              opacity={growthLevel > 20 ? 1 : 0.5}
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: growthLevel > 20 ? 1 : 0.5 }}
+              transition={{ duration: 1, delay: 0.2 }}
             />
           </>
         )}
@@ -167,21 +145,27 @@ const FocusShrine: React.FC<FocusShrineProps> = ({ stats, width = 300, height = 
         {growthLevel > 30 && (
           <>
             {/* Left branch 2 */}
-            <path
+            <motion.path
               d={`M ${width / 2} ${height * 0.62} Q ${width / 2 - 20} ${height * 0.60} ${width / 2 - 35} ${height * 0.58}`}
               fill="none"
               stroke="#4a3728"
               strokeWidth="3"
               strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1, delay: 0.4 }}
             />
 
             {/* Right branch 2 */}
-            <path
+            <motion.path
               d={`M ${width / 2} ${height * 0.65} Q ${width / 2 + 30} ${height * 0.63} ${width / 2 + 42} ${height * 0.60}`}
               fill="none"
               stroke="#4a3728"
               strokeWidth="3"
               strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1, delay: 0.6 }}
             />
           </>
         )}
@@ -196,13 +180,15 @@ const FocusShrine: React.FC<FocusShrineProps> = ({ stats, width = 300, height = 
             const size = 8 + (growthLevel / 100) * 6
 
             return (
-              <circle
+              <motion.circle
                 key={i}
                 cx={x}
                 cy={y}
                 r={size}
                 fill="#6b8e23"
-                opacity={0.6 + leafDensity * 0.4}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.6 + leafDensity * 0.4 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
               />
             )
           })}
@@ -216,91 +202,66 @@ const FocusShrine: React.FC<FocusShrineProps> = ({ stats, width = 300, height = 
             const y = height * 0.42 + Math.sin(angle + Math.PI / 4) * (radius * 0.5)
 
             return (
-              <circle
+              <motion.circle
                 key={`blossom-${i}`}
                 cx={x}
                 cy={y}
                 r={4}
                 fill="#ffb7c5"
-                opacity={0.8}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.8 }}
+                transition={{ duration: 0.6, delay: 1 + i * 0.1 }}
               />
             )
           })}
       </svg>
 
       {/* Growth info panel */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '16px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(255, 255, 255, 0.9)',
-          padding: '8px 16px',
-          borderRadius: 'var(--radius)',
-          border: '2px solid var(--gold)',
-          boxShadow: 'var(--shadow)',
-          textAlign: 'center',
-        }}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-4 py-2 rounded border-2 border-gold shadow-zen text-center"
       >
-        <div style={{ fontSize: '11px', color: 'var(--muted)', marginBottom: '4px' }}>
+        <div className="text-[11px] text-muted mb-1 font-mono">
           {growthStage.name}
         </div>
-        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--accent)' }}>
+        <div className="text-xl font-bold text-accent font-serif">
           {Math.floor(growthLevel)}%
         </div>
-        <div style={{ fontSize: '10px', color: 'var(--muted)', fontStyle: 'italic' }}>
+        <div className="text-[10px] text-muted italic">
           {growthStage.description}
         </div>
-      </div>
+      </motion.div>
 
       {/* Growth progress bar */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '16px',
-          left: '16px',
-          right: '16px',
-          height: '8px',
-          background: 'rgba(255, 255, 255, 0.3)',
-          borderRadius: '999px',
-          overflow: 'hidden',
-          border: '1px solid var(--border)',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${growthLevel}%`,
-            background: 'linear-gradient(90deg, var(--bamboo-green) 0%, var(--gold) 100%)',
-            transition: 'width 1s ease-out',
-          }}
+      <div className="absolute bottom-4 left-4 right-4 h-2 bg-white/30 rounded-full overflow-hidden border border-border">
+        <motion.div
+          className="h-full bg-gradient-to-r from-bamboo-green to-gold"
+          initial={{ width: 0 }}
+          animate={{ width: `${growthLevel}%` }}
+          transition={{ duration: 1, ease: "easeOut" }}
         />
       </div>
 
       {/* Milestone indicators */}
-      {growthLevel >= 100 && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '48px',
-            animation: 'zenRipple 2s ease-in-out infinite',
-            pointerEvents: 'none',
-          }}
-        >
-          ✨
-        </div>
-      )}
-
-      <style>{`
-        .focus-shrine {
-          animation: toriiGateFade 0.8s ease-out;
-        }
-      `}</style>
-    </div>
+      <AnimatePresence>
+        {growthLevel >= 100 && (
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl pointer-events-none"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 1, 0.5],
+              rotate: [0, 10, -10, 0]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            ✨
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

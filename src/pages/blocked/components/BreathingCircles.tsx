@@ -5,6 +5,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 
 interface BreathingCirclesProps {
   size?: number
@@ -13,73 +14,44 @@ interface BreathingCirclesProps {
 export const BreathingCircles: React.FC<BreathingCirclesProps> = ({ size = 200 }) => {
   return (
     <div
-      className="breath-container"
-      style={{
-        position: 'relative',
-        width: `${size}px`,
-        height: `${size}px`,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: '0 auto var(--spacing-2xl, 48px)',
-      }}
+      className="relative flex items-center justify-center pointer-events-none"
+      style={{ width: size, height: size }}
     >
-      {/* Outer breathing circle */}
-      <div
-        className="breath-circle"
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(39, 76, 119, 0.1)', // Seigaiha with low opacity
-          animation: 'breath 4s ease-in-out infinite alternate',
+      {/* Outer breathing circle (Sun Halo) */}
+      <motion.div
+        className="absolute inset-0 rounded-full bg-gradient-to-tr from-accent/20 to-gold/10 blur-xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
         }}
       />
 
-      {/* Inner breathing circle */}
-      <div
-        className="breath-circle-inner"
-        style={{
-          position: 'absolute',
-          width: '60%',
-          height: '60%',
-          borderRadius: '50%',
-          backgroundColor: 'var(--palette-ocean, #274C77)',
-          opacity: 0.8,
-          boxShadow: '0 0 30px rgba(39, 76, 119, 0.3)',
-          animation: 'breathInner 4s ease-in-out infinite alternate',
+      {/* Inner breathing circle (Sun Core) */}
+      <motion.div
+        className="absolute inset-[25%] rounded-full bg-gradient-to-br from-accent/30 to-gold/20 backdrop-blur-sm border border-white/10 shadow-zen"
+        animate={{
+          scale: [1, 1.15, 1],
+          opacity: [0.8, 1, 0.8],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5
         }}
       />
 
-      <style>{`
-        @keyframes breath {
-          0% {
-            transform: scale(0.8);
-            opacity: 0.1;
-          }
-          100% {
-            transform: scale(1.2);
-            opacity: 0.2;
-          }
-        }
-
-        @keyframes breathInner {
-          0% {
-            transform: scale(0.9);
-          }
-          100% {
-            transform: scale(1.1);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .breath-circle,
-          .breath-circle-inner {
-            animation: none !important;
-          }
-        }
-      `}</style>
+      {/* Core dot */}
+      <motion.div
+        className="absolute w-2 h-2 rounded-full bg-gold/50 shadow-[0_0_10px_var(--gold)]"
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
     </div>
   )
 }

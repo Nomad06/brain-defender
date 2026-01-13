@@ -75,12 +75,16 @@ async function handleFocusSessionEnd(): Promise<void> {
   await rebuildRules()
 
   // Show notification
-  await browser.notifications.create({
-    type: 'basic',
-    iconUrl: browser.runtime.getURL('icons/icon-48.png'),
-    title: 'Focus Session Complete',
-    message: 'Your focus session has ended. Great work!',
-  })
+  try {
+    await browser.notifications.create(`focusSessionEnd_${Date.now()}`, {
+      type: 'basic',
+      iconUrl: browser.runtime.getURL('icons/icon128.png'),
+      title: 'Focus Session Complete',
+      message: 'Your focus session has ended. Great work!',
+    })
+  } catch (notifErr) {
+    console.debug('[Alarms] Failed to show notification:', notifErr)
+  }
 }
 
 /**

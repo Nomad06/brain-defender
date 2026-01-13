@@ -5,6 +5,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import type { ZenQuote } from '../../../shared/japanese-zen'
 
 interface ZenQuoteFooterProps {
@@ -16,51 +17,23 @@ export const ZenQuoteFooter: React.FC<ZenQuoteFooterProps> = ({ quote, language 
   const text = language === 'ru' ? quote.textRu : quote.text
 
   return (
-    <div
-      className="quote-container"
-      style={{
-        textAlign: 'center',
-        marginTop: '48px',
-        opacity: 0,
-        animation: 'fadeIn 2s ease-out forwards 2s',
-      }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.7 }}
+      transition={{ duration: 2, delay: 2, ease: "easeOut" }}
+      className="text-center mt-12 px-4"
     >
       <p
-        className="quote"
-        style={{
-          fontFamily: 'var(--font-serif, "Noto Serif JP", serif)',
-          fontStyle: 'italic',
-          color: 'var(--muted)',
-          fontSize: '0.9rem',
-          lineHeight: 1.6,
-        }}
+        className="font-serif italic text-sumi-gray text-sm md:text-base leading-relaxed"
         data-zen
       >
         "{text}"
         {quote.author && (
-          <span style={{ display: 'block', marginTop: '4px', fontSize: '0.8rem', fontStyle: 'normal' }}>
+          <span className="block mt-2 text-xs md:text-sm not-italic opacity-80">
             — {quote.author}
           </span>
         )}
       </p>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 0.7;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .quote-container {
-            animation: none !important;
-            opacity: 0.7 !important;
-          }
-        }
-      `}</style>
-    </div>
+    </motion.div>
   )
 }

@@ -5,6 +5,7 @@
  */
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import type { ZenPhrase } from '../../../shared/japanese-zen'
 
 interface ZenCardProps {
@@ -16,87 +17,57 @@ export const ZenCard: React.FC<ZenCardProps> = ({ zenPhrase, language }) => {
   const meaning = language === 'ru' ? zenPhrase.meaningRu : zenPhrase.meaning
   const message = language === 'ru' ? zenPhrase.messageRu : zenPhrase.message
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+        delayChildren: 0.5
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 1, ease: "easeOut" as const }
+    }
+  }
+
   return (
-    <div
-      style={{
-        textAlign: 'center',
-        marginBottom: '32px',
-        opacity: 0,
-        animation: 'fadeInUp 1s ease-out forwards 0.5s',
-      }}
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="text-center mb-8"
     >
       {/* Large Kanji Title */}
-      <h1
-        className="kanji-title"
-        style={{
-          fontFamily: 'var(--font-serif, "Noto Serif JP", serif)',
-          fontSize: 'clamp(3.5rem, 10vw, 5rem)',
-          lineHeight: 1,
-          marginBottom: '8px',
-          color: 'var(--text)',
-          opacity: 0,
-          animation: 'fadeInUp 1s ease-out forwards 0.5s',
-        }}
+      <motion.h1
+        variants={itemVariants}
+        className="font-serif text-[clamp(3.5rem,10vw,5rem)] leading-none mb-2 text-sumi-black"
         data-zen
       >
         {zenPhrase.kanji}
-      </h1>
+      </motion.h1>
 
       {/* Romanji + Meaning Subtitle */}
-      <h2
-        className="subtitle"
-        style={{
-          fontSize: '1.2rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.2em',
-          color: 'var(--muted)',
-          marginBottom: '24px',
-          opacity: 0,
-          animation: 'fadeInUp 1s ease-out forwards 0.8s',
-        }}
+      <motion.h2
+        variants={itemVariants}
+        className="text-lg md:text-xl uppercase tracking-[0.2em] text-sumi-gray mb-6 font-light"
       >
         {zenPhrase.romanji} — {meaning}
-      </h2>
+      </motion.h2>
 
       {/* Contextual Message */}
-      <p
-        className="message"
-        style={{
-          fontSize: '1.2rem',
-          lineHeight: 1.8,
-          color: 'var(--text)',
-          fontWeight: 300,
-          maxWidth: '600px',
-          margin: '0 auto',
-          whiteSpace: 'pre-line',
-          opacity: 0,
-          animation: 'fadeInUp 1s ease-out forwards 1.1s',
-        }}
+      <motion.p
+        variants={itemVariants}
+        className="text-lg md:text-xl leading-relaxed text-sumi-black font-light max-w-2xl mx-auto whitespace-pre-line"
       >
         {message}
-      </p>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .kanji-title,
-          .subtitle,
-          .message {
-            animation: none !important;
-            opacity: 1 !important;
-          }
-        }
-      `}</style>
-    </div>
+      </motion.p>
+    </motion.div>
   )
 }

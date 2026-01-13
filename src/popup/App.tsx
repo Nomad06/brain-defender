@@ -4,10 +4,34 @@
  */
 
 import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { messagingClient } from '../shared/messaging/client'
 import { normalizeHost } from '../shared/utils/domain'
 import { t, initI18n } from '../shared/i18n'
 import { SessionState, type FocusSession } from '../shared/domain/focus-sessions'
+import { SettingsIcon, ShieldIcon } from '../shared/components/Icons'
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      duration: 0.4
+    }
+  },
+  exit: { opacity: 0 }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
+  }
+}
 
 const App: React.FC = () => {
   const [sitesCount, setSitesCount] = useState<number>(0)
@@ -165,186 +189,169 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container">
-        <div className="card" style={{ padding: '14px' }}>
-          <div className="h1">{t('popup.title')}</div>
-          <div className="muted" style={{ marginTop: '12px', textAlign: 'center' }}>
-            {t('common.loading')}
-          </div>
+      <div className="w-full h-[500px] flex items-center justify-center bg-washi">
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-xl font-bold font-serif text-sumi-black">{t('popup.title')}</div>
+          <div className="text-sumi-gray">{t('common.loading')}</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container" style={{ width: '350px', minHeight: '500px', display: 'flex', flexDirection: 'column', background: 'var(--washi-white)', padding: '24px', boxSizing: 'border-box' }}>
-      {showPomodoroModal ? (
-        <PomodoroModal
-          onClose={() => setShowPomodoroModal(false)}
-          onStart={async () => {
-            await loadFocusSession()
-            setShowPomodoroModal(false)
-          }}
-        />
-      ) : (
-        <>
-          {/* Header */}
-          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--sumi-black)', fontWeight: 600, fontSize: '1.1rem' }}>
-              <div style={{ width: '20px', height: '20px', border: '2px solid var(--accent)', borderRadius: '50%', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '6px', height: '6px', background: 'var(--accent)', borderRadius: '50%' }} />
-              </div>
-              <span>Focusan</span>
-            </div>
-            <button
-              onClick={handleOpenOptions}
-              style={{ color: 'var(--color-stone)', padding: '4px', background: 'none', border: 'none', cursor: 'pointer' }}
+    <div className="w-[320px] min-h-[500px] bg-washi flex flex-col p-4">
+      <AnimatePresence mode="wait">
+        {showPomodoroModal ? (
+          <PomodoroModal
+            key="modal"
+            onClose={() => setShowPomodoroModal(false)}
+            onStart={async () => {
+              await loadFocusSession()
+              setShowPomodoroModal(false)
+            }}
+          />
+        ) : (
+          <motion.div
+            key="main"
+            className="flex flex-col flex-1"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* Header */}
+            <motion.header
+              className="flex justify-between items-center mb-6"
+              variants={itemVariants}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M19.4 15A1.65 1.65 0 0 0 20.2 12A1.65 1.65 0 0 0 19.4 9M12 21A1.65 1.65 0 0 0 15 20.2A1.65 1.65 0 0 0 12 19.4M4.6 15A1.65 1.65 0 0 0 3.8 12A1.65 1.65 0 0 0 4.6 9M12 3A1.65 1.65 0 0 0 9 3.8A1.65 1.65 0 0 0 12 4.6M16.24 16.24A1.65 1.65 0 0 0 18.36 14.12A1.65 1.65 0 0 0 16.24 16.24M16.24 7.76A1.65 1.65 0 0 0 14.12 5.64A1.65 1.65 0 0 0 16.24 7.76M7.76 16.24A1.65 1.65 0 0 0 5.64 18.36A1.65 1.65 0 0 0 7.76 16.24M7.76 7.76A1.65 1.65 0 0 0 9.88 5.64A1.65 1.65 0 0 0 7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </header>
-
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
-            {/* Zen Quote */}
-            <div style={{ textAlign: 'center', color: 'var(--color-stone)', animation: 'fadeIn 1s ease-out' }}>
-              <span style={{ display: 'block', fontFamily: 'var(--font-family-serif)', fontSize: '1.5rem', color: 'var(--sumi-black)', marginBottom: '2px' }}>没頭</span>
-              <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.8 }}>Bottō — Immersion</span>
-            </div>
-
-            {/* Timer Circle */}
-            <div style={{ position: 'relative', width: '220px', height: '220px' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="220" height="220" style={{ transform: 'rotate(-90deg)' }}>
-                  <circle cx="110" cy="110" r="100" stroke="var(--color-sumi-light)" strokeWidth="8" fill="transparent" />
-                  <circle
-                    cx="110" cy="110" r="100"
-                    stroke="var(--accent)"
-                    strokeWidth="8"
-                    fill="transparent"
-                    strokeDasharray={2 * Math.PI * 100}
-                    strokeDashoffset={isSessionActive && currentSession ? (2 * Math.PI * 100) * (1 - (remainingTime / (currentSession.duration * 60))) : 0}
-                    strokeLinecap="round"
-                    style={{ transition: 'stroke-dashoffset 0.35s' }}
-                  />
-                </svg>
-                <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <span style={{ fontSize: '3.5rem', fontWeight: 300, color: 'var(--sumi-black)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                    {isSessionActive ? formatTime(remainingTime) : '25:00'}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--color-take)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px', fontWeight: 500 }}>
-                    {isSessionActive
-                      ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus')
-                      : 'Ready'}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 font-semibold text-lg text-sumi-black">
+                <img src="/logo.svg" alt="Focusan" className="w-6 h-6" />
+                <span className="font-serif tracking-wide">Focusan</span>
               </div>
-            </div>
+              <motion.button
+                whileHover={{ rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleOpenOptions}
+                className="text-sumi-gray hover:text-accent transition-colors p-1"
+              >
+                <SettingsIcon />
+              </motion.button>
+            </motion.header>
 
-            {/* Controls */}
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-              {isSessionActive ? (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    onClick={handlePauseFocusSession}
-                    style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
-                  >
-                    {currentSession?.state === SessionState.PAUSED ? 'Resume' : 'Pause'}
-                  </button>
-                  <button
-                    onClick={handleStopFocusSession}
-                    style={{ padding: '12px 24px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer' }}
-                  >
-                    Stop
-                  </button>
+            <main className="flex flex-col items-center gap-6 relative flex-1">
+              {/* Zen Quote */}
+              <motion.div
+                className="text-center"
+                variants={itemVariants}
+              >
+                <span className="font-serif block text-2xl text-sumi-black mb-1">没頭</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-sumi-gray">Bottō — Immersion</span>
+              </motion.div>
+
+              {/* Timer Circle */}
+              <motion.div
+                className="relative w-[180px] h-[180px]"
+                variants={itemVariants}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg width="180" height="180" className="-rotate-90">
+                    <circle cx="90" cy="90" r="80" stroke="rgba(46, 95, 111, 0.1)" strokeWidth="3" fill="transparent" />
+                    <motion.circle
+                      cx="90" cy="90" r="80"
+                      stroke="var(--accent)"
+                      strokeWidth="3"
+                      fill="transparent"
+                      strokeDasharray={2 * Math.PI * 80}
+                      initial={{ strokeDashoffset: 2 * Math.PI * 80 }}
+                      animate={{
+                        strokeDashoffset: isSessionActive && currentSession
+                          ? (2 * Math.PI * 80) * (1 - (remainingTime / (currentSession.duration * 60)))
+                          : 0
+                      }}
+                      transition={{ duration: 1, ease: "linear" }}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute flex flex-col items-center text-center">
+                    <span className="font-mono text-[2.8rem] font-light text-sumi-black leading-none tracking-tighter">
+                      {isSessionActive ? formatTime(remainingTime) : '25:00'}
+                    </span>
+                    <motion.span
+                      className="text-[0.65rem] text-accent uppercase tracking-[0.15em] mt-2 font-bold"
+                      animate={{ opacity: isSessionActive ? [1, 0.5, 1] : 1 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      {isSessionActive
+                        ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus Mode')
+                        : 'Ready to Focus'}
+                    </motion.span>
+                  </div>
                 </div>
-              ) : (
-                <button
-                  onClick={handleStartFocusSession}
-                  style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 500, fontSize: '1rem', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow)' }}
-                >
-                  Start Focus
-                </button>
-              )}
-            </div>
+              </motion.div>
+
+              {/* Controls */}
+              <motion.div
+                className="flex items-center gap-3 w-full justify-center"
+                variants={itemVariants}
+              >
+                {isSessionActive ? (
+                  <>
+                    <button
+                      onClick={handlePauseFocusSession}
+                      className="btn bg-white border-2 border-accent text-accent hover:bg-accent hover:text-white"
+                    >
+                      {currentSession?.state === SessionState.PAUSED ? 'Resume' : 'Pause'}
+                    </button>
+                    <button
+                      onClick={handleStopFocusSession}
+                      className="btn danger"
+                    >
+                      Stop
+                    </button>
+                  </>
+                ) : (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleStartFocusSession}
+                    className="btn primary text-lg px-8 py-3 shadow-zen-lg" // Reusing .btn .primary from styles.css via Tailwind
+                  >
+                    Start Focus
+                  </motion.button>
+                )}
+              </motion.div>
+            </main>
 
             {/* Footer / Status Card */}
-            <div style={{
-              marginTop: 'auto',
-              width: '100%',
-              background: 'var(--card2)',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-              border: '1px solid rgba(0,0,0,0.05)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  background: 'var(--bg2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--accent)'
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6-8 10-8 10z" />
-                  </svg>
+            <motion.div
+              className="mt-6 p-4 rounded-lg bg-white/60 backdrop-blur border border-border flex justify-between items-center shadow-zen"
+              variants={itemVariants}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10 text-accent">
+                  <ShieldIcon />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Protected</span>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--sumi-black)' }}>{sitesCount} Sites</span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-sumi-gray uppercase tracking-wider font-semibold">Protected</span>
+                  <span className="text-sm font-semibold text-sumi-black">{sitesCount} Sites</span>
                 </div>
               </div>
 
               {!isSessionActive && currentHost && (
                 <button
                   onClick={handleAddCurrentSite}
-                  style={{
-                    background: 'var(--bg1)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: 'var(--sumi-black)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'var(--accent)';
-                    e.currentTarget.style.color = 'var(--accent)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.08)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                    e.currentTarget.style.color = 'var(--sumi-black)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
-                  }}
+                  className="px-3 py-1.5 bg-white border border-border rounded text-xs hover:border-accent hover:text-accent transition-colors flex items-center gap-1 shadow-sm"
                   title={`Block ${currentHost}`}
                 >
-                  <span style={{ fontSize: '14px', lineHeight: 1 }}>+</span> Block
+                  <span className="font-bold text-lg leading-none">+</span> Block
                 </button>
               )}
-            </div>
-          </main>
-
-          {/* Spacer to replace old footer margin if needed, but the main content now handles it */}
-        </>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -422,172 +429,141 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
   }
 
   return (
-    <>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '12px',
-        }}
-      >
-        <div className="h2">{t('focusSession.selectSites')}</div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+      className="flex flex-col h-full gap-4"
+    >
+      <div className="flex justify-between items-center">
+        <h2 className="font-serif font-medium text-xl text-sumi-black">{t('focusSession.selectSites')}</h2>
         <button
-          className="btn"
+          className="text-sumi-gray hover:text-sumi-black p-2 text-xl leading-none"
           onClick={onClose}
-          style={{ padding: '4px 8px', fontSize: '18px', minWidth: 'auto' }}
         >
           ✕
         </button>
       </div>
 
-      <div className="muted" style={{ marginBottom: '12px', fontSize: '11px' }}>
+      <p className="text-sumi-gray text-xs">
         {t('focusSession.selectSitesHint')}
-      </div>
+      </p>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '16px' }}>
-          <div className="muted">{t('common.loading')}</div>
+        <div className="flex items-center justify-center flex-1">
+          <div className="text-sumi-gray">{t('common.loading')}</div>
         </div>
       ) : (
-        <>
+        <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-1">
           {/* Duration Input */}
-          <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card2)', padding: '8px 12px', borderRadius: '8px' }}>
-            <label style={{ fontWeight: '500', fontSize: '12px', flex: 1 }}>
+          <div className="bg-white/60 p-3 rounded-lg border border-border flex items-center gap-3 shadow-sm">
+            <label className="font-medium text-sm flex-1 text-sumi-black">
               Duration (minutes):
             </label>
             <input
               type="number"
-              className="input"
+              className="w-20 text-center font-mono p-2 rounded border border-border bg-white focus:border-accent outline-none"
               value={duration}
               onChange={e => setDuration(Math.max(1, parseInt(e.target.value) || 25))}
               min="1"
               max="180"
-              style={{ width: '60px', fontSize: '12px', padding: '4px 8px' }}
             />
           </div>
 
           {/* Main sites list */}
-          <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '12px' }}>
-              {t('focusSession.mainSites')}:
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-xs text-sumi-gray uppercase tracking-wider">
+              {t('focusSession.mainSites')}
             </label>
-            <div
-              style={{
-                maxHeight: '150px',
-                overflowY: 'auto',
-                border: '1px solid var(--border)',
-                borderRadius: '4px',
-                padding: '4px',
-                background: 'var(--card2)',
-              }}
-            >
+            <div className="bg-white/40 border border-border rounded-lg p-2 max-h-48 overflow-y-auto">
               {sites.length === 0 ? (
-                <div className="muted" style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+                <div className="text-sumi-gray text-center p-4 text-xs">
                   {t('focusSession.noSites')}
                 </div>
               ) : (
-                sites.map(site => (
-                  <label
-                    key={site.host}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '6px',
-                      cursor: 'pointer',
-                      borderRadius: '4px',
-                      transition: 'background 0.15s',
-                    }}
-                    onMouseOver={e => (e.currentTarget.style.background = 'var(--card)')}
-                    onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedMainSites.has(site.host)}
-                      onChange={() => handleToggleMainSite(site.host)}
-                      style={{ cursor: 'pointer' }}
-                    />
-                    <span style={{ flex: 1, fontSize: '11px', userSelect: 'none' }}>{site.host}</span>
-                  </label>
-                ))
+                <div className="flex flex-col gap-1">
+                  {sites.map(site => (
+                    <label
+                      key={site.host}
+                      className="flex items-center gap-2 p-2 cursor-pointer rounded hover:bg-black/5 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-accent w-4 h-4 cursor-pointer"
+                        checked={selectedMainSites.has(site.host)}
+                        onChange={() => handleToggleMainSite(site.host)}
+                      />
+                      <span className="font-mono flex-1 text-xs text-sumi-black">{site.host}</span>
+                    </label>
+                  ))}
+                </div>
               )}
             </div>
           </div>
 
           {/* Additional sites */}
-          <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '12px' }}>
-              {t('focusSession.additionalSites')}:
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-xs text-sumi-gray uppercase tracking-wider">
+              {t('focusSession.additionalSites')}
             </label>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div className="flex gap-2">
               <input
                 type="text"
-                className="input"
+                className="flex-1 text-xs p-2 rounded border border-border bg-white focus:border-accent outline-none"
                 value={newSiteInput}
                 onChange={e => setNewSiteInput(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && handleAddAdditionalSite()}
                 placeholder="example.com"
-                style={{ flex: 1, fontSize: '11px' }}
               />
               <button
-                className="btn"
+                className="btn text-xs px-3 py-2 bg-white border border-border hover:bg-gray-50"
                 onClick={handleAddAdditionalSite}
-                style={{ fontSize: '11px', padding: '6px 10px' }}
               >
                 {t('common.add')}
               </button>
             </div>
-            <div style={{ marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '4px', minHeight: '20px' }}>
-              {additionalSites.map(host => (
-                <div
-                  key={host}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '3px 6px',
-                    background: 'var(--card2)',
-                    borderRadius: '4px',
-                    fontSize: '10px',
-                  }}
-                >
-                  <span style={{ userSelect: 'none' }}>{host}</span>
-                  <button
-                    className="btn"
-                    onClick={() => handleRemoveAdditionalSite(host)}
-                    style={{
-                      padding: '2px 4px',
-                      fontSize: '9px',
-                      marginLeft: '2px',
-                      minWidth: 'auto',
-                      lineHeight: '1',
-                    }}
-                    title={t('common.remove')}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-            <button className="btn" onClick={onClose} style={{ flex: 1, fontSize: '11px' }}>
-              {t('common.cancel')}
-            </button>
-            <button
-              className="btn primary"
-              onClick={handleStartSession}
-              style={{ flex: 1, fontSize: '11px' }}
-            >
-              {t('focusSession.startSession')}
-            </button>
+            {additionalSites.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {additionalSites.map(host => (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    key={host}
+                    className="flex items-center gap-2 px-3 py-1 bg-kinari-cream rounded-full text-xs border border-border"
+                  >
+                    <span className="font-mono text-sumi-black">{host}</span>
+                    <button
+                      onClick={() => handleRemoveAdditionalSite(host)}
+                      className="text-sumi-gray hover:text-danger"
+                    >
+                      ✕
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
-        </>
+        </div>
       )}
-    </>
+
+      {/* Action buttons */}
+      <div className="flex gap-3 mt-auto pt-4 border-t border-border">
+        <button
+          className="btn w-1/3 bg-white border border-border hover:bg-gray-50"
+          onClick={onClose}
+        >
+          {t('common.cancel')}
+        </button>
+        <button
+          className="btn primary flex-1"
+          onClick={handleStartSession}
+        >
+          {t('focusSession.startSession')}
+        </button>
+      </div>
+    </motion.div>
   )
 }
 

@@ -20,7 +20,7 @@ export const HaikuCard: React.FC<HaikuCardProps> = ({ haiku, language }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-washi border-2 border-border p-8 mb-6 text-center shadow-lg max-w-md mx-auto relative overflow-hidden"
+      className="washi-card border-2 border-border p-8 mb-6 text-center max-w-md mx-auto relative overflow-hidden"
     >
       {/* Decorative vertical line */}
       <div className="absolute left-6 top-6 bottom-6 w-[1px] bg-border/30" />

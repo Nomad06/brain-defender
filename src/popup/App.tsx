@@ -1,6 +1,6 @@
 /**
  * Popup React App for Brain Defender
- * Main extension popup component
+ * High-end Japanese Zen Redesign
  */
 
 import React, { useState, useEffect } from 'react'
@@ -9,7 +9,8 @@ import { messagingClient } from '../shared/messaging/client'
 import { normalizeHost } from '../shared/utils/domain'
 import { t, initI18n } from '../shared/i18n'
 import { SessionState, type FocusSession } from '../shared/domain/focus-sessions'
-import { SettingsIcon, ShieldIcon } from '../shared/components/Icons'
+import { SettingsIcon, SamuraiShieldIcon } from '../shared/components/Icons'
+import { playSound, SoundType } from '../shared/sound'
 
 // Animation variants
 const containerVariants = {
@@ -18,19 +19,25 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      duration: 0.4
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1] as const // Fix explicit type
     }
   },
   exit: { opacity: 0 }
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
+    transition: { type: "spring" as const, stiffness: 400, damping: 30 }
   }
+}
+
+const breathingVariants = {
+  inhale: { scale: 1.05, opacity: 0.9, transition: { duration: 4, ease: "easeInOut" as const } },
+  exhale: { scale: 1, opacity: 0.7, transition: { duration: 4, ease: "easeInOut" as const } }
 }
 
 const App: React.FC = () => {
@@ -40,6 +47,7 @@ const App: React.FC = () => {
   const [showPomodoroModal, setShowPomodoroModal] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [currentHost, setCurrentHost] = useState<string>('')
+  const [breathState, setBreathState] = useState<'inhale' | 'exhale'>('inhale')
 
   // Detect current host
   useEffect(() => {
@@ -50,6 +58,14 @@ const App: React.FC = () => {
         if (host) setCurrentHost(host)
       }
     })
+  }, [])
+
+  // Breathing cycle
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBreathState(prev => prev === 'inhale' ? 'exhale' : 'inhale')
+    }, 4000)
+    return () => clearInterval(interval)
   }, [])
 
   // Load sites count
@@ -69,8 +85,6 @@ const App: React.FC = () => {
       const session = await messagingClient.getCurrentSession()
       if (session) {
         setCurrentSession(session)
-
-        // Calculate remaining time
         if (session.state === SessionState.WORKING || session.state === SessionState.BREAK) {
           const now = Date.now()
           const remaining = Math.max(0, Math.floor((session.endTime - now) / 1000))
@@ -116,25 +130,17 @@ const App: React.FC = () => {
   // Add current site to block list
   const handleAddCurrentSite = async () => {
     try {
+      playSound(SoundType.BAMBOO_STRIKE)
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
       const tab = tabs[0]
 
-      if (!tab?.url) {
-        console.error('[Popup] No active tab URL')
-        return
-      }
-
+      if (!tab?.url) return
       const host = normalizeHost(tab.url)
-      if (!host) {
-        console.error('[Popup] Could not normalize host from URL:', tab.url)
-        return
-      }
+      if (!host) return
 
       const success = await messagingClient.addSite(host)
       if (success) {
         await loadSitesCount()
-      } else {
-        console.error('[Popup] Failed to add site')
       }
     } catch (err) {
       console.error('[Popup] Error adding current site:', err)
@@ -143,17 +149,20 @@ const App: React.FC = () => {
 
   // Open options page
   const handleOpenOptions = () => {
+    playSound(SoundType.KOTO_PLUCK)
     chrome.runtime.openOptionsPage()
   }
 
-  // Start focus session (opens modal)
+  // Start focus session
   const handleStartFocusSession = () => {
+    playSound(SoundType.TEMPLE_BELL)
     setShowPomodoroModal(true)
   }
 
   // Pause focus session
   const handlePauseFocusSession = async () => {
     try {
+      playSound(SoundType.SOFT_GONG)
       if (currentSession?.state === SessionState.PAUSED) {
         await messagingClient.resumeFocusSession()
       } else {
@@ -167,6 +176,7 @@ const App: React.FC = () => {
 
   // Stop focus session
   const handleStopFocusSession = async () => {
+    playSound(SoundType.SOFT_GONG)
     try {
       await messagingClient.stopFocusSession()
       await loadFocusSession()
@@ -182,24 +192,24 @@ const App: React.FC = () => {
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
-  // Check if session is active
-  const isSessionActive =
-    currentSession &&
-    currentSession.state !== SessionState.IDLE
+  const isSessionActive = currentSession && currentSession.state !== SessionState.IDLE
 
   if (loading) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center bg-washi">
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-xl font-bold font-serif text-sumi-black">{t('popup.title')}</div>
-          <div className="text-sumi-gray">{t('common.loading')}</div>
-        </div>
+      <div className="w-full h-[500px] flex items-center justify-center bg-washi transition-all duration-500">
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="flex flex-col items-center gap-2"
+        >
+          <div className="text-2xl font-serif text-sumi-black tracking-widest">Focusan</div>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="w-[320px] min-h-[500px] bg-washi flex flex-col p-4">
+    <div className="w-[340px] min-h-[520px] bg-washi flex flex-col p-5 font-sans overflow-hidden relative">
       <AnimatePresence mode="wait">
         {showPomodoroModal ? (
           <PomodoroModal
@@ -213,7 +223,7 @@ const App: React.FC = () => {
         ) : (
           <motion.div
             key="main"
-            className="flex flex-col flex-1"
+            className="flex flex-col flex-1 relative z-10"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -221,102 +231,128 @@ const App: React.FC = () => {
           >
             {/* Header */}
             <motion.header
-              className="flex justify-between items-center mb-6"
+              className="flex justify-between items-center mb-8"
               variants={itemVariants}
             >
-              <div className="flex items-center gap-2 font-semibold text-lg text-sumi-black">
-                <img src="/logo.svg" alt="Focusan" className="w-6 h-6" />
-                <span className="font-serif tracking-wide">Focusan</span>
+              <div className="flex items-center gap-3">
+                <img src="/zen-circle.png" alt="Focusan" className="w-8 h-8 drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" />
+                <div className="flex flex-col">
+                  <span className="font-serif text-lg text-sumi-black tracking-wide leading-none">Focusan</span>
+                  <span className="text-[12px] font-serif tracking-[0.2em] text-accent mt-0.5">集中</span>
+                </div>
               </div>
               <motion.button
-                whileHover={{ rotate: 90 }}
+                whileHover={{ rotate: 45, scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleOpenOptions}
-                className="text-sumi-gray hover:text-accent transition-colors p-1"
+                className="text-sumi-gray hover:text-accent transition-colors p-2 rounded-full hover:bg-black/5"
               >
                 <SettingsIcon />
               </motion.button>
             </motion.header>
 
-            <main className="flex flex-col items-center gap-6 relative flex-1">
-              {/* Zen Quote */}
+            <main className="flex flex-col items-center gap-8 relative flex-1 justify-center">
+              {/* Timer Circle with Breathing Effect */}
               <motion.div
-                className="text-center"
+                className="relative w-[220px] h-[220px] flex items-center justify-center"
                 variants={itemVariants}
               >
-                <span className="font-serif block text-2xl text-sumi-black mb-1">没頭</span>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-sumi-gray">Bottō — Immersion</span>
-              </motion.div>
+                {/* Breathing Glow Background */}
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-accent/5 blur-2xl" // Increased blur for airier feel
+                  variants={breathingVariants}
+                  animate={breathState}
+                />
 
-              {/* Timer Circle */}
-              <motion.div
-                className="relative w-[180px] h-[180px]"
-                variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg width="180" height="180" className="-rotate-90">
-                    <circle cx="90" cy="90" r="80" stroke="rgba(46, 95, 111, 0.1)" strokeWidth="3" fill="transparent" />
-                    <motion.circle
-                      cx="90" cy="90" r="80"
-                      stroke="var(--accent)"
-                      strokeWidth="3"
-                      fill="transparent"
-                      strokeDasharray={2 * Math.PI * 80}
-                      initial={{ strokeDashoffset: 2 * Math.PI * 80 }}
-                      animate={{
-                        strokeDashoffset: isSessionActive && currentSession
-                          ? (2 * Math.PI * 80) * (1 - (remainingTime / (currentSession.duration * 60)))
-                          : 0
-                      }}
-                      transition={{ duration: 1, ease: "linear" }}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute flex flex-col items-center text-center">
-                    <span className="font-mono text-[2.8rem] font-light text-sumi-black leading-none tracking-tighter">
-                      {isSessionActive ? formatTime(remainingTime) : '25:00'}
-                    </span>
-                    <motion.span
-                      className="text-[0.65rem] text-accent uppercase tracking-[0.15em] mt-2 font-bold"
-                      animate={{ opacity: isSessionActive ? [1, 0.5, 1] : 1 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    >
+                {/* SVG Ring */}
+                <svg width="220" height="220" className="-rotate-90 drop-shadow-sm">
+                  {/* Track - Thinner and more transparent */}
+                  <circle cx="110" cy="110" r="95" stroke="rgba(46, 95, 111, 0.05)" strokeWidth="1" fill="transparent" />
+
+                  {/* Progress - Thinner stroke */}
+                  <motion.circle
+                    cx="110" cy="110" r="95"
+                    stroke="var(--accent)"
+                    strokeWidth="1.5"
+                    fill="transparent"
+                    strokeDasharray={2 * Math.PI * 95}
+                    strokeLinecap="round"
+                    animate={{
+                      strokeDashoffset: isSessionActive && currentSession
+                        ? (2 * Math.PI * 95) * (1 - (remainingTime / (currentSession.duration * 60)))
+                        : (2 * Math.PI * 95)
+                    }}
+                    transition={{ duration: 1, ease: "linear" }}
+                    className="drop-shadow-sm" // Reduced shadow intensity
+                  />
+                </svg>
+
+                {/* Center Text - Scaled down for more air */}
+                <div className="absolute flex flex-col items-center text-center z-10 transform scale-75">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 0.5, y: 0 }}
+                    className="text-[10px] uppercase tracking-[0.3em] text-sumi-gray mb-2 font-serif"
+                  >
+                    Total Immersion
+                  </motion.div>
+
+                  <motion.span
+                    className="font-mono text-[3.5rem] font-light text-sumi-black leading-none tracking-tighter tabular-nums"
+                  >
+                    {isSessionActive ? formatTime(remainingTime) : '25:00'}
+                  </motion.span>
+
+                  <motion.div
+                    className="mt-3 flex flex-col items-center gap-1"
+                    animate={{ opacity: isSessionActive ? 1 : 0.6 }}
+                  >
+                    <span className="text-xs font-serif text-sumi-gray uppercase tracking-[0.2em]">
                       {isSessionActive
-                        ? (currentSession?.state === SessionState.PAUSED ? 'Paused' : 'Focus Mode')
-                        : 'Ready to Focus'}
-                    </motion.span>
-                  </div>
+                        ? (currentSession?.state === SessionState.PAUSED ? t('focusSession.paused') : t('focusSession.active'))
+                        : t('focusSession.ready')}
+                    </span>
+                    {isSessionActive && (
+                      <motion.div
+                        className="w-1 h-1 rounded-full bg-accent"
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    )}
+                  </motion.div>
                 </div>
               </motion.div>
 
-              {/* Controls */}
+              {/* Minimalist Controls */}
               <motion.div
-                className="flex items-center gap-3 w-full justify-center"
+                className="flex items-center gap-4 w-full justify-center px-4"
                 variants={itemVariants}
               >
                 {isSessionActive ? (
                   <>
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handlePauseFocusSession}
-                      className="btn bg-white border-2 border-accent text-accent hover:bg-accent hover:text-white"
+                      className="btn secondary flex-1 shadow-sm font-serif"
                     >
                       {currentSession?.state === SessionState.PAUSED ? 'Resume' : 'Pause'}
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handleStopFocusSession}
-                      className="btn danger"
+                      className="btn danger w-auto px-6 font-serif"
                     >
                       Stop
-                    </button>
+                    </motion.button>
                   </>
                 ) : (
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleStartFocusSession}
-                    className="btn primary text-lg px-8 py-3 shadow-zen-lg" // Reusing .btn .primary from styles.css via Tailwind
+                    className="btn primary w-full py-3.5 text-lg shadow-lantern tracking-wide font-serif"
                   >
                     Start Focus
                   </motion.button>
@@ -326,27 +362,29 @@ const App: React.FC = () => {
 
             {/* Footer / Status Card */}
             <motion.div
-              className="mt-6 p-4 rounded-lg bg-white/60 backdrop-blur border border-border flex justify-between items-center shadow-zen"
+              className="mt-8 washi-card p-4 border border-border flex justify-between items-center"
               variants={itemVariants}
             >
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10 text-accent">
-                  <ShieldIcon />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/5 text-accent border border-accent/20">
+                  <SamuraiShieldIcon size={16} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-sumi-gray uppercase tracking-wider font-semibold">Protected</span>
-                  <span className="text-sm font-semibold text-sumi-black">{sitesCount} Sites</span>
+                  <span className="text-[9px] text-sumi-gray uppercase tracking-wider font-semibold">Protected</span>
+                  <span className="text-sm font-semibold text-sumi-black font-mono">{sitesCount} Sites</span>
                 </div>
               </div>
 
               {!isSessionActive && currentHost && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleAddCurrentSite}
-                  className="px-3 py-1.5 bg-white border border-border rounded text-xs hover:border-accent hover:text-accent transition-colors flex items-center gap-1 shadow-sm"
+                  className="px-3 py-1.5 bg-white border border-border rounded text-xs hover:border-accent hover:text-accent transition-colors flex items-center gap-1 shadow-sm font-medium text-sumi-gray"
                   title={`Block ${currentHost}`}
                 >
-                  <span className="font-bold text-lg leading-none">+</span> Block
-                </button>
+                  <span className="font-bold text-lg leading-none mb-0.5">+</span> Block
+                </motion.button>
               )}
             </motion.div>
           </motion.div>
@@ -386,6 +424,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
 
   // Add additional site
   const handleAddAdditionalSite = () => {
+    playSound(SoundType.KOTO_PLUCK)
     const host = normalizeHost(newSiteInput)
     if (!host) {
       alert(t('errors.invalidDomain'))
@@ -403,11 +442,13 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
 
   // Remove additional site
   const handleRemoveAdditionalSite = (host: string) => {
+    playSound(SoundType.BAMBOO_STRIKE)
     setAdditionalSites(additionalSites.filter(s => s !== host))
   }
 
   // Toggle main site selection
   const handleToggleMainSite = (host: string) => {
+    playSound(SoundType.KOTO_PLUCK)
     const newSet = new Set(selectedMainSites)
     if (newSet.has(host)) {
       newSet.delete(host)
@@ -420,6 +461,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
   // Start session with selected sites
   const handleStartSession = async () => {
     try {
+      playSound(SoundType.TEMPLE_BELL)
       const sitesToBlock = [...Array.from(selectedMainSites), ...additionalSites]
       await messagingClient.startFocusSession(duration, sitesToBlock)
       onStart()
@@ -434,36 +476,36 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col h-full gap-4"
+      className="flex flex-col h-full gap-4 relative z-10"
     >
       <div className="flex justify-between items-center">
         <h2 className="font-serif font-medium text-xl text-sumi-black">{t('focusSession.selectSites')}</h2>
         <button
-          className="text-sumi-gray hover:text-sumi-black p-2 text-xl leading-none"
-          onClick={onClose}
+          className="text-sumi-gray hover:text-sumi-black p-2 text-xl leading-none transition-transform hover:rotate-90"
+          onClick={() => { playSound(SoundType.SOFT_GONG); onClose(); }}
         >
           ✕
         </button>
       </div>
 
-      <p className="text-sumi-gray text-xs">
+      <p className="text-sumi-gray text-xs font-serif italic opacity-80">
         {t('focusSession.selectSitesHint')}
       </p>
 
       {loading ? (
         <div className="flex items-center justify-center flex-1">
-          <div className="text-sumi-gray">{t('common.loading')}</div>
+          <div className="text-sumi-gray animate-pulse font-serif">{t('common.loading')}...</div>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-1">
+        <div className="flex flex-col gap-5 flex-1 overflow-y-auto pr-1 custom-scrollbar">
           {/* Duration Input */}
-          <div className="bg-white/60 p-3 rounded-lg border border-border flex items-center gap-3 shadow-sm">
-            <label className="font-medium text-sm flex-1 text-sumi-black">
-              Duration (minutes):
+          <div className="washi-card p-4 border border-border flex items-center gap-4 shadow-sm">
+            <label className="font-medium text-sm flex-1 text-sumi-black font-serif">
+              Duration (min)
             </label>
             <input
               type="number"
-              className="w-20 text-center font-mono p-2 rounded border border-border bg-white focus:border-accent outline-none"
+              className="w-20 text-center font-mono p-2 rounded border border-border bg-white focus:border-accent outline-none text-lg text-accent font-bold"
               value={duration}
               onChange={e => setDuration(Math.max(1, parseInt(e.target.value) || 25))}
               min="1"
@@ -473,12 +515,12 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
 
           {/* Main sites list */}
           <div className="flex flex-col gap-2">
-            <label className="font-semibold text-xs text-sumi-gray uppercase tracking-wider">
+            <label className="font-semibold text-[10px] text-sumi-gray uppercase tracking-widest pl-1">
               {t('focusSession.mainSites')}
             </label>
-            <div className="bg-white/40 border border-border rounded-lg p-2 max-h-48 overflow-y-auto">
+            <div className="washi-card border border-border p-2 max-h-48 overflow-y-auto">
               {sites.length === 0 ? (
-                <div className="text-sumi-gray text-center p-4 text-xs">
+                <div className="text-sumi-gray text-center p-4 text-xs italic">
                   {t('focusSession.noSites')}
                 </div>
               ) : (
@@ -486,7 +528,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
                   {sites.map(site => (
                     <label
                       key={site.host}
-                      className="flex items-center gap-2 p-2 cursor-pointer rounded hover:bg-black/5 transition-colors"
+                      className="flex items-center gap-3 p-2 cursor-pointer rounded hover:bg-black/5 transition-colors group"
                     >
                       <input
                         type="checkbox"
@@ -494,7 +536,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
                         checked={selectedMainSites.has(site.host)}
                         onChange={() => handleToggleMainSite(site.host)}
                       />
-                      <span className="font-mono flex-1 text-xs text-sumi-black">{site.host}</span>
+                      <span className="font-mono flex-1 text-xs text-sumi-black group-hover:text-accent transition-colors">{site.host}</span>
                     </label>
                   ))}
                 </div>
@@ -504,20 +546,20 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
 
           {/* Additional sites */}
           <div className="flex flex-col gap-2">
-            <label className="font-semibold text-xs text-sumi-gray uppercase tracking-wider">
+            <label className="font-semibold text-[10px] text-sumi-gray uppercase tracking-widest pl-1">
               {t('focusSession.additionalSites')}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
-                className="flex-1 text-xs p-2 rounded border border-border bg-white focus:border-accent outline-none"
+                className="flex-1 text-xs p-2.5 rounded border border-border bg-white focus:border-accent outline-none font-mono"
                 value={newSiteInput}
                 onChange={e => setNewSiteInput(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && handleAddAdditionalSite()}
                 placeholder="example.com"
               />
               <button
-                className="btn text-xs px-3 py-2 bg-white border border-border hover:bg-gray-50"
+                className="btn secondary text-xs px-4"
                 onClick={handleAddAdditionalSite}
               >
                 {t('common.add')}
@@ -525,18 +567,18 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
             </div>
 
             {additionalSites.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-1">
                 {additionalSites.map(host => (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     key={host}
-                    className="flex items-center gap-2 px-3 py-1 bg-kinari-cream rounded-full text-xs border border-border"
+                    className="flex items-center gap-2 px-3 py-1 bg-kinari-cream rounded-full text-xs border border-border text-sumi-black shadow-sm"
                   >
-                    <span className="font-mono text-sumi-black">{host}</span>
+                    <span className="font-mono">{host}</span>
                     <button
                       onClick={() => handleRemoveAdditionalSite(host)}
-                      className="text-sumi-gray hover:text-danger"
+                      className="text-sumi-gray hover:text-danger w-4 h-4 flex items-center justify-center rounded-full hover:bg-danger/10"
                     >
                       ✕
                     </button>
@@ -551,13 +593,13 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
       {/* Action buttons */}
       <div className="flex gap-3 mt-auto pt-4 border-t border-border">
         <button
-          className="btn w-1/3 bg-white border border-border hover:bg-gray-50"
-          onClick={onClose}
+          className="btn secondary w-1/3"
+          onClick={() => { playSound(SoundType.SOFT_GONG); onClose(); }}
         >
           {t('common.cancel')}
         </button>
         <button
-          className="btn primary flex-1"
+          className="btn primary flex-1 shadow-lantern"
           onClick={handleStartSession}
         >
           {t('focusSession.startSession')}

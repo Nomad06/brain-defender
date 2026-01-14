@@ -144,22 +144,16 @@ const ACHIEVEMENT_CHECKS: Record<
   },
 }
 
-// Cached definitions to avoid recreating on every access
-let cachedDefinitions: Record<AchievementType, AchievementDefinition> | null = null
-
 /**
- * Get all achievement definitions (lazy-loaded)
+ * Get all achievement definitions (generated dynamically for current language)
  * This is called only when ACHIEVEMENT_DEFINITIONS is accessed
  */
 function getAchievementDefinitionsInternal(): Record<AchievementType, AchievementDefinition> {
-  if (!cachedDefinitions) {
-    cachedDefinitions = Object.keys(ACHIEVEMENT_CHECKS).reduce((acc, key) => {
-      const type = key as AchievementType
-      acc[type] = getLocalizedAchievement(type)
-      return acc
-    }, {} as Record<AchievementType, AchievementDefinition>)
-  }
-  return cachedDefinitions
+  return Object.keys(ACHIEVEMENT_CHECKS).reduce((acc, key) => {
+    const type = key as AchievementType
+    acc[type] = getLocalizedAchievement(type)
+    return acc
+  }, {} as Record<AchievementType, AchievementDefinition>)
 }
 
 // Legacy: Keep for backward compatibility

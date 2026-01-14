@@ -42,7 +42,7 @@ export const ZenCard: React.FC<ZenCardProps> = ({ zenPhrase, language }) => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="text-center mb-8"
+      className="text-center mb-8 relative z-10"
     >
       {/* Large Kanji Title */}
       <motion.h1

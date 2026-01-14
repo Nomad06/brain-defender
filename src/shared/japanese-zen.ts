@@ -137,35 +137,27 @@ export interface ZenQuote {
 export const JAPANESE_ZEN_QUOTES: ZenQuote[] = [
   {
     text: 'The obstacle is the path.',
-    textRu: 'Препятствие и есть путь.',
-    author: 'Zen Proverb',
+    textRu: 'Препятствие и есть путь.'
   },
   {
     text: 'The journey of a thousand miles begins with a single step.',
-    textRu: 'Путешествие в тысячу ли начинается с одного шага.',
-    author: 'Lao Tzu',
+    textRu: 'Путешествие в тысячу ли начинается с одного шага.'
   },
   {
     text: 'Fall down seven times, stand up eight.',
-    textRu: 'Упади семь раз, встань восемь.',
-    author: 'Japanese Proverb',
+    textRu: 'Упади семь раз, встань восемь.'
   },
   {
     text: 'A smooth sea never made a skilled sailor.',
-    textRu: 'Спокойное море не сделает матроса искусным.',
-  },
-  {
-    text: 'The mind is everything. What you think, you become.',
-    textRu: 'Разум — это всё. Чем вы думаете, тем становитесь.',
-    author: 'Buddha',
+    textRu: 'Спокойное море не сделает матроса искусным.'
   },
   {
     text: 'Wherever you are, be all there.',
-    textRu: 'Где бы вы ни были, будьте там полностью.',
+    textRu: 'Где бы вы ни были, будьте там полностью.'
   },
   {
     text: 'The quieter you become, the more you can hear.',
-    textRu: 'Чем тише вы становитесь, тем больше вы слышите.',
+    textRu: 'Чем тише вы становитесь, тем больше вы слышите.'
   },
   {
     text: 'Do not seek to follow in the footsteps of the wise. Seek what they sought.',
@@ -178,8 +170,7 @@ export const JAPANESE_ZEN_QUOTES: ZenQuote[] = [
   },
   {
     text: 'If you understand, things are just as they are. If you do not understand, things are just as they are.',
-    textRu: 'Понимаете вы или нет, вещи такие, какие они есть.',
-    author: 'Zen Saying',
+    textRu: 'Понимаете вы или нет, вещи такие, какие они есть.'
   },
 ]
 

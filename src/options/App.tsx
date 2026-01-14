@@ -1,6 +1,6 @@
 /**
  * Options Page React App for Focusan
- * Full settings and management interface with Japanese aesthetics
+ * High-end Japanese Zen Redesign
  */
 
 import React, { useState, useEffect } from 'react'
@@ -10,6 +10,7 @@ import { normalizeHost } from '../shared/utils/domain'
 import { t, setLanguage, initI18n } from '../shared/i18n'
 import { useLanguage } from '../shared/i18n/useLanguage'
 import type { SiteObject } from '../shared/storage/schemas'
+import { SamuraiShieldIcon, ScrollIcon, KatanakakeIcon } from '../shared/components/Icons'
 import type { Stats } from '../shared/domain/stats'
 import type { AchievementsData } from '../shared/domain/achievements'
 import { ACHIEVEMENT_DEFINITIONS, getAchievementProgress, type AchievementProgress, type AchievementType } from '../shared/domain/achievements'
@@ -17,10 +18,10 @@ import { type Schedule } from '../shared/domain/schedule'
 import DeleteChallengeModal from './DeleteChallengeModal'
 import ScheduleModal from './ScheduleModal'
 import ConditionalRulesModal from './ConditionalRulesModal'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 import type { ConditionalRule } from '../shared/domain/conditional-rules'
-import { getAllThemes, getCurrentThemeId, switchTheme, getCurrentTheme, type Theme } from '../shared/themes'
 
-type Tab = 'sites' | 'stats' | 'achievements' | 'appearance'
+type Tab = 'sites' | 'stats' | 'achievements'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,7 +32,7 @@ const containerVariants = {
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
@@ -59,9 +60,7 @@ const App: React.FC = () => {
   const [deletingHosts, setDeletingHosts] = useState<string[]>([])
   const [schedulingHost, setSchedulingHost] = useState<{ host: string; schedule: Schedule | null } | null>(null)
   const [conditionalRulesHost, setConditionalRulesHost] = useState<{ host: string; rules: ConditionalRule[] } | null>(null)
-  const [currentThemeId, setCurrentThemeId] = useState<string>('default')
-  const [currentTheme, setCurrentTheme] = useState<Theme | null>(null)
-  const [availableThemes, setAvailableThemes] = useState<Theme[]>([])
+
 
   // Reactive language hook
   const language = useLanguage()
@@ -70,12 +69,6 @@ const App: React.FC = () => {
   useEffect(() => {
     const init = async () => {
       await initI18n()
-      const themes = getAllThemes()
-      setAvailableThemes(themes)
-      const themeId = await getCurrentThemeId()
-      setCurrentThemeId(themeId)
-      const theme = await getCurrentTheme()
-      setCurrentTheme(theme)
       loadAllData()
     }
     init()
@@ -122,14 +115,7 @@ const App: React.FC = () => {
     }
   }
 
-  const handleThemeChange = async (themeId: string) => {
-    const success = await switchTheme(themeId)
-    if (success) {
-      setCurrentThemeId(themeId)
-      const theme = await getCurrentTheme()
-      setCurrentTheme(theme)
-    }
-  }
+
 
   const handleAddSite = async () => {
     const host = normalizeHost(newSiteInput)
@@ -356,91 +342,99 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-washi flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl font-bold font-serif mb-2">{t('options.title')}</div>
-          <div className="text-sumi-gray">{t('common.loading')}</div>
+          <div className="text-xl font-bold font-serif mb-2 text-sumi-black">{t('options.title')}</div>
+          <div className="text-sumi-gray font-serif">{t('common.loading')}...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-washi flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white/60 backdrop-blur-md border-r border-border flex flex-col fixed h-full z-10 shadow-sm">
-        <div className="p-6 flex flex-col items-center border-b border-border/50">
-          <motion.img
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            src="/logo.svg"
-            alt="Focusan Logo"
-            className="w-16 h-16 drop-shadow-md mb-3"
-          />
-          <h1 className={`text-xl font-bold text-sumi-black ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-            {currentTheme?.metadata.name || 'Focusan'}
-          </h1>
+    <div className="min-h-screen bg-washi flex text-sumi-black font-sans">
+      {/* Floating Sidebar */}
+      <aside className="w-[280px] bg-white/60 backdrop-blur-xl border-r border-border/60 flex flex-col fixed h-full z-20 shadow-[0_0_30px_rgba(0,0,0,0.02)]">
+        <div className="p-8 pb-6 flex flex-col items-center border-b border-border/30">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-white to-gray-50 shadow-inner border border-white/50"
+          >
+            <img src="/zen-circle.png" alt="Focusan Logo" className="w-12 h-12 drop-shadow-sm opacity-90" />
+          </motion.div>
+          <h1 className="text-2xl font-serif text-sumi-black tracking-tight mb-1">Focusan</h1>
+          <span className="text-[14px] font-serif tracking-[0.25em] text-accent opacity-80">{t('options.zenFocus')}</span>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {['sites', 'stats', 'achievements', 'appearance'].map((tab, index) => {
-            const icons = { sites: '🛡️', stats: '📊', achievements: '🏆', appearance: '🎨' }
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          {['sites', 'stats', 'achievements'].map((tab) => {
+            const icons = {
+              sites: <SamuraiShieldIcon size={24} />,
+              stats: <ScrollIcon size={24} />,
+              achievements: <KatanakakeIcon size={24} />,
+            }
             const labels = {
               sites: t('options.blocklist'),
               stats: t('options.dashboard'),
               achievements: t('options.achievements'),
-              appearance: t('options.appearance')
             }
             const isActive = activeTab === tab
 
             return (
-              <motion.button
-                key={tab}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 * index }}
-                onClick={() => setActiveTab(tab as Tab)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-                  ? 'bg-accent/10 text-accent font-semibold shadow-sm'
-                  : 'text-sumi-gray hover:bg-black/5 hover:text-sumi-black'
-                  }`}
-              >
-                <span className="text-lg">{icons[tab as keyof typeof icons]}</span>
-                <span>{labels[tab as keyof typeof labels]}</span>
-              </motion.button>
+              <div key={tab} className="relative group">
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute inset-0 bg-accent/5 rounded-xl"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <button
+                  onClick={() => setActiveTab(tab as Tab)}
+                  className={`relative w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 ${isActive ? 'text-accent font-medium' : 'text-sumi-gray hover:text-sumi-black'
+                    }`}
+                >
+                  <span className="text-xl opacity-90">{icons[tab as keyof typeof icons]}</span>
+                  <span className="text-sm tracking-wide">{labels[tab as keyof typeof labels]}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute right-4 w-1.5 h-1.5 rounded-full bg-accent"
+                    />
+                  )}
+                </button>
+              </div>
             )
           })}
         </nav>
 
-        <div className={`p-6 text-center text-xs text-sumi-gray border-t border-border/50 ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : ''}`}>
-          {currentTheme?.metadata.id === 'japanese' ? '一期一会' : 'One thing at a time'}
+        <div className="p-6 border-t border-border/30">
+          <div className="text-center">
+            <p className="font-serif text-xs text-sumi-gray/60 italic">
+              {'"一期一会"'}
+            </p>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
-        {/* Header Area */}
-        <div className="flex justify-between items-center mb-8">
+      {/* Main Content Area */}
+      <main className="flex-1 ml-[280px] p-8 lg:p-12 max-w-7xl mx-auto">
+        {/* Top Bar */}
+        <div className="flex justify-between items-end mb-10 pb-4 border-b border-border/30">
           <div>
-            <h2 className={`text-3xl font-bold text-sumi-black mb-1 ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : ''}`}>
+            <h2 className="text-3xl font-serif text-sumi-black mb-2 tracking-tight">
               {activeTab === 'sites' && t('options.blocklist')}
               {activeTab === 'stats' && t('options.dashboard')}
               {activeTab === 'achievements' && t('options.achievements')}
-              {activeTab === 'appearance' && t('options.appearance')}
             </h2>
-            <p className={`text-sumi-gray ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : ''}`}>
-              {activeTab === 'sites' && (currentTheme?.metadata.id === 'japanese' ? '心を乱すサイト' : 'Sites that disturb your peace')}
-              {activeTab === 'stats' && (currentTheme?.metadata.id === 'japanese' ? '集中の道' : 'Your journey of focus')}
-              {activeTab === 'achievements' && (currentTheme?.metadata.id === 'japanese' ? '道の節目' : 'Milestones on your path')}
-              {activeTab === 'appearance' && (currentTheme?.metadata.id === 'japanese' ? '外観の設定' : 'Customize your experience')}
+            <p className="text-sumi-gray font-sans text-sm tracking-wide opacity-80">
+              {activeTab === 'sites' && t('options.subtitleSites')}
+              {activeTab === 'stats' && t('options.subtitleStats')}
+              {activeTab === 'achievements' && t('options.subtitleAchievements')}
             </p>
           </div>
-          <select
-            value={language}
-            onChange={e => handleLanguageChange(e.target.value)}
-            className="px-4 py-2 rounded-full border border-border bg-white text-sm focus:border-accent outline-none cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            <option value="ru">🇷🇺 {t('options.languageRu')}</option>
-            <option value="en">🇬🇧 {t('options.languageEn')}</option>
-          </select>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher currentLang={language} onLanguageChange={handleLanguageChange} />
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -452,180 +446,184 @@ const App: React.FC = () => {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="space-y-6"
+              className="space-y-8"
             >
-              <div className="bg-white/60 backdrop-blur-xl p-6 rounded-xl border border-border shadow-sm">
-                <div className="flex gap-3 mb-4">
+              <div className="washi-card p-6 border border-border/60 shadow-[var(--shadow-lg)]">
+                <div className="flex gap-4 mb-6">
                   <input
-                    className="flex-1 px-4 py-2 rounded-lg border border-border bg-white focus:border-accent outline-none transition-all shadow-sm"
+                    className="flex-1 px-5 py-3 rounded-lg border border-border bg-white/50 focus:bg-white focus:border-accent outline-none transition-all shadow-inner font-mono text-sm placeholder:font-sans"
                     value={newSiteInput}
                     onChange={e => setNewSiteInput(e.target.value)}
                     onKeyPress={e => e.key === 'Enter' && handleAddSite()}
                     placeholder={t('options.inputPlaceholder')}
                   />
                   <button
-                    className="btn primary px-8"
+                    className="btn primary px-8 shadow-md hover:shadow-lg transition-shadow"
                     onClick={handleAddSite}
                   >
                     {t('options.addButton')}
                   </button>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-4 border-t border-border/30 pt-6">
                   <button
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border transition-all ${newSiteSchedule
-                      ? 'border-accent text-accent bg-accent/10'
-                      : 'border-border text-sumi-gray hover:bg-black/5'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border transition-all text-sm font-medium ${newSiteSchedule
+                      ? 'border-accent text-accent bg-accent/5'
+                      : 'border-dashed border-border text-sumi-gray hover:border-sumi-gray hover:bg-black/5'
                       }`}
                     onClick={() => setShowNewScheduleModal(true)}
                   >
-                    <span>📅</span>
-                    {t('options.scheduleButtonTitle') || 'Schedule'}
-                    {newSiteSchedule && <span className="text-xs">✓</span>}
+                    <span className="opacity-70">📅</span>
+                    {t('options.scheduleButtonTitle') || t('options.setSchedule')}
+                    {newSiteSchedule && <span className="ml-1 text-xs bg-accent text-white px-1.5 rounded-full">✓</span>}
                   </button>
                   <button
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border transition-all ${newSiteRules.length > 0
-                      ? 'border-accent text-accent bg-accent/10'
-                      : 'border-border text-sumi-gray hover:bg-black/5'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border transition-all text-sm font-medium ${newSiteRules.length > 0
+                      ? 'border-accent text-accent bg-accent/5'
+                      : 'border-dashed border-border text-sumi-gray hover:border-sumi-gray hover:bg-black/5'
                       }`}
                     onClick={() => setShowNewRulesModal(true)}
                   >
-                    <span>🔀</span>
-                    {t('options.conditionsButtonTitle') || 'Conditions'}
-                    {newSiteRules.length > 0 && <span className="text-xs">({newSiteRules.length})</span>}
+                    <span className="opacity-70">🔀</span>
+                    {t('options.conditionsButtonTitle') || t('options.setConditions')}
+                    {newSiteRules.length > 0 && <span className="ml-1 text-xs bg-accent text-white px-1.5 rounded-full">{newSiteRules.length}</span>}
                   </button>
                 </div>
               </div>
 
-              {/* Selection Bar */}
-              {selectedSites.size > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-between items-center p-4 rounded-xl bg-white/80 backdrop-blur-md border border-border shadow-sm sticky top-4 z-20"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="bg-accent/10 text-accent px-3 py-1.5 rounded-full text-sm font-semibold">
-                      {selectedSites.size} selected
-                    </span>
-                    <button
-                      onClick={handleSelectAll}
-                      className="text-sm text-sumi-gray hover:text-sumi-black px-3 py-1 rounded hover:bg-black/5 transition-colors"
-                    >All</button>
-                    <button
-                      onClick={handleDeselectAll}
-                      className="text-sm text-sumi-gray hover:text-sumi-black px-3 py-1 rounded hover:bg-black/5 transition-colors"
-                    >None</button>
-                  </div>
-                  <button
-                    onClick={handleBulkDelete}
-                    className="btn danger text-sm px-4 py-1.5"
-                  >Delete</button>
-                </motion.div>
-              )}
-
-              {/* Bulk Add */}
-              <div className="bg-white/60 backdrop-blur-xl p-6 rounded-xl border border-border shadow-sm">
-                <div className="font-semibold mb-3 text-sumi-black text-sm">Bulk Add</div>
-                <textarea
-                  className="w-full min-h-[80px] mb-3 text-sm font-mono p-3 rounded-lg bg-white/90 border border-border focus:border-accent outline-none transition-all"
-                  value={bulkSitesInput}
-                  onChange={e => setBulkSitesInput(e.target.value)}
-                  placeholder="example.com&#10;another.com"
-                />
-                <button
-                  onClick={handleBulkAdd}
-                  className="btn bg-accent/10 text-accent border border-accent hover:bg-accent hover:text-white rounded-full px-6 py-1.5 text-sm font-semibold transition-all"
-                >Add All</button>
-              </div>
-
-              {/* Sites List */}
-              <div className="bg-white/60 backdrop-blur-xl rounded-xl border border-border shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center p-4 border-b border-border bg-white/40">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleExport}
-                      className="px-3 py-1.5 text-sm rounded border border-border text-sumi-gray hover:bg-white hover:text-sumi-black transition-colors"
-                    >{t('options.export')}</button>
-                    <button
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.accept = '.json'
-                        input.onchange = e => {
-                          const file = (e.target as HTMLInputElement).files?.[0]
-                          if (file) handleImport(file)
-                        }
-                        input.click()
-                      }}
-                      className="px-3 py-1.5 text-sm rounded border border-border text-sumi-gray hover:bg-white hover:text-sumi-black transition-colors"
-                    >{t('options.import')}</button>
-                  </div>
-                  <select
-                    value={categoryFilter}
-                    onChange={e => setCategoryFilter(e.target.value)}
-                    className="px-3 py-1.5 text-sm rounded-full border border-border bg-white/50 focus:border-accent outline-none"
+              {/* Selection Actions */}
+              <AnimatePresence>
+                {selectedSites.size > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="flex justify-between items-center p-4 rounded-xl bg-accent text-white shadow-lg sticky top-4 z-30"
                   >
-                    <option value="all">{t('options.allCategories')}</option>
+                    <div className="flex items-center gap-4 px-2">
+                      <span className="font-semibold text-lg">{selectedSites.size}</span>
+                      <span className="text-white/80 text-sm border-l border-white/20 pl-4">{t('options.selectedItems')}</span>
+                      <div className="flex gap-2 ml-2">
+                        <button onClick={handleSelectAll} className="px-3 py-1 rounded-md bg-white/10 hover:bg-white/20 text-xs font-medium transition-colors">{t('options.selectAll')}</button>
+                        <button onClick={handleDeselectAll} className="px-3 py-1 rounded-md bg-white/10 hover:bg-white/20 text-xs font-medium transition-colors">{t('options.clearSelection')}</button>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleBulkDelete}
+                      className="px-6 py-2 bg-white text-accent rounded-lg font-bold text-sm shadow-sm hover:bg-gray-50 transition-colors"
+                    >
+                      {t('options.deleteSelected')}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Sites List Container */}
+              <div className="washi-card rounded-xl border border-border/60 shadow-[var(--shadow-lg)] overflow-hidden">
+                <div className="flex justify-between items-center p-5 border-b border-border/50 bg-gray-50/30">
+                  <div className="flex gap-2">
+                    <button onClick={() => setCategoryFilter('all')} className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors ${categoryFilter === 'all' ? 'bg-sumi-black text-white' : 'bg-white border border-border text-sumi-gray hover:border-sumi-gray'}`}>{t('options.allCategories')}</button>
                     {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors ${categoryFilter === cat ? 'bg-sumi-black text-white' : 'bg-white border border-border text-sumi-gray hover:border-sumi-gray'}`}>{cat}</button>
                     ))}
-                  </select>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={handleExport} className="text-xs text-sumi-gray hover:text-accent font-medium px-3 py-1.5 hover:bg-accent/5 rounded transition-colors">{t('options.exportJson')}</button>
+                    <button onClick={() => {
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.accept = '.json'
+                      input.onchange = e => {
+                        const file = (e.target as HTMLInputElement).files?.[0]
+                        if (file) handleImport(file)
+                      }
+                      input.click()
+                    }} className="text-xs text-sumi-gray hover:text-accent font-medium px-3 py-1.5 hover:bg-accent/5 rounded transition-colors">{t('options.importJson')}</button>
+                  </div>
                 </div>
 
-                <div className="divide-y divide-border/50">
+                <div className="divide-y divide-border/30 max-h-[600px] overflow-y-auto custom-scrollbar">
                   {filteredSites.length === 0 ? (
-                    <div className={`text-center py-16 px-6 text-sumi-gray/70 text-base ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-                      {t('options.noSites')}
+                    <div className="py-24 text-center">
+                      <div className="text-4xl opacity-20 mb-3">🍃</div>
+                      <div className="text-sumi-gray opacity-60 font-serif">{t('options.emptyList')}</div>
                     </div>
                   ) : (
                     filteredSites.map((site) => (
                       <motion.div
+                        layout
                         variants={itemVariants}
                         key={site.host}
-                        className="flex justify-between items-center p-5 hover:bg-white/50 transition-colors group"
+                        className={`flex justify-between items-center p-5 hover:bg-white/60 transition-colors group ${selectedSites.has(site.host) ? 'bg-accent/5' : ''}`}
                       >
-                        <div className="flex items-center gap-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedSites.has(site.host)}
-                            onChange={() => handleToggleSite(site.host)}
-                            className="w-5 h-5 accent-accent cursor-pointer rounded border-gray-300"
-                          />
+                        <div className="flex items-center gap-5">
+                          <div className="relative flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedSites.has(site.host)}
+                              onChange={() => handleToggleSite(site.host)}
+                              className="w-5 h-5 appearance-none rounded border border-border checked:bg-accent checked:border-accent transition-all cursor-pointer z-10"
+                            />
+                            {selectedSites.has(site.host) && <span className="absolute text-white text-xs pointer-events-none z-10">✓</span>}
+                          </div>
+
                           <div>
-                            <div className="font-medium text-base text-sumi-black font-mono">
+                            <div className="font-medium text-base text-sumi-black font-mono tracking-tight group-hover:text-accent transition-colors">
                               {site.host}
                             </div>
-                            <div className="flex gap-2 mt-1.5">
+                            <div className="flex gap-2 mt-2">
                               {site.category && (
-                                <span className="text-[10px] uppercase tracking-wider text-accent bg-accent/10 px-2.5 py-0.5 rounded-full font-bold">{site.category}</span>
+                                <span className="text-[9px] uppercase tracking-widest text-white bg-sumi-gray/40 px-2 py-0.5 rounded-sm font-bold">{site.category}</span>
                               )}
                               {site.schedule && (
-                                <span className="text-[10px] uppercase tracking-wider text-sumi-gray bg-black/5 px-2.5 py-0.5 rounded-full font-bold">📅 Schedule</span>
+                                <span className="text-[9px] uppercase tracking-widest text-accent border border-accent/20 px-2 py-0.5 rounded-sm font-bold flex items-center gap-1">
+                                  <span>📅</span> {t('options.scheduleLabel')}
+                                </span>
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-2 opacity-10 group-hover:opacity-100 transition-opacity">
+
+                        <div className="flex items-center gap-1 opacity-10 group-hover:opacity-100 transition-opacity transform translate-x-4 group-hover:translate-x-0 duration-300">
                           <button
                             onClick={() => handleOpenSchedule(site.host)}
-                            title={t('options.scheduleButtonTitle')}
-                            className="p-2 rounded hover:bg-black/5 text-sumi-gray transition-colors"
+                            title="Schedule"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-accent/10 hover:text-accent text-sumi-gray transition-colors"
                           >📅</button>
                           <button
                             onClick={() => handleOpenConditionalRules(site.host)}
-                            title={t('options.conditionsButtonTitle')}
-                            className="p-2 rounded hover:bg-black/5 text-sumi-gray transition-colors"
+                            title="Rules"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-accent/10 hover:text-accent text-sumi-gray transition-colors"
                           >🔀</button>
+                          <div className="w-px h-4 bg-border mx-1"></div>
                           <button
                             onClick={() => handleRemoveSite(site.host)}
-                            title={t('common.delete')}
-                            className="p-2 rounded hover:bg-danger hover:text-white text-danger transition-colors"
+                            title="Delete"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-danger hover:text-white text-danger transition-colors"
                           >✕</button>
                         </div>
                       </motion.div>
                     ))
                   )}
+                </div>
+
+                {/* Bulk Add Section (Bottom) */}
+                <div className="bg-gray-50/50 p-6 border-t border-border/50">
+                  <div className="text-xs font-bold uppercase tracking-widest text-sumi-gray mb-3">{t('options.bulkAdd')}</div>
+                  <div className="flex gap-3">
+                    <textarea
+                      className="flex-1 min-h-[40px] max-h-[100px] p-3 rounded-lg border border-border bg-white text-sm font-mono focus:border-accent outline-none transition-all resize-y"
+                      value={bulkSitesInput}
+                      onChange={e => setBulkSitesInput(e.target.value)}
+                      placeholder={t('options.pasteDomains')}
+                    />
+                    <button
+                      onClick={handleBulkAdd}
+                      className="btn secondary h-auto px-6 whitespace-nowrap text-xs font-bold uppercase tracking-widest"
+                    >
+                      {t('options.addList')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -643,51 +641,69 @@ const App: React.FC = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                  { label: t('stats.totalBlocks'), value: stats.totalBlocks, emoji: '🛡️' },
-                  { label: t('stats.streakDays'), value: stats.streakDays, emoji: '🔥' },
-                  { label: t('stats.totalSites'), value: stats.totalSites, emoji: '📊' }
+                  { label: t('stats.totalBlocks'), value: stats.totalBlocks, icon: 'ShieldIcon' },
+                  { label: t('stats.streakDays'), value: stats.streakDays, icon: 'FlameIcon' },
+                  { label: t('stats.totalSites'), value: stats.totalSites, icon: 'LayoutIcon' }
                 ].map((stat) => (
                   <motion.div
                     key={stat.label}
                     variants={itemVariants}
-                    className="bg-white/60 backdrop-blur-md p-8 rounded-xl border border-border shadow-sm text-center transform transition-transform hover:-translate-y-1"
+                    className="washi-card p-8 border border-border/60 flex flex-col items-center justify-center relative overflow-hidden group"
                   >
-                    <div className="text-4xl mb-3">{stat.emoji}</div>
-                    <div className="text-sm text-sumi-gray mb-2 font-medium uppercase tracking-wider">
-                      {stat.label}
-                    </div>
-                    <div className={`text-4xl font-bold text-accent ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-                      {stat.value}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white to-transparent opacity-50 z-0"></div>
+                    <div className="relative z-10 text-center">
+                      <div className="text-5xl font-light text-sumi-black mb-4 group-hover:scale-110 transition-transform duration-500 font-mono tracking-tighter">
+                        {stat.value}
+                      </div>
+                      <div className="text-xs font-bold uppercase tracking-[0.2em] text-sumi-gray group-hover:text-accent transition-colors">
+                        {stat.label}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
+              {/* Add charts here in future updates */}
+
               <div>
-                <h3 className={`text-xl font-semibold mb-5 text-sumi-black ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-                  {t('stats.bySite')}
-                </h3>
-                <div className="bg-white/60 backdrop-blur-md rounded-xl border border-border shadow-sm overflow-hidden">
+                <div className="flex justify-between items-end mb-4">
+                  <h3 className="text-lg font-serif font-bold text-sumi-black">{t('options.mostBlocked')}</h3>
+                </div>
+                <div className="washi-card border border-border/60 overflow-hidden">
                   {Object.entries(stats.bySite)
                     .sort(([, a], [, b]) => b.blocks - a.blocks)
-                    .map(([host, siteStats]) => (
+                    .slice(0, 10)
+                    .map(([host, siteStats], index) => (
                       <motion.div
                         variants={itemVariants}
                         key={host}
-                        className="flex justify-between p-5 border-b border-border/50 last:border-none hover:bg-white/50 transition-colors"
+                        className="flex justify-between items-center p-5 border-b border-border/40 last:border-none hover:bg-white/50 transition-colors"
                       >
-                        <div className="font-medium text-sumi-black font-mono text-base">{host}</div>
-                        <div className="text-accent font-semibold text-sm">{siteStats.blocks} blocks</div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs font-mono text-sumi-gray w-6 text-center">{index + 1}</span>
+                          <div className="font-medium text-sumi-black font-mono text-base">{host}</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-24 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-accent" style={{ width: `${Math.min(100, (siteStats.blocks / (stats.totalBlocks || 1)) * 100)}%` }}></div>
+                          </div>
+                          <span className="text-accent font-bold text-sm w-12 text-right">{siteStats.blocks}</span>
+                        </div>
                       </motion.div>
                     ))}
+                  {Object.keys(stats.bySite).length === 0 && (
+                    <div className="p-8 text-center text-sumi-gray italic">{t('options.noData')}</div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center pt-8">
                 <button
                   onClick={handleClearStats}
-                  className="btn danger px-8 py-3 rounded-full font-semibold shadow-sm"
-                >{t('options.clearStats')}</button>
+                  className="text-xs text-danger hover:text-red-700 hover:underline underline-offset-4 transition-all opacity-60 hover:opacity-100"
+                >
+                  {t('options.clearStats')}
+                </button>
               </div>
             </motion.div>
           )}
@@ -702,21 +718,25 @@ const App: React.FC = () => {
               exit="hidden"
               className="space-y-8"
             >
-              <div className="bg-white/60 backdrop-blur-md p-8 rounded-xl border border-border shadow-sm">
-                <div className={`text-2xl font-bold mb-4 text-sumi-black ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-                  {achievements.unlocked.length} / {Object.keys(ACHIEVEMENT_DEFINITIONS).length} Unlocked
-                </div>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-accent to-gold"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                  />
+              <div className="washi-card p-10 border border-border/60 text-center relative overflow-hidden">
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="text-6xl font-serif text-sumi-black mb-2">
+                    {achievements.unlocked.length} <span className="text-2xl text-sumi-gray font-sans opacity-50">/ {Object.keys(ACHIEVEMENT_DEFINITIONS).length}</span>
+                  </div>
+                  <div className="text-sm font-bold uppercase tracking-[0.2em] text-accent mb-8">{t('options.unlockedAchievements')}</div>
+
+                  <div className="w-full max-w-md h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-accent to-gold"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Object.entries(ACHIEVEMENT_DEFINITIONS).map(([type, def]) => {
                   const achievementType = type as AchievementType
                   const progress = achievementProgress[achievementType]
@@ -726,30 +746,33 @@ const App: React.FC = () => {
                     <motion.div
                       variants={itemVariants}
                       key={type}
-                      className={`bg-white/60 backdrop-blur-md p-7 rounded-xl transition-all duration-300 ${isUnlocked
-                        ? 'border-2 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]'
-                        : 'border border-border grayscale opacity-80 bg-gray-50/50'
+                      className={`washi-card p-6 border transition-all duration-300 relative group overflow-hidden h-full flex flex-col ${isUnlocked
+                        ? 'border-gold/50 shadow-[0_4px_20px_rgba(212,175,55,0.15)] bg-gradient-to-br from-white to-gold/5'
+                        : 'border-border/60 opacity-70 grayscale hover:grayscale-0 hover:opacity-100'
                         }`}
                     >
-                      <div className="text-5xl text-center mb-4">{def.icon}</div>
-                      <div className="font-semibold text-center mb-2 text-lg text-sumi-black">
-                        {def.name}
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-4xl filter drop-shadow-sm">{def.icon}</span>
+                        {isUnlocked && <span className="text-gold text-xs font-bold border border-gold rounded px-2 py-0.5 ml-2">{t('achievements.unlocked').toUpperCase()}</span>}
                       </div>
-                      <div className="text-sm text-center text-sumi-gray mb-4 leading-relaxed">
-                        {def.description}
-                      </div>
-                      {isUnlocked ? (
-                        <div className="text-gold text-center font-bold text-sm bg-gold/10 p-2 rounded-full border border-gold/20">
-                          ✓ Unlocked
-                        </div>
-                      ) : (
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-auto">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-accent to-gold"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress?.progress || 0}%` }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                          />
+
+                      <h4 className="font-serif font-bold text-lg text-sumi-black mb-1 group-hover:text-accent transition-colors">{def.name}</h4>
+                      <p className="text-sm text-sumi-gray leading-relaxed mb-4 flex-1">{def.description}</p>
+
+                      {!isUnlocked && (
+                        <div className="mt-auto pt-4 border-t border-dashed border-border/50">
+                          <div className="flex justify-between text-xs text-sumi-gray mb-1">
+                            <span>{t('options.progress')}</span>
+                            <span className="font-mono">{Math.round(progress?.progress || 0)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-accent"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${progress?.progress || 0}%` }}
+                              transition={{ duration: 0.5, delay: 0.2 }}
+                            />
+                          </div>
                         </div>
                       )}
                     </motion.div>
@@ -759,43 +782,7 @@ const App: React.FC = () => {
             </motion.div>
           )}
 
-          {/* Appearance Tab */}
-          {activeTab === 'appearance' && (
-            <motion.div
-              key="appearance"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-            >
-              <div className="bg-white/60 backdrop-blur-md p-8 rounded-xl border border-border shadow-sm">
-                <div className={`text-xl font-semibold mb-6 text-sumi-black ${currentTheme?.metadata.id === 'japanese' ? 'font-serif' : 'font-sans'}`}>
-                  Seasonal Themes
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  {availableThemes.map((theme) => (
-                    <motion.button
-                      variants={itemVariants}
-                      key={theme.metadata.id}
-                      onClick={() => handleThemeChange(theme.metadata.id)}
-                      className={`p-6 rounded-2xl backdrop-blur-md cursor-pointer flex flex-col items-center gap-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${currentThemeId === theme.metadata.id
-                        ? 'border-2 border-accent bg-accent/10'
-                        : 'border border-border bg-white/40 hover:bg-white/80'
-                        }`}
-                    >
-                      <div className="w-12 h-12 rounded-full shadow-lg" style={{ background: theme.colors.accent }} />
-                      <div>
-                        <div className="text-2xl mb-1 text-center">{theme.metadata.emoji}</div>
-                        <div className="font-semibold text-base text-sumi-black text-center">
-                          {theme.metadata.name}
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
+
         </AnimatePresence>
       </main>
 

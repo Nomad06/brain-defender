@@ -1,86 +1,20 @@
 /**
  * Theme Manager
- * Handles theme registration, switching, and application
+ * Simplified for single Focusan theme
  */
 
-import browser from 'webextension-polyfill'
 import { focusanTheme } from './focusan'
-import type { Theme, ThemeRegistry, ThemePreference } from './types'
-
-const STORAGE_KEY = 'theme_preference'
+import type { Theme } from './types'
 
 /**
- * Registry of all available themes
- * To add a new theme: import it and add to this object
- */
-export const THEMES: ThemeRegistry = {
-  focusan: focusanTheme,
-  // Add new themes here:
-  // mytheme: myTheme,
-}
-
-/**
- * Get all available themes as an array
- */
-export function getAllThemes(): Theme[] {
-  return Object.values(THEMES)
-}
-
-/**
- * Get a theme by ID
- */
-export function getThemeById(id: string): Theme | null {
-  return THEMES[id] || null
-}
-
-/**
- * Get current theme preference from storage
- */
-export async function getCurrentThemeId(): Promise<string> {
-  try {
-    const result = await browser.storage.sync.get(STORAGE_KEY)
-    const preference = result[STORAGE_KEY] as ThemePreference | undefined
-    return preference?.themeId || 'focusan'
-  } catch (error) {
-    console.error('[Theme] Error getting theme preference:', error)
-    return 'focusan'
-  }
-}
-
-/**
- * Get current theme object
+ * Get current theme (Always Focusan)
  */
 export async function getCurrentTheme(): Promise<Theme> {
-  const themeId = await getCurrentThemeId()
-  return getThemeById(themeId) || focusanTheme
-}
-
-/**
- * Set theme preference in storage
- */
-export async function setThemePreference(themeId: string): Promise<boolean> {
-  try {
-    if (!THEMES[themeId]) {
-      console.error(`[Theme] Theme "${themeId}" not found`)
-      return false
-    }
-
-    const preference: ThemePreference = {
-      themeId,
-      appliedAt: Date.now(),
-    }
-
-    await browser.storage.sync.set({ [STORAGE_KEY]: preference })
-    return true
-  } catch (error) {
-    console.error('[Theme] Error setting theme preference:', error)
-    return false
-  }
+  return focusanTheme
 }
 
 /**
  * Apply theme to current document
- * Sets CSS custom properties and injects custom CSS
  */
 export function applyTheme(theme: Theme): void {
   const root = document.documentElement
@@ -135,29 +69,12 @@ export function applyTheme(theme: Theme): void {
 
 /**
  * Initialize theme on page load
- * Call this in every page's entry point
  */
 export async function initializeTheme(): Promise<void> {
-  const theme = await getCurrentTheme()
-  applyTheme(theme)
-}
-
-/**
- * Switch to a different theme
- * Saves preference and applies immediately
- */
-export async function switchTheme(themeId: string): Promise<boolean> {
-  const success = await setThemePreference(themeId)
-  if (success) {
-    const theme = getThemeById(themeId)
-    if (theme) {
-      applyTheme(theme)
-      return true
-    }
-  }
-  return false
+  applyTheme(focusanTheme)
 }
 
 // Re-export types and themes for convenience
-export type { Theme, ThemePreference } from './types'
+export type { Theme } from './types'
 export { focusanTheme }
+

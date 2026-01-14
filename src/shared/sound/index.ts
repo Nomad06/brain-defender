@@ -15,8 +15,8 @@ export enum SoundType {
 
 class SoundManager {
   private audioContext: AudioContext | null = null
-  private enabled: boolean = true
-  private volume: number = 0.3
+  private enabled: boolean = false // Disabled by user request
+  private volume: number = 0.0
 
   /**
    * Initialize Audio Context (lazy initialization)
@@ -82,28 +82,27 @@ class SoundManager {
   }
 
   /**
-   * Temple Bell - Deep, resonant bell for session start
+   * Temple Bell - Pure, warm bell
    */
   private playTempleBell(ctx: AudioContext): void {
     const now = ctx.currentTime
-    const duration = 3.0
+    const duration = 2.0
 
-    // Create oscillators for harmonic richness
-    const fundamentalFreq = 220 // A3
-    const harmonics = [1, 2.4, 3.8, 5.2] // Bell-like harmonic ratios
+    // Pure harmonious overtones (Fundamental, Octave, Twelfth)
+    // A3 (220Hz) based
+    const freqs = [220, 440, 660]
 
-    harmonics.forEach((ratio, index) => {
+    freqs.forEach((freq, index) => {
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
 
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(fundamentalFreq * ratio, now)
+      osc.type = 'sine' // Pure sine
+      osc.frequency.setValueAtTime(freq, now)
 
       // Amplitude decreases for higher harmonics
-      const amplitude = this.volume / (index + 1) * 0.4
-      gain.gain.setValueAtTime(amplitude, now)
-
-      // Exponential decay (bell characteristic)
+      const amplitude = this.volume * (0.3 / (index + 1))
+      gain.gain.setValueAtTime(0, now)
+      gain.gain.linearRampToValueAtTime(amplitude, now + 0.05) // Soft attack
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
       osc.connect(gain)
@@ -112,231 +111,145 @@ class SoundManager {
       osc.start(now)
       osc.stop(now + duration)
     })
-
-    // Add metallic shimmer with noise
-    this.addMetallicShimmer(ctx, now, duration, 0.15)
   }
 
   /**
-   * Soft Gong - Gentle gong for session end
+   * Soft Gong - Deep, grounding tone
    */
   private playSoftGong(ctx: AudioContext): void {
     const now = ctx.currentTime
-    const duration = 2.5
+    const duration = 3.0
 
-    // Gong fundamental and harmonics
-    const fundamentalFreq = 150 // Lower than bell
-    const harmonics = [1, 1.5, 2.3, 3.1, 4.2]
+    // A low, warm fundamental
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
 
-    harmonics.forEach((ratio, index) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(110, now) // A2 (Low)
 
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(fundamentalFreq * ratio, now)
+    const amplitude = this.volume * 0.4
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(amplitude, now + 0.5) // Very slow attack
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
-      const amplitude = this.volume / (index + 1) * 0.3
-      gain.gain.setValueAtTime(amplitude, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
 
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.start(now)
-      osc.stop(now + duration)
-    })
-
-    this.addMetallicShimmer(ctx, now, duration, 0.1)
+    osc.start(now)
+    osc.stop(now + duration)
   }
 
   /**
-   * Bamboo Strike - Quick, hollow strike for blocked sites
+   * Bamboo Strike - Simple, dry woodblock sound
    */
   private playBambooStrike(ctx: AudioContext): void {
     const now = ctx.currentTime
-    const duration = 0.15
+    const duration = 0.1
 
-    // Hollow bamboo sound (higher frequency, short decay)
-    const frequencies = [800, 1200, 1600]
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
 
-    frequencies.forEach((freq, index) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(800, now)
 
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(freq, now)
+    // Pitch envelope for "knock" sound
+    osc.frequency.exponentialRampToValueAtTime(400, now + 0.05)
 
-      const amplitude = this.volume * 0.3 / (index + 1)
-      gain.gain.setValueAtTime(amplitude, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+    gain.gain.setValueAtTime(this.volume * 0.3, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05)
 
-      osc.connect(gain)
-      gain.connect(ctx.destination)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
 
-      osc.start(now)
-      osc.stop(now + duration)
-    })
-
-    // Add click/attack
-    this.addPercussiveClick(ctx, now, 0.02)
+    osc.start(now)
+    osc.stop(now + duration)
   }
 
   /**
-   * Koto Pluck - String pluck for achievements
+   * Koto Pluck - Gentle string
    */
   private playKotoPluck(ctx: AudioContext): void {
     const now = ctx.currentTime
-    const duration = 1.2
+    const duration = 1.0
 
-    // Koto-like plucked string (pentatonic scale note)
     const fundamentalFreq = 440 // A4
-    const harmonics = [1, 2, 3, 4, 5, 6]
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
 
-    harmonics.forEach((harmonic) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+    osc.type = 'triangle' // Slightly brighter than sine, but warm
+    osc.frequency.setValueAtTime(fundamentalFreq, now)
 
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(fundamentalFreq * harmonic, now)
+    // Pluck envelope
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(this.volume * 0.2, now + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
-      // String pluck envelope: sharp attack, exponential decay
-      const amplitude = this.volume * 0.25 / harmonic
-      gain.gain.setValueAtTime(0, now)
-      gain.gain.linearRampToValueAtTime(amplitude, now + 0.005) // Sharp attack
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+    // Lowpass filter to warm it up
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(3000, now)
+    filter.frequency.exponentialRampToValueAtTime(500, now + 0.2) // Dampening string
 
-      osc.connect(gain)
-      gain.connect(ctx.destination)
+    osc.connect(filter)
+    filter.connect(gain)
+    gain.connect(ctx.destination)
 
-      osc.start(now)
-      osc.stop(now + duration)
-    })
+    osc.start(now)
+    osc.stop(now + duration)
   }
 
   /**
-   * Wind Chime - Gentle chime for notifications
+   * Wind Chime - Pure pentatonic tones
    */
   private playWindChime(ctx: AudioContext): void {
     const now = ctx.currentTime
 
-    // Multiple chimes with slight delay (like wind hitting them)
-    const notes = [880, 1100, 1320, 1760] // Pentatonic-ish
-    const delays = [0, 0.08, 0.15, 0.22]
+    // Major Pentatonic (F, G, A, C, D) - very neutral and happy
+    const notes = [698.46, 783.99, 880.00, 1046.50]
+    const randomNote = notes[Math.floor(Math.random() * notes.length)]
 
-    notes.forEach((freq, index) => {
-      const startTime = now + delays[index]
-      const duration = 1.5
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
 
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(randomNote, now)
 
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(freq, startTime)
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(this.volume * 0.15, now + 0.05)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 2.0)
 
-      const amplitude = this.volume * 0.2
-      gain.gain.setValueAtTime(0, startTime)
-      gain.gain.linearRampToValueAtTime(amplitude, startTime + 0.01)
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
 
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.start(startTime)
-      osc.stop(startTime + duration)
-    })
+    osc.start(now)
+    osc.stop(now + 2.0)
   }
 
   /**
-   * Meditation Bell - Three gentle bells for breathing
+   * Meditation Bell - Single pure tone
    */
   private playMeditationBell(ctx: AudioContext): void {
     const now = ctx.currentTime
-    const noteGap = 0.3
-    const duration = 1.0
+    const duration = 2.0
 
-    // Three gentle bell tones
-    for (let i = 0; i < 3; i++) {
-      const startTime = now + (i * noteGap)
-      const freq = 660 // E5
-
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(freq, startTime)
-
-      const amplitude = this.volume * 0.15
-      gain.gain.setValueAtTime(amplitude, startTime)
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.start(startTime)
-      osc.stop(startTime + duration)
-    }
-  }
-
-  /**
-   * Add metallic shimmer effect (for bells and gongs)
-   */
-  private addMetallicShimmer(ctx: AudioContext, startTime: number, duration: number, intensity: number): void {
-    // High-frequency shimmer using filtered noise
-    const bufferSize = ctx.sampleRate * duration
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-    const data = buffer.getChannelData(0)
-
-    // Generate white noise
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * intensity
-    }
-
-    const noise = ctx.createBufferSource()
-    noise.buffer = buffer
-
-    // High-pass filter for shimmer
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'highpass'
-    filter.frequency.setValueAtTime(3000, startTime)
-
+    const osc = ctx.createOscillator()
     const gain = ctx.createGain()
-    gain.gain.setValueAtTime(this.volume * intensity, startTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
 
-    noise.connect(filter)
-    filter.connect(gain)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(523.25, now) // C5
+
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(this.volume * 0.2, now + 0.1)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+
+    osc.connect(gain)
     gain.connect(ctx.destination)
 
-    noise.start(startTime)
-    noise.stop(startTime + duration)
+    osc.start(now)
+    osc.stop(now + duration)
   }
 
-  /**
-   * Add percussive click for bamboo strike
-   */
-  private addPercussiveClick(ctx: AudioContext, startTime: number, duration: number): void {
-    const bufferSize = ctx.sampleRate * duration
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-    const data = buffer.getChannelData(0)
-
-    // Generate short noise burst
-    for (let i = 0; i < bufferSize; i++) {
-      const envelope = 1 - (i / bufferSize)
-      data[i] = (Math.random() * 2 - 1) * envelope
-    }
-
-    const noise = ctx.createBufferSource()
-    noise.buffer = buffer
-
-    const gain = ctx.createGain()
-    gain.gain.setValueAtTime(this.volume * 0.4, startTime)
-
-    noise.connect(gain)
-    gain.connect(ctx.destination)
-
-    noise.start(startTime)
-    noise.stop(startTime + duration)
-  }
+  // Helper methods for noise/shimmer removed entirely for cleaner sound
 
   /**
    * Clean up audio context

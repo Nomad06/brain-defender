@@ -44,11 +44,14 @@ export function useLanguage(): Language {
       changes: Record<string, browser.Storage.StorageChange>,
       areaName: string
     ) => {
-      if (areaName === 'sync' && changes.language) {
-        const newLang = changes.language.newValue
+      if (areaName === 'local' && changes['i18n_language']) {
+        const newLang = changes['i18n_language'].newValue
         if (newLang && (newLang === 'ru' || newLang === 'en')) {
           console.log('[useLanguage] Language changed to:', newLang)
-          setLanguage(newLang as Language)
+          const validLang = newLang as Language
+          // Sync global state immediately so t() works in the upcoming render
+          import('./index').then(({ syncLanguage }) => syncLanguage(validLang))
+          setLanguage(validLang)
         }
       }
     }

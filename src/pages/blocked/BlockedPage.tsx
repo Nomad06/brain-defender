@@ -382,16 +382,18 @@ const BlockedPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-washi flex flex-col items-center justify-center p-6 text-sumi-black overflow-x-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-sumi-black overflow-x-hidden">
       {/* Main Block Content - Centered Zen Layout */}
-      <div className="w-full max-w-4xl min-h-[80vh] flex flex-col items-center justify-center relative">
+      <div className="w-full max-w-4xl min-h-[80vh] flex flex-col items-center justify-center relative shoji-slide-enter shoji-slide-enter-active">
         <div className="w-full flex flex-col items-center justify-center text-center z-10">
 
           {/* Theme-aware Motivational Content */}
           {theme?.metadata.id === 'focusan' ? (
             <>
               {/* Focusan Theme: Breathing Circles + Zen Phrase */}
-              <BreathingCircles size={200} />
+              <div className="mb-20">
+                <BreathingCircles size={200} />
+              </div>
               <ZenCard zenPhrase={zenPhrase} language={currentLanguage} />
             </>
           ) : (

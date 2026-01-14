@@ -49,6 +49,14 @@ export async function setLanguage(lang: Language): Promise<void> {
 }
 
 /**
+ * Sync language without saving to storage
+ * Used by hooks to keep state in sync
+ */
+export function syncLanguage(lang: Language): void {
+  currentLanguage = lang
+}
+
+/**
  * Get a translation string
  *
  * @param key - Translation key (e.g., 'popup.title')
@@ -104,4 +112,4 @@ export function getRandomBlockedPhrase(): string {
 }
 
 export { translations, type Language }
-export { useLanguage } from './useLanguage'
+

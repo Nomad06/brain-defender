@@ -10,7 +10,18 @@ import { normalizeHost } from '../shared/utils/domain'
 import { t, setLanguage, initI18n } from '../shared/i18n'
 import { useLanguage } from '../shared/i18n/useLanguage'
 import type { SiteObject } from '../shared/storage/schemas'
-import { SamuraiShieldIcon, ScrollIcon, KatanakakeIcon } from '../shared/components/Icons'
+import {
+  SamuraiShieldIcon,
+  ScrollIcon,
+  KatanakakeIcon,
+  CalendarIcon,
+  ShuffleIcon,
+  XIcon,
+  LeafIcon,
+  LayoutIcon,
+  FlameIcon,
+  ShieldIcon
+} from '../shared/components/Icons'
 import type { Stats } from '../shared/domain/stats'
 import type { AchievementsData } from '../shared/domain/achievements'
 import { ACHIEVEMENT_DEFINITIONS, getAchievementProgress, type AchievementProgress, type AchievementType } from '../shared/domain/achievements'
@@ -473,7 +484,7 @@ const App: React.FC = () => {
                       }`}
                     onClick={() => setShowNewScheduleModal(true)}
                   >
-                    <span className="opacity-70">📅</span>
+                    <CalendarIcon className="w-4 h-4 opacity-70" />
                     {t('options.scheduleButtonTitle') || t('options.setSchedule')}
                     {newSiteSchedule && <span className="ml-1 text-xs bg-accent text-white px-1.5 rounded-full">✓</span>}
                   </button>
@@ -484,7 +495,7 @@ const App: React.FC = () => {
                       }`}
                     onClick={() => setShowNewRulesModal(true)}
                   >
-                    <span className="opacity-70">🔀</span>
+                    <ShuffleIcon className="w-4 h-4 opacity-70" />
                     {t('options.conditionsButtonTitle') || t('options.setConditions')}
                     {newSiteRules.length > 0 && <span className="ml-1 text-xs bg-accent text-white px-1.5 rounded-full">{newSiteRules.length}</span>}
                   </button>
@@ -545,7 +556,9 @@ const App: React.FC = () => {
                 <div className="divide-y divide-border/30 max-h-[600px] overflow-y-auto custom-scrollbar">
                   {filteredSites.length === 0 ? (
                     <div className="py-24 text-center">
-                      <div className="text-4xl opacity-20 mb-3">🍃</div>
+                      <div className="flex justify-center mb-3">
+                        <LeafIcon size={48} className="text-sumi-gray/20" />
+                      </div>
                       <div className="text-sumi-gray opacity-60 font-serif">{t('options.emptyList')}</div>
                     </div>
                   ) : (
@@ -564,7 +577,7 @@ const App: React.FC = () => {
                               onChange={() => handleToggleSite(site.host)}
                               className="w-5 h-5 appearance-none rounded border border-border checked:bg-accent checked:border-accent transition-all cursor-pointer z-10"
                             />
-                            {selectedSites.has(site.host) && <span className="absolute text-white text-xs pointer-events-none z-10">✓</span>}
+                            {selectedSites.has(site.host) && <div className="absolute pointer-events-none z-10 flex items-center justify-center"><XIcon size={12} className="text-white rotate-45" strokeWidth={3} /></div>}
                           </div>
 
                           <div>
@@ -577,7 +590,12 @@ const App: React.FC = () => {
                               )}
                               {site.schedule && (
                                 <span className="text-[9px] uppercase tracking-widest text-accent border border-accent/20 px-2 py-0.5 rounded-sm font-bold flex items-center gap-1">
-                                  <span>📅</span> {t('options.scheduleLabel')}
+                                  <CalendarIcon size={10} /> {t('options.scheduleLabel')}
+                                </span>
+                              )}
+                              {site.conditionalRules && site.conditionalRules.length > 0 && (
+                                <span className="text-[9px] uppercase tracking-widest text-accent border border-accent/20 px-2 py-0.5 rounded-sm font-bold flex items-center gap-1">
+                                  <ShuffleIcon size={10} /> {t('options.conditionsLabel')}
                                 </span>
                               )}
                             </div>
@@ -589,18 +607,18 @@ const App: React.FC = () => {
                             onClick={() => handleOpenSchedule(site.host)}
                             title="Schedule"
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-accent/10 hover:text-accent text-sumi-gray transition-colors"
-                          >📅</button>
+                          ><CalendarIcon size={16} /></button>
                           <button
                             onClick={() => handleOpenConditionalRules(site.host)}
                             title="Rules"
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-accent/10 hover:text-accent text-sumi-gray transition-colors"
-                          >🔀</button>
+                          ><ShuffleIcon size={16} /></button>
                           <div className="w-px h-4 bg-border mx-1"></div>
                           <button
                             onClick={() => handleRemoveSite(site.host)}
                             title="Delete"
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-danger hover:text-white text-danger transition-colors"
-                          >✕</button>
+                          ><XIcon size={16} /></button>
                         </div>
                       </motion.div>
                     ))
@@ -641,9 +659,9 @@ const App: React.FC = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                  { label: t('stats.totalBlocks'), value: stats.totalBlocks, icon: 'ShieldIcon' },
-                  { label: t('stats.streakDays'), value: stats.streakDays, icon: 'FlameIcon' },
-                  { label: t('stats.totalSites'), value: stats.totalSites, icon: 'LayoutIcon' }
+                  { label: t('stats.totalBlocks'), value: stats.totalBlocks, icon: <ShieldIcon size={48} strokeWidth={1} /> },
+                  { label: t('stats.streakDays'), value: stats.streakDays, icon: <FlameIcon size={48} strokeWidth={1} /> },
+                  { label: t('stats.totalSites'), value: stats.totalSites, icon: <LayoutIcon size={48} strokeWidth={1} /> }
                 ].map((stat) => (
                   <motion.div
                     key={stat.label}

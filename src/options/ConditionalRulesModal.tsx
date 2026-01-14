@@ -14,6 +14,7 @@ import {
   getConditionTypes,
   validateConditionalRule,
 } from '../shared/domain/conditional-rules'
+import { HashIcon, TimerIcon, PlayIcon, PauseIcon, TrashIcon, XIcon } from '../shared/components/Icons'
 
 interface ConditionalRulesModalProps {
   host: string
@@ -89,7 +90,7 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
             className="p-2 rounded-full hover:bg-black/5 text-sumi-gray transition-colors"
             onClick={onClose}
           >
-            ✕
+            <XIcon size={20} />
           </button>
         </div>
 
@@ -114,7 +115,9 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                     <div className="p-4 flex justify-between items-start gap-4">
                       <div className="flex-1">
                         <div className="font-semibold text-sm mb-1 text-sumi-black flex items-center gap-2">
-                          <span>{conditionTypes.find(t => t.type === rule.type)?.icon}</span>
+                          <span>
+                            {rule.type === ConditionType.VISITS_PER_DAY ? <HashIcon size={16} /> : <TimerIcon size={16} />}
+                          </span>
                           {conditionTypes.find(t => t.type === rule.type)?.name}
                         </div>
                         <div className="text-xs text-sumi-gray">
@@ -126,13 +129,13 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                           className="p-1.5 rounded text-xs border border-border hover:bg-gray-100 transition-colors"
                           onClick={() => handleToggleRule(index)}
                         >
-                          {rule.enabled ? '⏸' : '▶️'}
+                          {rule.enabled ? <PauseIcon size={14} /> : <PlayIcon size={14} />}
                         </button>
                         <button
                           className="p-1.5 rounded text-xs border border-danger text-danger hover:bg-danger hover:text-white transition-colors"
                           onClick={() => handleRemoveRule(index)}
                         >
-                          ✕
+                          <TrashIcon size={14} />
                         </button>
                       </div>
                     </div>
@@ -196,7 +199,9 @@ const ConditionalRulesModal: React.FC<ConditionalRulesModalProps> = ({
                   onClick={() => handleAddRule(type.type)}
                   title={type.description}
                 >
-                  <span className="text-base">{type.icon}</span>
+                  <span className="text-base text-sumi-gray">
+                    {type.type === ConditionType.VISITS_PER_DAY ? <HashIcon size={16} /> : <TimerIcon size={16} />}
+                  </span>
                   {type.name}
                 </button>
               ))}

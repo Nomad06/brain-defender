@@ -9,7 +9,7 @@ import { messagingClient } from '../shared/messaging/client'
 import { normalizeHost } from '../shared/utils/domain'
 import { t, initI18n } from '../shared/i18n'
 import { SessionState, type FocusSession } from '../shared/domain/focus-sessions'
-import { SettingsIcon, SamuraiShieldIcon } from '../shared/components/Icons'
+import { SettingsIcon, SamuraiShieldIcon, XIcon } from '../shared/components/Icons'
 import { playSound, SoundType } from '../shared/sound'
 
 // Animation variants
@@ -481,10 +481,10 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
       <div className="flex justify-between items-center">
         <h2 className="font-serif font-medium text-xl text-sumi-black">{t('focusSession.selectSites')}</h2>
         <button
-          className="text-sumi-gray hover:text-sumi-black p-2 text-xl leading-none transition-transform hover:rotate-90"
+          className="text-sumi-gray hover:text-sumi-black p-2 transition-transform hover:rotate-90 rounded-full hover:bg-black/5"
           onClick={() => { playSound(SoundType.SOFT_GONG); onClose(); }}
         >
-          ✕
+          <XIcon size={20} />
         </button>
       </div>
 
@@ -580,7 +580,7 @@ const PomodoroModal: React.FC<PomodoroModalProps> = ({ onClose, onStart }) => {
                       onClick={() => handleRemoveAdditionalSite(host)}
                       className="text-sumi-gray hover:text-danger w-4 h-4 flex items-center justify-center rounded-full hover:bg-danger/10"
                     >
-                      ✕
+                      <XIcon size={12} />
                     </button>
                   </motion.div>
                 ))}

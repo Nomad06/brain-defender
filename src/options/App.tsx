@@ -26,6 +26,7 @@ import type { Stats } from '../shared/domain/stats'
 import type { AchievementsData } from '../shared/domain/achievements'
 import { ACHIEVEMENT_DEFINITIONS, getAchievementProgress, type AchievementProgress, type AchievementType } from '../shared/domain/achievements'
 import { type Schedule } from '../shared/domain/schedule'
+import { shouldShowChallengeForSchedule, shouldShowChallengeForRules } from '../shared/domain/strictness'
 import ChallengeModal from './ChallengeModal'
 import ScheduleModal from './ScheduleModal'
 import ConditionalRulesModal from './ConditionalRulesModal'
@@ -231,21 +232,32 @@ const App: React.FC = () => {
   const handleSaveSchedule = async (schedule: Schedule | null) => {
     if (!schedulingHost) return
 
-    setPendingAction({
-      type: 'save',
-      description: t('options.securityChallengeDescription'),
-      onConfirm: async () => {
-        try {
-          await messagingClient.updateSite(schedulingHost.host, { schedule })
-          await loadSites()
-          setSchedulingHost(null)
-          setPendingAction(null)
-        } catch (err) {
-          console.error('[Options] Error saving schedule:', err)
-          alert('Failed to save schedule')
-        }
+    const oldSchedule = schedulingHost.schedule
+    const requiresChallenge = shouldShowChallengeForSchedule(oldSchedule, schedule)
+
+    const saveSchedule = async () => {
+      try {
+        await messagingClient.updateSite(schedulingHost.host, { schedule })
+        await loadSites()
+        setSchedulingHost(null)
+        setPendingAction(null)
+      } catch (err) {
+        console.error('[Options] Error saving schedule:', err)
+        alert('Failed to save schedule')
       }
-    })
+    }
+
+    if (requiresChallenge) {
+      // Making protection weaker - show challenge with warning
+      setPendingAction({
+        type: 'save',
+        description: t('options.weakeningProtectionWarning'),
+        onConfirm: saveSchedule
+      })
+    } else {
+      // Making protection stronger or keeping same - save directly
+      await saveSchedule()
+    }
   }
 
   const handleCancelSchedule = () => {
@@ -263,21 +275,32 @@ const App: React.FC = () => {
   const handleSaveConditionalRules = async (rules: ConditionalRule[]) => {
     if (!conditionalRulesHost) return
 
-    setPendingAction({
-      type: 'save',
-      description: t('options.securityChallengeDescription'),
-      onConfirm: async () => {
-        try {
-          await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
-          await loadSites()
-          setConditionalRulesHost(null)
-          setPendingAction(null)
-        } catch (err) {
-          console.error('[Options] Error saving conditional rules:', err)
-          alert('Failed to save conditional rules')
-        }
+    const oldRules = conditionalRulesHost.rules
+    const requiresChallenge = shouldShowChallengeForRules(oldRules, rules)
+
+    const saveRules = async () => {
+      try {
+        await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
+        await loadSites()
+        setConditionalRulesHost(null)
+        setPendingAction(null)
+      } catch (err) {
+        console.error('[Options] Error saving conditional rules:', err)
+        alert('Failed to save conditional rules')
       }
-    })
+    }
+
+    if (requiresChallenge) {
+      // Making protection weaker - show challenge with warning
+      setPendingAction({
+        type: 'save',
+        description: t('options.weakeningProtectionWarning'),
+        onConfirm: saveRules
+      })
+    } else {
+      // Making protection stronger or keeping same - save directly
+      await saveRules()
+    }
   }
 
   const handleToggleSite = (host: string) => {

@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   FOCUS_SESSIONS: 'focusSessions',
   ACHIEVEMENTS: 'achievements',
   CATEGORIES: 'siteCategories',
+  STRICT_MODE: 'strictMode',
 } as const
 
 // Migration version - increment when data format changes

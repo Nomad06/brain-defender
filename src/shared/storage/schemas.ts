@@ -57,6 +57,8 @@ export const ExtensionStorageSchema = z.object({
   blockedSites: SitesArraySchema.optional(),
   i18n_language: z.string().optional(),
   siteCategories: z.array(z.string()).optional(),
+  strictMode: z.boolean().optional(),
+  strictModeStart: z.number().optional(),
 
   // Local storage
   blockStats: StatsSchema.optional(),

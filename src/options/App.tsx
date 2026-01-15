@@ -30,6 +30,8 @@ import { shouldShowChallengeForSchedule, shouldShowChallengeForRules } from '../
 import ChallengeModal from './ChallengeModal'
 import ScheduleModal from './ScheduleModal'
 import ConditionalRulesModal from './ConditionalRulesModal'
+import StrictLockModal from './StrictLockModal'
+import { getStrictMode, setStrictMode } from '../shared/storage/storage'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import type { ConditionalRule } from '../shared/domain/conditional-rules'
 
@@ -58,6 +60,9 @@ const App: React.FC = () => {
   const [newSiteRules, setNewSiteRules] = useState<ConditionalRule[]>([])
   const [showNewScheduleModal, setShowNewScheduleModal] = useState<boolean>(false)
   const [showNewRulesModal, setShowNewRulesModal] = useState<boolean>(false)
+  const [strictModeEnabled, setStrictModeEnabled] = useState<boolean>(false)
+  const [showStrictLockModal, setShowStrictLockModal] = useState<boolean>(false)
+  const [pendingStrictAction, setPendingStrictAction] = useState<(() => Promise<void>) | null>(null)
 
   const [sites, setSites] = useState<SiteObject[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
@@ -116,6 +121,15 @@ const App: React.FC = () => {
       setLoading(false)
     }
   }
+
+  const loadStrictMode = async () => {
+    const { enabled } = await getStrictMode()
+    setStrictModeEnabled(enabled)
+  }
+
+  useEffect(() => {
+    loadStrictMode()
+  }, [])
 
   const loadSites = async () => {
     try {
@@ -198,25 +212,36 @@ const App: React.FC = () => {
     })
   }
 
+  const checkStrictMode = async (action: () => Promise<void>) => {
+    if (strictModeEnabled) {
+      setPendingStrictAction(() => action)
+      setShowStrictLockModal(true)
+    } else {
+      await action()
+    }
+  }
+
   const performRemoveSites = async (hostsToDelete: string[]) => {
     if (hostsToDelete.length === 0) return
 
-    try {
-      for (const host of hostsToDelete) {
-        await messagingClient.removeSite(host)
+    await checkStrictMode(async () => {
+      try {
+        for (const host of hostsToDelete) {
+          await messagingClient.removeSite(host)
+        }
+        await loadSites()
+        setSelectedSites(prev => {
+          const newSet = new Set(prev)
+          hostsToDelete.forEach(h => newSet.delete(h))
+          return newSet
+        })
+      } catch (err) {
+        console.error('[Options] Error removing sites:', err)
+        alert(t('errors.failedToRemove'))
+      } finally {
+        setPendingAction(null)
       }
-      await loadSites()
-      setSelectedSites(prev => {
-        const newSet = new Set(prev)
-        hostsToDelete.forEach(h => newSet.delete(h))
-        return newSet
-      })
-    } catch (err) {
-      console.error('[Options] Error removing sites:', err)
-      alert(t('errors.failedToRemove'))
-    } finally {
-      setPendingAction(null)
-    }
+    })
   }
 
 
@@ -236,15 +261,17 @@ const App: React.FC = () => {
     const requiresChallenge = shouldShowChallengeForSchedule(oldSchedule, schedule)
 
     const saveSchedule = async () => {
-      try {
-        await messagingClient.updateSite(schedulingHost.host, { schedule })
-        await loadSites()
-        setSchedulingHost(null)
-        setPendingAction(null)
-      } catch (err) {
-        console.error('[Options] Error saving schedule:', err)
-        alert('Failed to save schedule')
-      }
+      await checkStrictMode(async () => {
+        try {
+          await messagingClient.updateSite(schedulingHost.host, { schedule })
+          await loadSites()
+          setSchedulingHost(null)
+          setPendingAction(null)
+        } catch (err) {
+          console.error('[Options] Error saving schedule:', err)
+          alert('Failed to save schedule')
+        }
+      })
     }
 
     if (requiresChallenge) {
@@ -279,15 +306,17 @@ const App: React.FC = () => {
     const requiresChallenge = shouldShowChallengeForRules(oldRules, rules)
 
     const saveRules = async () => {
-      try {
-        await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
-        await loadSites()
-        setConditionalRulesHost(null)
-        setPendingAction(null)
-      } catch (err) {
-        console.error('[Options] Error saving conditional rules:', err)
-        alert('Failed to save conditional rules')
-      }
+      await checkStrictMode(async () => {
+        try {
+          await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
+          await loadSites()
+          setConditionalRulesHost(null)
+          setPendingAction(null)
+        } catch (err) {
+          console.error('[Options] Error saving conditional rules:', err)
+          alert('Failed to save conditional rules')
+        }
+      })
     }
 
     if (requiresChallenge) {
@@ -370,14 +399,16 @@ const App: React.FC = () => {
       return
     }
 
-    try {
-      await messagingClient.clearStats()
-      await loadStats()
-      alert(t('options.statsCleared'))
-    } catch (err) {
-      console.error('[Options] Error clearing stats:', err)
-      alert(t('errors.failedToClearStats'))
-    }
+    await checkStrictMode(async () => {
+      try {
+        await messagingClient.clearStats()
+        await loadStats()
+        alert(t('options.statsCleared'))
+      } catch (err) {
+        console.error('[Options] Error clearing stats:', err)
+        alert(t('errors.failedToClearStats'))
+      }
+    })
   }
 
   const handleLanguageChange = async (lang: string) => {
@@ -502,8 +533,50 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher currentLang={language} onLanguageChange={handleLanguageChange} />
+            {/* Strict Mode Toggle */}
+            <div className="flex items-center gap-2 pl-4 border-l border-border/30">
+              <span className={`text-xs font-bold uppercase tracking-wider ${strictModeEnabled ? 'text-red-500' : 'text-gray-400'}`}>
+                {strictModeEnabled ? 'Strict Mode ON' : 'Strict Mode OFF'}
+              </span>
+              <button
+                onClick={() => {
+                  if (strictModeEnabled) {
+                    // Trying to disable strict mode -> Trigger Check!
+                    checkStrictMode(async () => {
+                      await setStrictMode(false)
+                      setStrictModeEnabled(false)
+                    })
+                  } else {
+                    if (confirm('Enable Strict Mode? verification via crypto payment will be required to delete sites or disable this mode.')) {
+                      setStrictMode(true).then(() => setStrictModeEnabled(true))
+                    }
+                  }
+                }}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${strictModeEnabled ? 'bg-red-500' : 'bg-gray-200'
+                  }`}
+              >
+                <span
+                  className={`${strictModeEnabled ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </button>
+            </div>
           </div>
         </div>
+
+        <StrictLockModal
+          isOpen={showStrictLockModal}
+          onClose={() => {
+            setShowStrictLockModal(false)
+            setPendingStrictAction(null)
+          }}
+          onSuccess={async () => {
+            if (pendingStrictAction) {
+              await pendingStrictAction()
+            }
+            setPendingStrictAction(null)
+          }}
+        />
 
         <AnimatePresence mode="wait">
           {/* Sites Tab */}

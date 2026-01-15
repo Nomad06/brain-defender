@@ -428,3 +428,47 @@ export async function importAllData(jsonString: string): Promise<boolean> {
     return false
   }
 }
+
+/**
+ * Get strict mode status
+ *
+ * @returns { enabled: boolean, startTime: number }
+ */
+export async function getStrictMode(): Promise<{ enabled: boolean; startTime?: number }> {
+  try {
+    const data = await browser.storage.sync.get([STORAGE_KEYS.STRICT_MODE, 'strictModeStart'])
+    return {
+      enabled: !!data[STORAGE_KEYS.STRICT_MODE],
+      startTime: (data.strictModeStart as number) || undefined,
+    }
+  } catch (err) {
+    console.error('[Storage] Error getting strict mode:', err)
+    return { enabled: false }
+  }
+}
+
+/**
+ * Set strict mode
+ *
+ * @param enabled - Whether strict mode is enabled
+ * @returns true if successful
+ */
+export async function setStrictMode(enabled: boolean): Promise<boolean> {
+  try {
+    const updates: any = {
+      [STORAGE_KEYS.STRICT_MODE]: enabled,
+    }
+
+    if (enabled) {
+      updates.strictModeStart = Date.now()
+    } else {
+      updates.strictModeStart = null
+    }
+
+    await browser.storage.sync.set(updates)
+    return true
+  } catch (err) {
+    console.error('[Storage] Error setting strict mode:', err)
+    return false
+  }
+}

@@ -106,47 +106,61 @@ async function buildRules() {
   }
 }
 
+
+let rebuildLock = Promise.resolve() as Promise<any>
+
 /**
  * Rebuild all DNR rules
  * Removes all existing rules and registers new ones
+ * Serialized to prevent race conditions
  *
  * @returns true if successful
  */
 export async function rebuildRules(): Promise<boolean> {
-  try {
-    console.log('[DNR] Rebuilding rules...')
+  const currentLock = rebuildLock
 
-    // Clean up expired temporary whitelist entries first
-    await cleanupExpiredWhitelist()
+  // Chain this request to the end of the current lock
+  const nextRebuild = async () => {
+    try {
+      console.log('[DNR] Rebuilding rules...')
 
-    // Get all existing rules
-    const existingRules = await browser.declarativeNetRequest.getDynamicRules()
-    const existingRuleIds = existingRules.map(rule => rule.id)
+      // Clean up expired temporary whitelist entries first
+      await cleanupExpiredWhitelist()
 
-    // Build new rules
-    const newRules = await buildRules()
+      // Get all existing rules
+      const existingRules = await browser.declarativeNetRequest.getDynamicRules()
+      const existingRuleIds = existingRules.map(rule => rule.id)
 
-    // Update rules
-    await browser.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: existingRuleIds,
-      addRules: newRules,
-    })
+      // Build new rules
+      const newRules = await buildRules()
 
-    // Update badge with count
-    const activeCount = newRules.length
-    await browser.action.setBadgeText({
-      text: activeCount > 0 ? String(activeCount) : '',
-    })
-    await browser.action.setBadgeBackgroundColor({
-      color: '#4CAF50',
-    })
+      // Update rules
+      await browser.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: existingRuleIds,
+        addRules: newRules,
+      })
 
-    console.log(`[DNR] Rules rebuilt: ${activeCount} active sites`)
-    return true
-  } catch (err) {
-    console.error('[DNR] Error rebuilding rules:', err)
-    return false
+      // Update badge with count
+      const activeCount = newRules.length
+      await browser.action.setBadgeText({
+        text: activeCount > 0 ? String(activeCount) : '',
+      })
+      await browser.action.setBadgeBackgroundColor({
+        color: '#4CAF50',
+      })
+
+      console.log(`[DNR] Rules rebuilt: ${activeCount} active sites`)
+      return true
+    } catch (err) {
+      console.error('[DNR] Error rebuilding rules:', err)
+      return false
+    }
   }
+
+  // Update the lock
+  rebuildLock = currentLock.then(nextRebuild)
+
+  return rebuildLock
 }
 
 /**

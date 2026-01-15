@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { type Schedule, ScheduleMode } from '../shared/domain/schedule'
 import { t } from '../shared/i18n'
+import { ZenSelect } from './components/ZenSelect'
 
 interface ScheduleModalProps {
   host: string
@@ -95,22 +96,19 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ host, initialSchedule, on
 
         <div className="p-6 overflow-y-auto max-h-[70vh]">
           {/* Mode selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-sumi-black mb-2">
-              {t('schedule.scheduleMode')}
-            </label>
-            <select
-              className="w-full px-4 py-2 rounded-lg border border-border bg-white focus:border-accent outline-none transition-colors"
-              value={mode}
-              onChange={e => setMode(e.target.value as ScheduleMode)}
-            >
-              <option value={ScheduleMode.ALWAYS}>{t('schedule.alwaysBlock')}</option>
-              <option value={ScheduleMode.WORK_HOURS}>{t('schedule.workHours')}</option>
-              <option value={ScheduleMode.WEEKENDS}>{t('schedule.weekendsOnly')}</option>
-              <option value={ScheduleMode.CUSTOM}>{t('schedule.customSchedule')}</option>
-              <option value={ScheduleMode.VACATION}>{t('schedule.vacation')}</option>
-            </select>
-          </div>
+
+          <ZenSelect
+            label={t('schedule.scheduleMode')}
+            value={mode}
+            onChange={(val) => setMode(val as ScheduleMode)}
+            options={[
+              { value: ScheduleMode.ALWAYS, label: t('schedule.alwaysBlock') },
+              { value: ScheduleMode.WORK_HOURS, label: t('schedule.workHours') },
+              { value: ScheduleMode.WEEKENDS, label: t('schedule.weekendsOnly') },
+              { value: ScheduleMode.CUSTOM, label: t('schedule.customSchedule') },
+              { value: ScheduleMode.VACATION, label: t('schedule.vacation') },
+            ]}
+          />
 
           {/* Work hours settings */}
           {mode === ScheduleMode.WORK_HOURS && (
@@ -158,8 +156,8 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ host, initialSchedule, on
                     key={day.value}
                     type="button"
                     className={`flex-1 min-w-[40px] py-2 px-1 text-xs rounded transition-colors ${customDays.has(day.value)
-                        ? 'bg-accent text-white shadow-sm'
-                        : 'bg-white border border-border text-sumi-gray hover:bg-gray-100'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-white border border-border text-sumi-gray hover:bg-gray-100'
                       }`}
                     onClick={() => toggleDay(day.value)}
                   >

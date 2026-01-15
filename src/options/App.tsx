@@ -26,7 +26,7 @@ import type { Stats } from '../shared/domain/stats'
 import type { AchievementsData } from '../shared/domain/achievements'
 import { ACHIEVEMENT_DEFINITIONS, getAchievementProgress, type AchievementProgress, type AchievementType } from '../shared/domain/achievements'
 import { type Schedule } from '../shared/domain/schedule'
-import DeleteChallengeModal from './DeleteChallengeModal'
+import ChallengeModal from './ChallengeModal'
 import ScheduleModal from './ScheduleModal'
 import ConditionalRulesModal from './ConditionalRulesModal'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
@@ -68,9 +68,17 @@ const App: React.FC = () => {
   const [bulkSitesInput, setBulkSitesInput] = useState<string>('')
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set())
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [deletingHosts, setDeletingHosts] = useState<string[]>([])
+
   const [schedulingHost, setSchedulingHost] = useState<{ host: string; schedule: Schedule | null } | null>(null)
   const [conditionalRulesHost, setConditionalRulesHost] = useState<{ host: string; rules: ConditionalRule[] } | null>(null)
+
+  // Pending action for security challenge
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'delete' | 'save'
+    title?: string
+    description?: string
+    onConfirm: () => Promise<void>
+  } | null>(null)
 
 
   // Reactive language hook
@@ -180,33 +188,37 @@ const App: React.FC = () => {
   }
 
   const handleRemoveSite = (host: string) => {
-    setDeletingHosts([host])
+    setPendingAction({
+      type: 'delete',
+      description: t('options.deleteChallengeDescription', { host }),
+      onConfirm: async () => {
+        await performRemoveSites([host])
+      }
+    })
   }
 
-  const confirmRemoveSites = async () => {
-    if (deletingHosts.length === 0) return
+  const performRemoveSites = async (hostsToDelete: string[]) => {
+    if (hostsToDelete.length === 0) return
 
     try {
-      for (const host of deletingHosts) {
+      for (const host of hostsToDelete) {
         await messagingClient.removeSite(host)
       }
       await loadSites()
       setSelectedSites(prev => {
         const newSet = new Set(prev)
-        deletingHosts.forEach(h => newSet.delete(h))
+        hostsToDelete.forEach(h => newSet.delete(h))
         return newSet
       })
-      setDeletingHosts([])
     } catch (err) {
       console.error('[Options] Error removing sites:', err)
       alert(t('errors.failedToRemove'))
-      setDeletingHosts([])
+    } finally {
+      setPendingAction(null)
     }
   }
 
-  const cancelRemoveSites = () => {
-    setDeletingHosts([])
-  }
+
 
   const handleOpenSchedule = (host: string) => {
     const site = sites.find(s => s.host === host)
@@ -219,14 +231,21 @@ const App: React.FC = () => {
   const handleSaveSchedule = async (schedule: Schedule | null) => {
     if (!schedulingHost) return
 
-    try {
-      await messagingClient.updateSite(schedulingHost.host, { schedule })
-      await loadSites()
-      setSchedulingHost(null)
-    } catch (err) {
-      console.error('[Options] Error saving schedule:', err)
-      alert('Failed to save schedule')
-    }
+    setPendingAction({
+      type: 'save',
+      description: t('options.securityChallengeDescription'),
+      onConfirm: async () => {
+        try {
+          await messagingClient.updateSite(schedulingHost.host, { schedule })
+          await loadSites()
+          setSchedulingHost(null)
+          setPendingAction(null)
+        } catch (err) {
+          console.error('[Options] Error saving schedule:', err)
+          alert('Failed to save schedule')
+        }
+      }
+    })
   }
 
   const handleCancelSchedule = () => {
@@ -244,14 +263,21 @@ const App: React.FC = () => {
   const handleSaveConditionalRules = async (rules: ConditionalRule[]) => {
     if (!conditionalRulesHost) return
 
-    try {
-      await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
-      await loadSites()
-      setConditionalRulesHost(null)
-    } catch (err) {
-      console.error('[Options] Error saving conditional rules:', err)
-      alert('Failed to save conditional rules')
-    }
+    setPendingAction({
+      type: 'save',
+      description: t('options.securityChallengeDescription'),
+      onConfirm: async () => {
+        try {
+          await messagingClient.updateSite(conditionalRulesHost.host, { conditionalRules: rules })
+          await loadSites()
+          setConditionalRulesHost(null)
+          setPendingAction(null)
+        } catch (err) {
+          console.error('[Options] Error saving conditional rules:', err)
+          alert('Failed to save conditional rules')
+        }
+      }
+    })
   }
 
   const handleToggleSite = (host: string) => {
@@ -277,7 +303,15 @@ const App: React.FC = () => {
 
   const handleBulkDelete = () => {
     if (selectedSites.size === 0) return
-    setDeletingHosts(Array.from(selectedSites))
+    // setDeletingHosts is not used anymore directly, use pendingAction
+    const hosts = Array.from(selectedSites)
+    setPendingAction({
+      type: 'delete',
+      description: t('deleteChallenge.multipleDescription', { count: hosts.length }),
+      onConfirm: async () => {
+        await performRemoveSites(hosts)
+      }
+    })
   }
 
   const handleExport = async () => {
@@ -832,14 +866,7 @@ const App: React.FC = () => {
           />
         )}
 
-        {deletingHosts.length > 0 && (
-          <DeleteChallengeModal
-            key="delete-modal"
-            hosts={deletingHosts}
-            onConfirm={confirmRemoveSites}
-            onCancel={cancelRemoveSites}
-          />
-        )}
+
 
         {schedulingHost && (
           <ScheduleModal
@@ -858,6 +885,17 @@ const App: React.FC = () => {
             initialRules={conditionalRulesHost.rules}
             onSave={handleSaveConditionalRules}
             onClose={() => setConditionalRulesHost(null)}
+          />
+        )}
+
+        {pendingAction && (
+          <ChallengeModal
+            key="challenge-modal"
+            actionType={pendingAction.type}
+            title={pendingAction.title}
+            description={pendingAction.description}
+            onConfirm={pendingAction.onConfirm}
+            onCancel={() => setPendingAction(null)}
           />
         )}
       </AnimatePresence>

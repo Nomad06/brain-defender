@@ -28,6 +28,7 @@ export default defineConfig({
         options: resolve(__dirname, 'src/options/index.html'),
         blocked: resolve(__dirname, 'src/pages/blocked/index.html'),
         diagnostics: resolve(__dirname, 'src/pages/diagnostics/index.html'),
+        welcome: resolve(__dirname, 'src/pages/welcome/index.html'),
       }
     }
   },

@@ -472,3 +472,20 @@ export async function setStrictMode(enabled: boolean): Promise<boolean> {
     return false
   }
 }
+/**
+ * Set onboarding seen status
+ *
+ * @param seen - Whether onboarding has been seen
+ * @returns true if successful
+ */
+export async function setOnboardingSeen(seen: boolean): Promise<boolean> {
+  try {
+    await browser.storage.sync.set({
+      hasSeenOnboarding: seen,
+    })
+    return true
+  } catch (err) {
+    console.error('[Storage] Error setting onboarding status:', err)
+    return false
+  }
+}

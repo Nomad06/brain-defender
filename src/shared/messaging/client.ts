@@ -286,6 +286,17 @@ export const messagingClient = {
     })
     return response.result
   },
+
+  /**
+   * Set onboarding seen status
+   */
+  async setOnboardingSeen(seen: boolean): Promise<boolean> {
+    const response = await sendMessage({
+      type: MessageType.SET_ONBOARDING_SEEN,
+      seen,
+    })
+    return response.success
+  },
 }
 
 /**

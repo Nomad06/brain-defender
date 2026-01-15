@@ -49,6 +49,7 @@ export enum MessageType {
   // System
   GET_MIGRATION_STATUS = 'GET_MIGRATION_STATUS',
   RUN_MIGRATIONS = 'RUN_MIGRATIONS',
+  SET_ONBOARDING_SEEN = 'SET_ONBOARDING_SEEN',
 }
 
 /**
@@ -64,19 +65,19 @@ export interface BaseMessage {
  */
 export interface SimpleMessage extends BaseMessage {
   type:
-    | MessageType.REBUILD_RULES
-    | MessageType.GET_SITES
-    | MessageType.STOP_FOCUS_SESSION
-    | MessageType.PAUSE_FOCUS_SESSION
-    | MessageType.RESUME_FOCUS_SESSION
-    | MessageType.GET_CURRENT_SESSION
-    | MessageType.GET_TEMP_WHITELIST
-    | MessageType.GET_STATS
-    | MessageType.CLEAR_STATS
-    | MessageType.GET_ACHIEVEMENTS
-    | MessageType.EXPORT_DATA
-    | MessageType.GET_MIGRATION_STATUS
-    | MessageType.RUN_MIGRATIONS
+  | MessageType.REBUILD_RULES
+  | MessageType.GET_SITES
+  | MessageType.STOP_FOCUS_SESSION
+  | MessageType.PAUSE_FOCUS_SESSION
+  | MessageType.RESUME_FOCUS_SESSION
+  | MessageType.GET_CURRENT_SESSION
+  | MessageType.GET_TEMP_WHITELIST
+  | MessageType.GET_STATS
+  | MessageType.CLEAR_STATS
+  | MessageType.GET_ACHIEVEMENTS
+  | MessageType.EXPORT_DATA
+  | MessageType.GET_MIGRATION_STATUS
+  | MessageType.RUN_MIGRATIONS
 }
 
 /**
@@ -167,6 +168,14 @@ export interface ImportDataMessage extends BaseMessage {
 }
 
 /**
+ * Set onboarding seen message
+ */
+export interface SetOnboardingSeenMessage extends BaseMessage {
+  type: MessageType.SET_ONBOARDING_SEEN
+  seen: boolean
+}
+
+/**
  * Union of all possible messages
  */
 export type Message =
@@ -181,6 +190,7 @@ export type Message =
   | RecordBlockMessage
   | CheckAchievementsMessage
   | ImportDataMessage
+  | SetOnboardingSeenMessage
 
 /**
  * Response types for each message
@@ -208,7 +218,9 @@ export interface MessageResponses {
   [MessageType.EXPORT_DATA]: { data: string }
   [MessageType.IMPORT_DATA]: { success: boolean }
   [MessageType.GET_MIGRATION_STATUS]: { version: number; needsMigration: boolean }
+  [MessageType.GET_MIGRATION_STATUS]: { version: number; needsMigration: boolean }
   [MessageType.RUN_MIGRATIONS]: { result: unknown }
+  [MessageType.SET_ONBOARDING_SEEN]: { success: boolean }
 }
 
 /**

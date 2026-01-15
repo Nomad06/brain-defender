@@ -146,6 +146,7 @@ export const translations = {
       totalSites: 'Заблокированных сайтов',
       bySite: 'Статистика по сайтам',
       blocks: 'Блокировок',
+      heatmap: 'Активность фокуса',
     },
     achievements: {
       unlockedAt: 'Получено',
@@ -420,6 +421,7 @@ export const translations = {
       totalSites: 'Blocked Sites',
       bySite: 'Statistics by Site',
       blocks: 'Blocks',
+      heatmap: 'Focus Activity',
     },
     achievements: {
       unlockedAt: 'Unlocked',

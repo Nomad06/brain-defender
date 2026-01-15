@@ -66,6 +66,7 @@ export const ExtensionStorageSchema = z.object({
   achievements: AchievementsDataSchema.optional(),
   tempWhitelist: TempWhitelistSchema.optional(),
   dataMigrationVersion: z.number().optional(),
+  hasSeenOnboarding: z.boolean().default(false),
 })
 
 export type ExtensionStorage = z.infer<typeof ExtensionStorageSchema>

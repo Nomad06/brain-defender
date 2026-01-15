@@ -25,7 +25,8 @@ export const StatsSchema = z.object({
   streakDays: z.number().min(0).default(0),
   lastBlockDate: z.number().nullable(),
   bySite: z.record(z.string(), SiteStatsSchema).default({}),
-  byDate: z.record(z.string(), z.number()).default({}),
+  byDate: z.record(z.string(), z.number()).default({}), // Total blocks per day
+  minutesByDate: z.record(z.string(), z.number()).default({}), // Total focus minutes per day
 })
 
 // Type exports
@@ -47,6 +48,7 @@ export async function initStats(): Promise<void> {
           lastBlockDate: null,
           bySite: {},
           byDate: {},
+          minutesByDate: {},
         },
       })
     }
@@ -79,6 +81,10 @@ export async function recordBlock(host: string): Promise<Stats | null> {
     // Initialize missing fields for backward compatibility
     if (!stats.byDate || typeof stats.byDate !== 'object') {
       stats.byDate = {}
+    }
+
+    if (!stats.minutesByDate || typeof stats.minutesByDate !== 'object') {
+      stats.minutesByDate = {}
     }
 
     if (!stats.bySite || typeof stats.bySite !== 'object') {
@@ -161,7 +167,7 @@ export async function recordBlock(host: string): Promise<Stats | null> {
             const lastBlockDateStr = lastBlockDate.toISOString().split('T')[0]
             const daysDiff = Math.floor(
               (new Date(today).getTime() - new Date(lastBlockDateStr).getTime()) /
-                (1000 * 60 * 60 * 24)
+              (1000 * 60 * 60 * 24)
             )
 
             if (daysDiff === 1) {
@@ -273,6 +279,12 @@ export async function addTimeSpent(host: string, minutes: number): Promise<Stats
 
     // Add time to today's total
     stats.bySite[host].timeSpentToday += minutes
+
+    // Add time to global daily total
+    const today = new Date().toISOString().split('T')[0]
+    if (!stats.minutesByDate) stats.minutesByDate = {}
+    if (!stats.minutesByDate[today]) stats.minutesByDate[today] = 0
+    stats.minutesByDate[today] += minutes
 
     await browser.storage.local.set({ [STORAGE_KEYS.BLOCK_STATS]: stats })
     return stats
@@ -467,6 +479,17 @@ export async function cleanupOldStats(daysToKeep = 90): Promise<boolean> {
       }
     }
     stats.byDate = newByDate
+
+    // Clean up minutesByDate
+    if (stats.minutesByDate) {
+      const newMinutesByDate: Record<string, number> = {}
+      for (const [date, count] of Object.entries(stats.minutesByDate)) {
+        if (date >= cutoffStr) {
+          newMinutesByDate[date] = count
+        }
+      }
+      stats.minutesByDate = newMinutesByDate
+    }
 
     // Clean up visitsByDate in each site
     for (const siteStats of Object.values(stats.bySite)) {

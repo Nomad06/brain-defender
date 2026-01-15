@@ -34,6 +34,7 @@ import StrictLockModal from './StrictLockModal'
 import { getStrictMode, setStrictMode } from '../shared/storage/storage'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import type { ConditionalRule } from '../shared/domain/conditional-rules'
+import Heatmap from '../shared/components/Heatmap'
 
 type Tab = 'sites' | 'stats' | 'achievements'
 
@@ -809,6 +810,14 @@ const App: React.FC = () => {
                     </div>
                   </motion.div>
                 ))}
+              </div>
+
+              {/* Heatmap */}
+              <div>
+                <h3 className="text-lg font-serif font-bold text-sumi-black mb-4">{t('stats.heatmap')}</h3>
+                <div className="washi-card p-6 border border-border/60 overflow-x-auto">
+                  <Heatmap data={stats.minutesByDate || {}} />
+                </div>
               </div>
 
               {/* Add charts here in future updates */}

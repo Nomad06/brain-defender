@@ -21,6 +21,7 @@ import {
   removeTempWhitelist as storageRemoveTempWhitelist,
   exportAllData,
   importAllData,
+  setOnboardingSeen,
 } from '../shared/storage/storage'
 import { rebuildRules } from './dnr-manager'
 import { recordVisitAttempt, recordBlock, getStats, clearStats } from '../shared/domain/stats'
@@ -142,6 +143,9 @@ export async function handleMessage(message: Message): Promise<unknown> {
 
       case MessageType.RUN_MIGRATIONS:
         return await handleRunMigrations()
+
+      case MessageType.SET_ONBOARDING_SEEN:
+        return await handleSetOnboardingSeen(message.seen)
 
       default:
         console.error('[Handlers] Unknown message type:', message)
@@ -369,6 +373,11 @@ async function handleRunMigrations(): Promise<MessageResponse<MessageType.RUN_MI
   await rebuildRules()
 
   return { result }
+}
+
+async function handleSetOnboardingSeen(seen: boolean): Promise<MessageResponse<MessageType.SET_ONBOARDING_SEEN>> {
+  await setOnboardingSeen(seen)
+  return createSuccessResponse()
 }
 
 /**

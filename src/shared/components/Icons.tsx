@@ -14,6 +14,8 @@ import {
     Play,
     Pause,
     Trash2,
+    ArrowRight,
+    Check,
     ChevronDown,
     type LucideProps
 } from 'lucide-react'
@@ -34,6 +36,8 @@ export const PlayIcon = Play
 export const PauseIcon = Pause
 export const TrashIcon = Trash2
 export const ChevronDownIcon = ChevronDown
+export const ArrowRightIcon = ArrowRight
+export const CheckIcon = Check
 
 // Standardized Custom Icons that match Lucide style
 // Default stroke width: 1.5px (Lucide default is 2px, but we can override or match)

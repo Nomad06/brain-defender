@@ -27,6 +27,11 @@ async function handleInstalled(
     if (details.reason === 'install') {
       console.log('[Background] First-time installation')
 
+      // Open Welcome Page
+      browser.tabs.create({
+        url: browser.runtime.getURL('src/pages/welcome/index.html')
+      })
+
       // Initialize focus sessions
       await initFocusSessions()
 
@@ -35,8 +40,8 @@ async function handleInstalled(
         await browser.notifications.create(`install_${Date.now()}`, {
           type: 'basic',
           iconUrl: browser.runtime.getURL('icons/icon128.png'),
-          title: 'Brain Defender Installed',
-          message: 'Your digital attention guardian is ready to help you stay focused!',
+          title: 'Welcome to Focusan',
+          message: 'Your journey to digital zen begins now.',
         })
       } catch (notifErr) {
         console.debug('[Background] Failed to show welcome notification:', notifErr)

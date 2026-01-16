@@ -19,7 +19,8 @@ import { BreathingCircles } from './components/BreathingCircles'
 import { ZenCard } from './components/ZenCard'
 import { ZenQuoteFooter } from './components/ZenQuoteFooter'
 import { getRandomZenPhrase, getRandomZenQuote } from '../../shared/japanese-zen'
-import ZenGarden from './ZenGarden'
+
+const ZenGarden = React.lazy(() => import('./ZenGarden'))
 
 
 // Eye exercise trajectories
@@ -560,7 +561,9 @@ const BlockedPage: React.FC = () => {
               >
                 <div className="text-lg font-semibold text-center mb-3 text-sumi-black">🪨 Zen Garden - 枯山水</div>
                 <div className="flex justify-center overflow-hidden">
-                  <ZenGarden width={Math.min(600, window.innerWidth - 60)} height={400} />
+                  <React.Suspense fallback={<div className="h-[400px] w-[600px] bg-kinari-cream animate-pulse rounded" />}>
+                    <ZenGarden width={Math.min(600, window.innerWidth - 60)} height={400} />
+                  </React.Suspense>
                 </div>
                 <button className="block mx-auto mt-4 px-6 py-2 rounded border border-border hover:bg-gray-50 transition-colors" onClick={stopZenExercise}>
                   {t('common.close')}

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { format, subDays, eachDayOfInterval } from 'date-fns'
+
+import { format, subDays, eachDayOfInterval, startOfWeek } from 'date-fns'
 
 interface HeatmapProps {
     data: Record<string, number> // YYYY-MM-DD -> minutes
@@ -8,14 +8,24 @@ interface HeatmapProps {
 }
 
 const Heatmap: React.FC<HeatmapProps> = ({ data }) => {
-    // Generate last 365 days
-    const calendarData = useMemo(() => {
+    const [hoveredDay, setHoveredDay] = React.useState<{
+        value: number
+        dateStr: string
+        formattedDate: string
+        x: number
+        y: number
+    } | null>(null)
+
+    // Generate calendar data grouped by weeks
+    const { weeks, monthLabels } = useMemo(() => {
         const today = new Date()
-        const startDate = subDays(today, 364) // Last 52 weeks approx
-        // Align start date to Sunday/Monday depending on preference. Let's start from 1 year ago.
+        // Ensure start date is a Monday
+        const startDate = startOfWeek(subDays(today, 364), { weekStartsOn: 1 })
 
         const days = eachDayOfInterval({ start: startDate, end: today })
-        return days.map(date => {
+
+        // Enhance days with data
+        const enhancedDays = days.map(date => {
             const dateStr = format(date, 'yyyy-MM-dd')
             const value = data[dateStr] || 0
             return {
@@ -25,6 +35,38 @@ const Heatmap: React.FC<HeatmapProps> = ({ data }) => {
                 level: getLevel(value)
             }
         })
+
+        // Chunk into weeks
+        const weeksArray: typeof enhancedDays[] = []
+        let currentWeek: typeof enhancedDays = []
+
+        enhancedDays.forEach((day) => {
+            currentWeek.push(day)
+            if (currentWeek.length === 7) {
+                weeksArray.push(currentWeek)
+                currentWeek = []
+            }
+        })
+        // Push last partial week if exists
+        if (currentWeek.length > 0) {
+            weeksArray.push(currentWeek)
+        }
+
+        // Calculate month labels
+        const labels: { weekIndex: number, label: string }[] = []
+        let lastMonth = ''
+
+        weeksArray.forEach((week, index) => {
+            const firstDay = week[0].date
+            const monthStr = format(firstDay, 'MMM')
+
+            if (monthStr !== lastMonth) {
+                labels.push({ weekIndex: index, label: monthStr })
+                lastMonth = monthStr
+            }
+        })
+
+        return { weeks: weeksArray, monthLabels: labels }
     }, [data])
 
     function getLevel(minutes: number) {
@@ -46,55 +88,58 @@ const Heatmap: React.FC<HeatmapProps> = ({ data }) => {
         }
     }
 
-    // Weeks calculation for grid
-    // We need to group by week
-    // But CSS grid can handle this with rows
-
     return (
-        <div className="w-full overflow-x-auto pb-4">
-            <div className="min-w-[700px]">
-                <div className="flex gap-1 text-xs text-sumi-gray mb-2">
-                    <span className="w-8"></span> {/* Spacer for day labels */}
-                    {/* Minimal logic for month labels - complex to do perfectly in grid without dedicated lib, 
-                so we'll skip month labels for MVP or do safe interval */}
-                    {Array.from({ length: 12 }).map((_, i) => (
-                        <span key={i} className="flex-1 text-center">{format(subDays(new Date(), (11 - i) * 30), 'MMM')}</span>
-                    ))}
+        <div className="w-full overflow-x-auto pb-4 relative">
+            <div className="min-w-fit pr-4">
+                {/* Month Labels Row */}
+                <div className="flex gap-[3px] text-xs text-sumi-gray mb-2 ml-8 pl-0.5">
+                    {weeks.map((_, index) => {
+                        const labelObj = monthLabels.find(l => l.weekIndex === index)
+                        return (
+                            <div key={index} className="w-[10px] flex-none relative">
+                                {labelObj && (
+                                    <span className="absolute left-0 bottom-0 whitespace-nowrap">
+                                        {labelObj.label}
+                                    </span>
+                                )}
+                            </div>
+                        )
+                    })}
                 </div>
 
                 <div className="flex gap-2">
                     {/* Day labels */}
-                    <div className="flex flex-col gap-[3px] text-[10px] text-sumi-gray/60 leading-3 pt-[2px]">
-                        <div className="h-[10px]">Mon</div>
-                        <div className="h-[10px]"></div>
-                        <div className="h-[10px]">Wed</div>
-                        <div className="h-[10px]"></div>
-                        <div className="h-[10px]">Fri</div>
-                        <div className="h-[10px]"></div>
-                        <div className="h-[10px]">Sun</div>
+                    <div className="flex flex-col gap-[3px] text-[10px] text-sumi-gray/60 pt-[0px] w-8 text-right pr-2">
+                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                            <div key={i} className="h-[10px] leading-[10px]">{day}</div>
+                        ))}
                     </div>
 
-                    <div className="flex flex-wrap flex-col h-[94px] content-start gap-[3px]">
-                        {/* 
-                We use flex-col with wrap + fixed height to simulate the GitHub grid 
-                7 squares * (10px + 3px gap) = ~91px. 
-                Height 94px allows for 7 items.
-             */}
-                        {calendarData.map((day) => (
-                            <motion.div
-                                key={day.dateStr}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.2 }}
-                                className={`w-[10px] h-[10px] rounded-[2px] ${getColorClass(day.level)} relative group`}
-                                title={`${day.value} mins on ${format(day.date, 'MMM d, yyyy')}`}
-                            >
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 pointer-events-none">
-                                    <div className="bg-sumi-black text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
-                                        {day.value} mins on {format(day.date, 'MMM d')}
-                                    </div>
-                                </div>
-                            </motion.div>
+                    {/* Heatmap Grid */}
+                    <div className="flex gap-[3px]" onMouseLeave={() => setHoveredDay(null)}>
+                        {weeks.map((week, weekIndex) => (
+                            <div key={weekIndex} className="flex flex-col gap-[3px] w-[10px]">
+                                {week.map((day) => (
+                                    <div
+                                        key={day.dateStr}
+                                        className={`w-[10px] h-[10px] rounded-[2px] ${getColorClass(day.level)} transition-all duration-200 hover:scale-125 hover:z-10 cursor-default`}
+                                        onMouseEnter={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect()
+                                            // Calculate position relative to the scrollable container or handling it fixed?
+                                            // A simple way is to use fixed position for tooltip or relative to the parent.
+                                            // Let's rely on standard mouse enter and use fixed/absolute positioning logic.
+                                            // Actually, simplest is to use the rect coordinates.
+                                            setHoveredDay({
+                                                value: day.value,
+                                                dateStr: day.dateStr,
+                                                formattedDate: format(day.date, 'MMM d'),
+                                                x: rect.left + rect.width / 2,
+                                                y: rect.top
+                                            })
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -111,6 +156,24 @@ const Heatmap: React.FC<HeatmapProps> = ({ data }) => {
                     <span>More</span>
                 </div>
             </div>
+
+            {/* Shared Tooltip Portal/Overlay */}
+            {hoveredDay && (
+                <div
+                    className="fixed z-50 pointer-events-none fade-in"
+                    style={{
+                        left: hoveredDay.x,
+                        top: hoveredDay.y,
+                        transform: 'translate(-50%, -120%)'
+                    }}
+                >
+                    <div className="bg-sumi-black text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap mb-2">
+                        {hoveredDay.value} mins on {hoveredDay.formattedDate}
+                        {/* Little arrow */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-sumi-black"></div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -69,7 +69,23 @@ const App: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null)
   const [achievements, setAchievements] = useState<AchievementsData | null>(null)
   const [achievementProgress, setAchievementProgress] = useState<Record<AchievementType, AchievementProgress> | null>(null)
-  const [activeTab, setActiveTab] = useState<Tab>('sites')
+  const getTabFromHash = (): Tab => {
+    const hash = window.location.hash.slice(1)
+    if (['sites', 'stats', 'achievements'].includes(hash)) {
+      return hash as Tab
+    }
+    return 'sites'
+  }
+
+  const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash)
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveTab(getTabFromHash())
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
   const [loading, setLoading] = useState<boolean>(true)
   const [newSiteInput, setNewSiteInput] = useState<string>('')
   const [bulkSitesInput, setBulkSitesInput] = useState<string>('')
@@ -489,7 +505,7 @@ const App: React.FC = () => {
                   />
                 )}
                 <button
-                  onClick={() => setActiveTab(tab as Tab)}
+                  onClick={() => window.location.hash = tab}
                   className={`relative w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 ${isActive ? 'text-accent font-medium' : 'text-sumi-gray hover:text-sumi-black'
                     }`}
                 >
@@ -694,9 +710,8 @@ const App: React.FC = () => {
                     </div>
                   ) : (
                     filteredSites.map((site) => (
-                      <motion.div
-                        layout
-                        variants={itemVariants}
+
+                      <div
                         key={site.host}
                         className={`flex justify-between items-center p-5 hover:bg-white/60 transition-colors group ${selectedSites.has(site.host) ? 'bg-accent/5' : ''}`}
                       >
@@ -751,7 +766,7 @@ const App: React.FC = () => {
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-danger hover:text-white text-danger transition-colors"
                           ><XIcon size={16} /></button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))
                   )}
                 </div>
@@ -831,8 +846,7 @@ const App: React.FC = () => {
                     .sort(([, a], [, b]) => b.blocks - a.blocks)
                     .slice(0, 10)
                     .map(([host, siteStats], index) => (
-                      <motion.div
-                        variants={itemVariants}
+                      <div
                         key={host}
                         className="flex justify-between items-center p-5 border-b border-border/40 last:border-none hover:bg-white/50 transition-colors"
                       >
@@ -846,7 +860,7 @@ const App: React.FC = () => {
                           </div>
                           <span className="text-accent font-bold text-sm w-12 text-right">{siteStats.blocks}</span>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   {Object.keys(stats.bySite).length === 0 && (
                     <div className="p-8 text-center text-sumi-gray italic">{t('options.noData')}</div>
@@ -867,12 +881,8 @@ const App: React.FC = () => {
 
           {/* Achievements Tab */}
           {activeTab === 'achievements' && achievements && achievementProgress && (
-            <motion.div
+            <div
               key="achievements"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
               className="space-y-8"
             >
               <div className="washi-card p-10 border border-border/60 text-center relative overflow-hidden">
@@ -883,11 +893,9 @@ const App: React.FC = () => {
                   <div className="text-sm font-bold uppercase tracking-[0.2em] text-accent mb-8">{t('options.unlockedAchievements')}</div>
 
                   <div className="w-full max-w-md h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-accent to-gold"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%` }}
-                      transition={{ duration: 1, ease: "easeOut" }}
+                    <div
+                      className="h-full bg-gradient-to-r from-accent to-gold transition-all duration-1000 ease-out"
+                      style={{ width: `${Math.round((achievements.unlocked.length / Object.keys(ACHIEVEMENT_DEFINITIONS).length) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -900,8 +908,7 @@ const App: React.FC = () => {
                   const isUnlocked = achievements.unlocked.includes(achievementType)
 
                   return (
-                    <motion.div
-                      variants={itemVariants}
+                    <div
                       key={type}
                       className={`washi-card p-6 border transition-all duration-300 relative group overflow-hidden h-full flex flex-col ${isUnlocked
                         ? 'border-gold/50 shadow-[0_4px_20px_rgba(212,175,55,0.15)] bg-gradient-to-br from-white to-gold/5'
@@ -923,20 +930,18 @@ const App: React.FC = () => {
                             <span className="font-mono">{Math.round(progress?.progress || 0)}%</span>
                           </div>
                           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <motion.div
-                              className="h-full bg-accent"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${progress?.progress || 0}%` }}
-                              transition={{ duration: 0.5, delay: 0.2 }}
+                            <div
+                              className="h-full bg-accent transition-all duration-500 delay-200"
+                              style={{ width: `${progress?.progress || 0}%` }}
                             />
                           </div>
                         </div>
                       )}
-                    </motion.div>
+                    </div>
                   )
                 })}
               </div>
-            </motion.div>
+            </div>
           )}
 
 

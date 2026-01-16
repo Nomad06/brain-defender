@@ -295,6 +295,36 @@ export async function addTimeSpent(host: string, minutes: number): Promise<Stats
 }
 
 /**
+ * Add global focus minutes for today (from Focus Session)
+ *
+ * @param minutes - Minutes to add
+ * @returns Updated stats or null on error
+ */
+export async function addFocusMinutes(minutes: number): Promise<Stats | null> {
+  try {
+    const data = await browser.storage.local.get(STORAGE_KEYS.BLOCK_STATS)
+    let stats: Stats = data[STORAGE_KEYS.BLOCK_STATS] as Stats
+
+    if (!stats) {
+      await initStats()
+      const freshData = await browser.storage.local.get(STORAGE_KEYS.BLOCK_STATS)
+      stats = freshData[STORAGE_KEYS.BLOCK_STATS] as Stats
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+    if (!stats.minutesByDate) stats.minutesByDate = {}
+    if (!stats.minutesByDate[today]) stats.minutesByDate[today] = 0
+    stats.minutesByDate[today] += minutes
+
+    await browser.storage.local.set({ [STORAGE_KEYS.BLOCK_STATS]: stats })
+    return stats
+  } catch (err) {
+    console.error('[Stats] Error adding focus minutes:', err)
+    return null
+  }
+}
+
+/**
  * Get current statistics
  * @returns Stats object or null on error
  */

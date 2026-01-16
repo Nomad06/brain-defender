@@ -8,6 +8,8 @@ import browser from 'webextension-polyfill'
 import { STORAGE_KEYS, FOCUS_SESSION_DEFAULTS } from '../constants'
 import { t } from '../i18n'
 
+import { addFocusMinutes } from './stats'
+
 // Session states enum
 export enum SessionState {
   IDLE = 'idle',
@@ -209,6 +211,11 @@ export async function stopFocusSession(): Promise<boolean> {
       data.stats = { totalSessions: 0, totalWorkTime: 0, totalBreakTime: 0 }
     data.stats.totalSessions = (data.stats.totalSessions || 0) + 1
     data.stats.totalWorkTime = (data.stats.totalWorkTime || 0) + actualDuration
+
+    // Add to global stats for heatmap
+    if (actualDuration > 0) {
+      await addFocusMinutes(actualDuration)
+    }
 
     data.currentSession = null
     await saveFocusSessionsData(data)

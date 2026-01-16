@@ -35,7 +35,7 @@ export const translations = {
       ],
     },
     popup: {
-      title: 'Brain Defender',
+      title: 'Focusan',
       blockList: 'Блок-лист:',
       addCurrent: 'Добавить текущий сайт',
       openOptions: 'Открыть список / настройки',
@@ -310,7 +310,7 @@ export const translations = {
       ],
     },
     popup: {
-      title: 'Brain Defender',
+      title: 'Focusan',
       blockList: 'Block list:',
       addCurrent: 'Add current site',
       openOptions: 'Open list / settings',

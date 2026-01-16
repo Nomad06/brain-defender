@@ -1,8 +1,9 @@
-# Brain Defender 🧠🛡️
+# Focusan 🧠🛡️
 
-**Your Digital Attention Guardian**
+![Focusan](icons/icon128.png)
 
-Brain Defender is a modern Chrome extension that helps you maintain focus and protect your attention by blocking distracting websites. Unlike harsh blockers, Brain Defender offers wellness exercises and motivational support when you're distracted, turning moments of weakness into wellness breaks.
+## Overview
+Focusan is a modern Chrome extension that helps you maintain focus and protect your attention by blocking distracting websites. Unlike harsh blockers, Focusan offers wellness exercises and motivational support when you're distracted, turning moments of weakness into wellness breaks.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=google-chrome)](https://chrome.google.com/webstore)
 [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](CHANGELOG.md)

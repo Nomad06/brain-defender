@@ -2,25 +2,18 @@
 
 ## Installation (5 minutes)
 
-### 1. Build the Extension
+# Focusan v2.0 - Quick Start Guide
 
-```bash
-# Install dependencies
-npm install
+## Installation
 
-# Build for production
-npm run build
-```
-
-**Expected output**: `dist/` folder with compiled extension
-
-### 2. Load in Chrome
-
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable **Developer mode** (toggle in top-right corner)
-3. Click **"Load unpacked"**
-4. Navigate to and select the `dist/` folder
-5. The Brain Defender icon should appear in your extensions toolbar
+### For Developers (Current State)
+1. Clone the repository
+2. Run `npm install` to install dependencies
+3. Run `npm run build` to build the extension
+4. Open Chrome and go to `chrome://extensions`
+5. Enable "Developer mode" in the top right
+6. Click "Load unpacked" and select the `dist` folder from the project directory
+7. The Focusan icon should appear in your extensions toolbar
 
 ## First Use
 

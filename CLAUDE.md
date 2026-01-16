@@ -1,8 +1,8 @@
-# Brain Defender - AI Assistant Documentation
+# Focusan - AI Assistant Documentation
 
-## Project Overview
+## Application Overview
 
-**Brain Defender** is a Chrome browser extension designed to help users maintain focus and attention by blocking distracting websites with motivational reminders. The extension uses Chrome's Manifest V3 architecture and provides flexible scheduling, statistics tracking, and focus session management.
+**Focusan** is a Chrome browser extension designed to help users maintain focus and attention by blocking distracting websites with motivational reminders. The extension uses Chrome's Manifest V3 architecture and provides flexible scheduling, statistics tracking, and focus session management.
 
 **Tech Stack**: TypeScript, React, Chrome Extension Manifest V3, Vite, Zod
 

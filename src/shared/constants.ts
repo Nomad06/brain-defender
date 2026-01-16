@@ -41,8 +41,8 @@ export const FOCUS_SESSION_DEFAULTS = {
 
 // Extension metadata
 export const EXTENSION_INFO = {
-  NAME: 'Brain Defender',
-  VERSION: '2.0.0',
+  NAME: 'Focusan',
+  VERSION: '0.0.1',
   DESCRIPTION: 'Защищает ваш фокус и внимание, блокируя отвлекающие сайты',
 } as const
 

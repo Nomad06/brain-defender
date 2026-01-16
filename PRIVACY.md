@@ -1,15 +1,15 @@
-# Brain Defender Privacy Policy
+# Focusan Privacy Policy
 
 **Last Updated: January 9, 2026**
 **Version: 2.0.0**
 
 ## Overview
 
-Brain Defender is committed to protecting your privacy. This extension operates entirely within your browser and does not collect, transmit, or share any personal data with external servers or third parties.
+Focusan is committed to protecting your privacy. This extension operates entirely within your browser and does not collect, transmit, or share any personal data with external servers or third parties.
 
 ## Information We Collect
 
-Brain Defender stores the following data **locally in your browser only**:
+Focusan stores the following data **locally in your browser only**:
 
 ### User Configuration Data
 - **Blocked websites list**: Domain names you choose to block
@@ -39,7 +39,7 @@ All data is stored using Chrome's built-in storage APIs:
 
 ## Data Transmission
 
-**Brain Defender does NOT**:
+**Focusan does NOT**:
 - ❌ Send data to external servers
 - ❌ Use analytics or tracking services
 - ❌ Communicate with any third-party services
@@ -52,7 +52,7 @@ All data is stored using Chrome's built-in storage APIs:
 
 ## Permissions Explanation
 
-Brain Defender requests the following Chrome permissions. Here's why each is needed:
+Focusan requests the following Chrome permissions. Here's why each is needed:
 
 | Permission | Purpose | Data Access |
 |------------|---------|-------------|
@@ -69,12 +69,12 @@ Brain Defender requests the following Chrome permissions. Here's why each is nee
 You have complete control over your data:
 
 ### Export Your Data
-1. Open Brain Defender Options
+1. Open Focusan Options
 2. Click "Export Data" button
 3. Download a JSON file with all your settings
 
 ### Import Your Data
-1. Open Brain Defender Options
+1. Open Focusan Options
 2. Click "Import Data" button
 3. Select your previously exported JSON file
 
@@ -85,7 +85,7 @@ You have complete control over your data:
 
 ### Delete All Data
 Uninstalling the extension removes all data from your browser. To completely reset:
-1. Uninstall Brain Defender from Chrome
+1. Uninstall Focusan from Chrome
 2. Reinstall from the Chrome Web Store (if desired)
 
 ## Data Retention
@@ -97,7 +97,7 @@ Uninstalling the extension removes all data from your browser. To completely res
 
 ## Third-Party Services
 
-Brain Defender does **NOT** use any third-party services, including:
+Focusan does **NOT** use any third-party services, including:
 - No analytics (Google Analytics, etc.)
 - No crash reporting services
 - No advertising networks
@@ -106,7 +106,7 @@ Brain Defender does **NOT** use any third-party services, including:
 
 ## Children's Privacy
 
-Brain Defender does not knowingly collect any information from children. The extension can be used by anyone with a Chrome browser, and all data remains private and local to the user's device.
+Focusan does not knowingly collect any information from children. The extension can be used by anyone with a Chrome browser, and all data remains private and local to the user's device.
 
 ## Changes to This Policy
 
@@ -117,14 +117,14 @@ We will notify users of significant changes to this privacy policy through:
 
 ## Open Source Transparency
 
-Brain Defender's source code is available for inspection. You can verify our privacy claims by reviewing:
+Focusan's source code is available for inspection. You can verify our privacy claims by reviewing:
 - Storage operations in `src/shared/storage/storage.ts`
 - Background service worker in `src/background/index.ts`
 - All data handling in the codebase
 
 ## Data Security
 
-While Brain Defender doesn't transmit data externally, we implement security best practices:
+While Focusan doesn't transmit data externally, we implement security best practices:
 - **Input validation**: All user inputs are validated using Zod schemas
 - **Type safety**: TypeScript ensures data type correctness
 - **No eval()**: No dynamic code execution

@@ -3,8 +3,6 @@
  * Defines the structure for switchable themes in the extension
  */
 
-import type { ThemeContentConfig } from './content-config'
-
 export interface ThemeColors {
   // Background colors
   bg1: string
@@ -66,10 +64,6 @@ export interface Theme {
 
   // Custom CSS that gets injected
   customCSS?: string
-
-  // Content configuration for blocked pages (optional)
-  // If not provided, uses default content config
-  contentConfig?: ThemeContentConfig
 }
 
 /**

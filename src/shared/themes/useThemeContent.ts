@@ -3,17 +3,13 @@
  * Provides theme-aware motivational content for blocked pages
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 import type { Theme } from './types'
-import type { ThemeContentConfig, MotivationalContent } from './content-config'
-import { getContentConfigForTheme, getMotivationalContent } from './content-config'
 import { getCurrentTheme, applyTheme } from './index'
 
 interface UseThemeContentReturn {
   theme: Theme | null
-  contentConfig: ThemeContentConfig | null
-  content: MotivationalContent | null
   isLoading: boolean
 }
 
@@ -74,29 +70,8 @@ export function useThemeContent(): UseThemeContentReturn {
     }
   }, [])
 
-  // Get content config from theme or fall back to theme ID lookup
-  const contentConfig = useMemo(() => {
-    if (!theme) return null
-
-    // Prefer explicit content config from theme
-    if (theme.contentConfig) {
-      return theme.contentConfig
-    }
-
-    // Otherwise look up by theme ID
-    return getContentConfigForTheme(theme.metadata.id)
-  }, [theme])
-
-  // Generate motivational content based on config
-  const content = useMemo(() => {
-    if (!contentConfig) return null
-    return getMotivationalContent(contentConfig)
-  }, [contentConfig])
-
   return {
     theme,
-    contentConfig,
-    content,
     isLoading
   }
 }
